@@ -1,5 +1,2 @@
-//Prueba hecha por Brenda :D
-
-//Le cambio algo a este documento
-
-//Ya puedo verlo:D
+//Instrucciones para subir algo: guardarlo, commit y push :D
+//Listo, terminamos
