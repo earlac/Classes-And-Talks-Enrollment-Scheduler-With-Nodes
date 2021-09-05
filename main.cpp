@@ -8,16 +8,17 @@ Estudiantes: Earl Areck Alvarado, 2020
 
 using namespace std;
 
-struct administrador {//Doubled linked list
+struct administrador {
     string usuario;
     string contrasenna;
-    administrador *sigAdmin, *antAdmin;
+    administrador *sigAdmin;
 
     administrador(string usuario, string contrasenna){
         usuario = usuario;
         contrasenna = contrasenna;
         sigAdmin = NULL;
-        antAdmin = NULL;
     }
 } *ListaAdministradores;
+
+
 
