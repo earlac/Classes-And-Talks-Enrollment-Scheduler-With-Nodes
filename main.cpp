@@ -36,6 +36,7 @@ struct profesor{ //Double linked list
 
         sigProf= NULL;
         antProf= NULL;
+
         gruposProfAux= NULL;
     }
 
@@ -47,6 +48,9 @@ struct estudiante{//Simple linked list
 
     estudiante *sigEst;
     struct enlazarGrupo *gruposEstAux;//Links to list of groups the student is in. Uses the same struct as Profesor
+
+    //struct enlazarCharla *charla;
+    //struct evaluacionesEntregadas *; Hacer otro struct para entrega
 
     estudiante(string nNombreEst, int nCarnet){
         nombreEst = nNombreEst;
@@ -78,11 +82,11 @@ struct enlazarGrupo{//Simple linked list
     enlazarGrupo *sigEn;
     struct grupo *enlaceGrupo; //Links to to the list of groups the user is in. Used by Estudiante and Profesor
     
+
     enlazarGrupo(grupo *nEnlaceGrupo){
         sigEn= NULL;
         enlaceGrupo= nEnlaceGrupo;
     }
-    
 };
 
 struct semestre{ //Simple linked list 
@@ -90,6 +94,7 @@ struct semestre{ //Simple linked list
     int numSemestre;
     int anno;
     semestre *sigSem;
+    //enlace a charlas, sin enlace
 
     semestre(int nSemestre, int nAnno){
         nSemestre= nSemestre;
@@ -225,6 +230,7 @@ struct charla{//Simple linked list
     string nombreCharla;
     int fecha; //Format: dd/mm/yy
     int hora; //Militar: 1630 = 4p.m
+    //Duracion puede ser fija, evaluaciones tambien 
 
     charla *sig;
     struct asistente *asistentes; //Links to list of students who went 
@@ -237,7 +243,7 @@ struct charla{//Simple linked list
 
 }*listaCharlas;
 
-struct asistente{
+struct asistente{//Al reves, estudiante A charla
     struct estudiante *estudiante;
     //string nombre;
     //int carnet;
