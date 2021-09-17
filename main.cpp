@@ -9,6 +9,8 @@ Estudiantes: Earl Areck Alvarado,
 
 using namespace std;
 
+//-----------------------------------------------------------------------------------Estructuras
+
 struct administrador {//Simple linked list
     string usuario; //username
     string contrasenna;
@@ -49,8 +51,8 @@ struct estudiante{//Simple linked list
     estudiante *sigEst;
     struct enlazarGrupo *gruposEstAux;//Links to list of groups the student is in. Uses the same struct as Profesor
 
-    //struct enlazarCharla *charla;
-    //struct evaluacionesEntregadas *; Hacer otro struct para entrega
+    struct enlazarCharla *charla;
+    struct evaluacionesEntregadas *evaluacionEst; 
 
     estudiante(string nNombreEst, int nCarnet){
         nombreEst = nNombreEst;
@@ -94,7 +96,7 @@ struct semestre{ //Simple linked list
     int numSemestre;
     int anno;
     semestre *sigSem;
-    //enlace a charlas, sin enlace
+    struct enlazarCharla *sigCharla;
 
     semestre(int nSemestre, int nAnno){
         nSemestre= nSemestre;
@@ -123,47 +125,57 @@ struct curso{ //Circular linked list
     struct grupo *grupoCursando; //Links to a list of groups that're taking the class
 
     curso(string nNombre, string nCodigo){
-        nombre= nNombre;
-        codigo= nCodigo;
+        nombre = nNombre;
+        codigo = nCodigo;
 
-        grupoCursando=NULL;
-        sigCurso = NULL;
+        grupoCursando =  NULL;
+        sigCurso      =  NULL;
     }
 
 } *listaCursos;
 
+struct evaluacionesEntregadas{//Simple linked list
+    struct evaluacion *sigEvaluacion; //Links to the evaluations
+    evaluacionesEntregadas *sig;
+    
+    evaluacionesEntregadas(evaluacion *nSigEv){
+        sigEvaluacion   = nSigEv;
+        sig             = NULL;
+    }
+};
+
 struct evaluacion{//Simple linked list. Links to the different evaluations the group has 
     
-    struct tarea *sigTarea;
-    struct examen *sigExamen;
+    struct tarea    *sigTarea;
+    struct examen   *sigExamen;
     struct proyecto *sigProyecto;
-    struct gira *sigGira;
+    struct gira     *sigGira;
     
     evaluacion *sigEv;
 
     evaluacion(tarea *nSigTarea, examen *nSigExamen, proyecto *nSigProyecto, gira *nSigGira){
 
-        sigTarea= nSigTarea;
+        sigTarea=   nSigTarea;
         sigExamen = nSigExamen;
-        sigProyecto= nSigProyecto;
-        sigGira= nSigGira;
-        sigEv = NULL;
+        sigProyecto=nSigProyecto;
+        sigGira=    nSigGira;
+        sigEv =     NULL;
     }
 };
 
 struct tarea{//Simple linked list.
-    int fechaEntrega; //Format: dd/mm/yyyy
-    int hora; //Format: militar, ie. 1600 = 4p.m
-    string idActividad; //Format: Tarea##, ie. Tarea#3
-    bool entregado = false; //If the student did it or not. Default is false. 
+    int     fechaEntrega; //Format: dd/mm/yyyy
+    int     hora; //Format: militar, ie. 1600 = 4p.m
+    string  idActividad; //Format: Tarea##, ie. Tarea#3
+    bool    entregado = false; //If the student did it or not. Default is false. 
 
     tarea *sigTarea;
     
     tarea(int nFechaEntrega, string nIdActividad, int nHora, bool nEntregado){
-        fechaEntrega= nFechaEntrega;
-        hora = nHora;
-        idActividad= nIdActividad;
-        entregado= nEntregado;
+        fechaEntrega=   nFechaEntrega;
+        hora =          nHora;
+        idActividad=    nIdActividad;
+        entregado=      nEntregado;
         
         sigTarea= NULL;
 
@@ -226,6 +238,16 @@ struct gira{
     }
 }*listaGiras;
 
+struct enlaceCharla{
+    struct charla *sigCharla; //Links to the course itself
+    enlaceCharla *sig; //Orders the courses
+
+    enlaceCharla(struct charla *nSigCharla){
+        sigCharla= nSigCharla;
+        sig = NULL;
+    }
+};
+
 struct charla{//Simple linked list 
     string nombreCharla;
     int fecha; //Format: dd/mm/yy
@@ -243,14 +265,415 @@ struct charla{//Simple linked list
 
 }*listaCharlas;
 
-struct asistente{//Al reves, estudiante A charla
-    struct estudiante *estudiante;
-    //string nombre;
-    //int carnet;
-    asistente *sigAs;
+//-----------------------------------------------------------------------------------Methods
 
-    asistente(struct estudiante *nEstudiante){
-        estudiante = nEstudiante;
-        asistente *sigAs = NULL;
+//------------------Students' Methods---------------------------------
+estudiante* buscarEst(int carnetEst){
+    estudiante *temp = listaEstudiantes;
+    while(temp != NULL){
+        if (temp->carnet == carnetEst)
+            return temp;
+        temp = temp->sigEst;
     }
-};
+    return NULL;
+}
+
+void insertarEst(){
+    int carnetEst;
+    cout<< "Ingrese el carnet del estudiante por agregar:"<<endl;
+    cin>> carnetEst;
+
+    if((buscarEst(carnetEst)) != NULL)
+        cout<<"El carnet ya se encuentra registrado bajo otro estudiante"<<endl;
+    else
+    {
+        string nombreEst;
+        cout<< "Ingrese el nombre del estudiante por agregar: ";
+        cin>> nombreEst;   
+
+        estudiante*nEst = new estudiante(nombreEst, carnetEst);
+
+        if(listaEstudiantes == NULL){//Lista vacia
+            listaEstudiantes = nEst;
+            cout<<"Lista vacia";
+        }
+
+        else if(carnetEst < (listaEstudiantes->carnet)){//Inicio de lista
+            nEst->sigEst = listaEstudiantes;
+            cout<<"Inicio de lista";
+        }
+        else{
+            estudiante*temp = listaEstudiantes;
+
+            while(temp != NULL){
+                //En medio
+                if((((temp->carnet) < carnetEst) && (((temp->sigEst)->carnet) > carnetEst))){
+                    nEst->sigEst = temp->sigEst;
+                    temp->sigEst = nEst;
+                    cout<<"Medio";
+                }
+                //Final de la lista
+                if((temp->sigEst) == NULL){
+                    temp->sigEst = nEst;
+                    nEst->sigEst = NULL;
+                    cout<<"Final";
+                    
+                }
+                temp = temp->sigEst;
+        /*}
+        while(temp!=NULL){
+            if((temp->sigEst)->carnet > carnetEst){
+                nEst->sigEst= temp->sigEst;
+                temp-sigEst= nEst
+                
+            }
+        }
+        cout<<"\nProfesor insertado exitosamente"<<endl;
+        */
+            }
+        }
+            
+        cout<<"Estudiante ingresado exitosamente"<<endl;
+    }
+} 
+
+//1235
+//1,1 2,2, 3,3 5
+//1   2    3   5 
+
+//------------------Admin Methods---------------------------------
+
+administrador* buscarAdmin(string nombreA){
+    administrador* temp = listaAdministradores;
+    while(temp!= NULL){
+        if (temp->usuario == nombreA)
+            return temp;
+        temp = temp->sigAdmin;
+    }
+    return NULL;
+}
+
+void insertarAdmin(string nombreA, string contrasennaA){
+    
+    administrador *nA = new administrador(nombreA, contrasennaA);
+    nA->sigAdmin = listaAdministradores;
+    listaAdministradores = nA;     
+    cout<<"\nAdministrador insertado existosamente"<<endl;
+}
+
+void insertarAdminAux(){
+    string nombreA;
+    cout<<"Ingrese el nombre de usuario del nuevo administrador: ";
+    cin>>nombreA;
+    
+    if((buscarAdmin(nombreA)) != NULL)
+    {
+        cout<<"El usuario ya se encuentra registrado"<<endl;
+    }
+    else
+    {
+    string contrasennaA;
+    cout<<"Ingrese la contrasena del nuevo administrador: ";
+    cin>>contrasennaA;
+
+    insertarAdmin(nombreA, contrasennaA);
+    }
+}
+
+//------------------Teachers' Methods---------------------------------
+
+profesor* buscarProf(int cedulaP){
+    profesor *temp = listaProfesores;
+    while(temp != NULL){
+        if (temp->cedulaProf == cedulaP)
+            return temp;
+        temp = temp->sigProf;
+    }
+    return NULL;
+}
+
+void insertarProf(){
+    int cedulaP;
+    cout<< "Ingrese la cedula del profesor a ingresar:"<<endl;
+    cin>> cedulaP;
+
+    if((buscarProf(cedulaP)) != NULL){
+        cout<<"El profesor ya se encuentra registrado"<<endl;
+    }
+    else
+    {
+        string nombreP;
+        cout<< "Ingrese el nombre del profesor a ingresar: ";
+        cin>> nombreP;   
+
+        profesor*nP = new profesor(nombreP, cedulaP);
+
+        nP->sigProf = listaProfesores;
+
+        if(listaProfesores != NULL)
+            listaProfesores->antProf = nP;
+        listaProfesores = nP;
+        cout<<"\nProfesor insertado exitosamente"<<endl;
+    } 
+}
+
+void modificarProf(){
+    cout<< "Ingrese la cedula del profesor a modificar: "<<endl;
+    int cedulaP;
+    cin>> cedulaP;
+
+    profesor *temp = buscarProf(cedulaP);
+    
+    if(temp == NULL){
+        cout<<"\nEl profesor no existe, no se puede modificar"<<endl;
+    }
+    else{
+        string nomProf;
+        cout<<"Ingrese el nuevo nombre del profesor: "<<endl;
+        cin>>nomProf;
+        temp->nombreProf = nomProf;
+        cout<<"Nombre del profesor modificado existosamente"<<endl;
+    }
+}
+
+void eliminarProf(){
+    cout<< "Ingrese la cedula del profesor a eliminar: "<<endl;
+    int cedProf;
+    cin>>cedProf;
+    
+    profesor *temp = buscarProf(cedProf);
+
+    if(temp == NULL){
+        cout<<"El profesor no existe, no se puede borrar"<<endl;
+    }
+    else{
+        if(temp == listaProfesores){
+            if(temp->sigProf == NULL)
+                listaProfesores = NULL;
+            else{
+                listaProfesores = listaProfesores->sigProf;
+                listaProfesores->antProf = NULL;
+            }
+        }
+        else{
+            if(temp->sigProf == NULL)
+                temp->antProf->sigProf = NULL;
+            else{
+                temp->antProf->sigProf = temp->sigProf;
+                temp->sigProf->antProf = temp->antProf;
+            }
+        }
+        cout<<"Profesor eliminado exitosamente"<<endl;
+    }
+}
+
+
+//------------------Printing Methods---------------------------------
+
+void imprimirProfesores(){
+    if(listaProfesores == NULL)
+        cout<<"\nNo hay profesores en la lista"<<endl;
+    else{
+        profesor *temp = listaProfesores;
+        cout<<"Lista de profesores: "<<endl;
+        while(temp->sigProf != NULL){
+            cout<<"Profesor: "<<temp->nombreProf<<", Cedula: " <<temp->cedulaProf<<endl;
+            temp = temp->sigProf;
+        }
+        cout<<"Profesor: "<<temp->nombreProf<<", Cedula: " <<temp->cedulaProf<<endl;    
+    }
+}
+
+void imprimirAdmins(){
+    if(listaAdministradores == NULL)
+        cout<<"\nNo hay administradores en la lista"<<endl;
+    else{
+        administrador *temp = listaAdministradores;
+        cout<<"Lista de administradores: ";
+        while(temp != NULL){
+            cout<<temp->usuario<<", ";
+            temp = temp->sigAdmin;
+        }
+        cout<<endl;
+    }
+}
+
+void imprimirEstudiantes(){
+    estudiante *temp = listaEstudiantes;
+    cout<<"Lista de estudiantes: "<<endl;
+    while(temp != NULL){
+        cout<<"Estudiante: "<<temp->nombreEst<<", Carnet: "<<temp->carnet<<endl;
+        temp = temp->sigEst;
+    }
+
+}
+
+
+//------------------Menus---------------------------------
+
+void menuPrincipal();
+void menuAdmin();
+
+void menuAdminEst(){
+    cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
+    
+    cout<<"a- Insertar estudiante\nb- Modificar estudiante\nc- Borrar estudiante\n\n1- Volver al menu de administrador\n2- Volver al menu principal\n\n\nOpcion: ";
+    string opcion;
+    cin>> opcion;
+
+    if(opcion == "a"){
+        insertarEst();
+        menuAdminEst();
+    }
+    else if(opcion == "b")
+        cout<<"modificarEst()";
+    else if(opcion == "c")
+        cout<<"borrarEst()";
+    else if(opcion == "z"){
+        imprimirEstudiantes();
+        menuAdminEst();
+    }
+    else if(opcion == "1")
+        menuAdmin();
+    else if(opcion == "2")
+        menuPrincipal();
+    else{
+        cout<<"Opcion Invalida"<<endl;
+        menuAdminEst();
+    }
+}
+
+void menuAdminProf(){
+    cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
+    cout<<"a- Insertar profesor\nb- Modificar profesor\nc- Borrar profesor\n\n1-Volver al menu de administrador \n2-Volver al menu principal \nOpcion: ";
+    string opcionMenuAdminProf;
+    cin>> opcionMenuAdminProf;
+
+    if (opcionMenuAdminProf== "a"){
+        //cout<< "Insertar"<<endl;
+        insertarProf();
+    }else if(opcionMenuAdminProf=="b"){
+        //cout<< "Modificar"<<endl;
+        modificarProf();
+        
+    }else if(opcionMenuAdminProf=="c"){
+        eliminarProf();
+        //cout<< "Borrar"<<endl;
+
+    }else if(opcionMenuAdminProf=="1"){
+        //cout<<"Salir"<<endl;
+        menuAdmin();
+    }
+    else if(opcionMenuAdminProf=="2"){
+        menuPrincipal();
+    }
+    else if(opcionMenuAdminProf=="z"){
+        imprimirProfesores();
+
+    }else{
+        cout<< "Ingrese una opcion valida"<<endl;
+        menuAdminProf();
+    }
+    
+    menuAdminProf();
+}
+void menuAdmin(){
+    cout<<"\nEscoja e ingrese el caracter del objeto que desea modificar:"<<endl;
+    cout<<"a- Insertar Administrador\nb- Profesores\nc- Estudiantes\nd- Semestres\ne- Cursos\nf- Grupos\n\n0- Volver al menu principal\nOpcion: ";
+    
+    string opcionMenuAdmin;
+    
+    cin>> opcionMenuAdmin;
+    
+    if(opcionMenuAdmin =="a"){
+        insertarAdminAux();
+        menuAdmin();
+    }
+    else if(opcionMenuAdmin == "b"){
+        //cout<< "Profesores"<<endl;
+        menuAdminProf();
+    }
+    else if(opcionMenuAdmin == "c"){
+        //cout<< "Estudiantes"<<endl;
+        menuAdminEst();
+    }
+    else if(opcionMenuAdmin == "d"){
+        cout<< "Semestres"<<endl;
+    }
+    else if(opcionMenuAdmin == "e"){
+        cout<< "Cursos"<<endl;
+    }
+    else if(opcionMenuAdmin == "f"){
+        cout<< "Grupos"<<endl;
+    }
+    else if(opcionMenuAdmin == "0"){
+        menuPrincipal();
+    }else{
+        cout<<"Ingrese una opcion valida."<<endl;
+        menuAdmin();
+    }
+}
+
+void ingresarAdmin(){
+    string nombreA;
+    string contrasennaA;
+    string opcion;
+    administrador* temp = listaAdministradores;
+    
+    cout<<"Nombre de usuario: ";
+    cin>>nombreA;
+
+    if ((buscarAdmin(nombreA)) == NULL){
+        cout<<"El usuario ingresado no existe. Si desea volver al menu principal digite 1"<<endl;
+        cin>>opcion;
+        if(opcion == "1"){
+            menuPrincipal();
+        }
+        else{
+            ingresarAdmin();
+        }
+    }
+    else{
+        cout<<"Contrasena: ";
+        cin>>contrasennaA;
+    
+        temp = (buscarAdmin(nombreA));
+        if ((temp->contrasenna != contrasennaA)){
+            cout<<"Usuario o contrasena incorrecta"<<endl;
+            menuPrincipal();
+        }else{
+            menuAdmin();
+        }
+    }
+}
+
+void menuPrincipal(){
+    /*
+    F: Displays the main menu for user to choose between Administrator or User.
+    I: Number of choice.
+    O: Respective function in the system.
+    */
+    cout<<"Bienvenido al sistema de Gestion de Actividades Curriculares"<<endl;
+    cout<<"Ingrese el numero de la seccion deseada: \n 1- Administrador\n 2- Usuario \nNumero:";
+    int opcion;
+    cin>>opcion;
+    if(opcion==1){
+        //cout<<"Administrador: "<<endl;
+        ingresarAdmin();
+    }else if(opcion==2){
+        cout<<"Usuario: "<<endl;
+    }else{
+        cout<<"Ingrese una opcion valida.";
+        menuPrincipal();
+    }
+}
+
+int main(){
+    insertarAdmin("Maria", "123");
+    insertarAdmin("Juan", "4567");
+    insertarAdmin("Carlos", "930");
+    imprimirAdmins();
+    menuPrincipal();
+
+    return 0;
+}
