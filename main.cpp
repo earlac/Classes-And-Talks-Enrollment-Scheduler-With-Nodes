@@ -273,6 +273,7 @@ estudiante* buscarEst(int carnetEst){
     estudiante *temp = listaEstudiantes;
     while(temp != NULL){
         if (temp->carnet == carnetEst)
+            cout<< temp->carnet<<endl;
             cout<<"u"<<endl;
             return temp;
         temp = temp->sigEst;
@@ -348,9 +349,7 @@ void insertarEst(){
     cout<< "Ingrese el carnet del estudiante por agregar:"<<endl;
     cin>> carnetEst;
     cout<<"i"<<endl;
-    if((buscarEst(carnetEst)) != NULL)
-        cout<<"El carnet ya se encuentra registrado bajo otro estudiante"<<endl;
-    else{
+    
         cout<<"j"<<endl;
         string nombreEst;
         cout<< "Ingrese el nombre del estudiante por agregar: ";
@@ -364,6 +363,11 @@ void insertarEst(){
             cout<<"Lista vacia";
             menuAdminEst();
         }
+        estudiante*existe= buscarEst(carnetEst);
+        cout<<existe->carnet<<endl;
+        if(existe != NULL){
+            cout<<"El carnet ya se encuentra registrado bajo otro estudiante"<<endl;
+        }
         //Inicio de la lista
         cout<<"Valorando primer elemento"<<endl;
         estudiante*primero=listaEstudiantes;
@@ -373,6 +377,7 @@ void insertarEst(){
             nEst->sigEst=listaEstudiantes;
             listaEstudiantes= nEst;
             cout<<"Primer elemento insertado"<<endl;
+            menuAdminEst();
         }
 
         //Final de la lista
@@ -380,6 +385,7 @@ void insertarEst(){
         estudiante*tempF= listaEstudiantes;
         cout<<"c"<<endl;
         while(tempF->sigEst !=NULL){
+            cout<<"w"<<endl;
             tempF= tempF->sigEst;
         }
         cout<<"a"<<endl;
@@ -406,7 +412,7 @@ void insertarEst(){
             temp= temp->sigEst;
         }
         menuAdminEst();
-    }
+    
     
 }
 
@@ -575,6 +581,7 @@ void imprimirEstudiantes(){
     estudiante *temp = listaEstudiantes;
     cout<<"Lista de estudiantes: "<<endl;
     while(temp != NULL){
+        cout<<"pasando al siguiente"<<endl;
         cout<<"Estudiante: "<<temp->nombreEst<<", Carnet: "<<temp->carnet<<endl;
         temp = temp->sigEst;
     }
