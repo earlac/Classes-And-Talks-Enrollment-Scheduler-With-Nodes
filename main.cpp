@@ -412,7 +412,7 @@ void insertarEst(){
     
 }
 
-void modificarEstudiante(){
+void modificarEst(){
     
     int carnet;
     cout<<"\nIngrese el carnet del estudiante a modificar: ";
@@ -433,7 +433,7 @@ void modificarEstudiante(){
     }
 }
 
-void eliminarEstudiante(){
+void eliminarEst(){
 
     int carnetEst;
     cout<<"\nIngrese el carnet del estudiante a eliminar: ";
@@ -658,10 +658,14 @@ void menuAdminEst(){
         insertarEst();
         menuAdminEst();
     }
-    else if(opcion == "b")
-        cout<<"modificarEst()";
-    else if(opcion == "c")
-        cout<<"borrarEst()";
+    else if(opcion == "b"){
+        modificarEst();
+        menuAdminEst();
+    }
+    else if(opcion == "c"){
+        eliminarEst();
+        menuAdminEst();
+    }
     else if(opcion == "z"){
         imprimirEstudiantes();
         menuAdminEst();
