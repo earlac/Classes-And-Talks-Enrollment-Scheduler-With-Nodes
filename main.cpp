@@ -272,23 +272,28 @@ estudiante* buscarEst(int carnetEst){
     cout<<"t"<<endl;
     estudiante *temp = listaEstudiantes;
     while(temp != NULL){
-        if (temp->carnet == carnetEst)
+        if (temp->carnet == carnetEst){
             cout<< temp->carnet<<endl;
             cout<<"u"<<endl;
             return temp;
+        }
         temp = temp->sigEst;
     }
     cout<<"v"<<endl;
     return NULL;
 }
+void menuAdminEst();
 
-/*void insertarEst(){
+/*
+void insertarEst(){
     int carnetEst;
     cout<< "Ingrese el carnet del estudiante por agregar:"<<endl;
     cin>> carnetEst;
 
-    if((buscarEst(carnetEst)) != NULL)
+    if((buscarEst(carnetEst)) != NULL){
         cout<<"El carnet ya se encuentra registrado bajo otro estudiante"<<endl;
+        return;
+    }
     else
     {
         string nombreEst;
@@ -317,32 +322,20 @@ estudiante* buscarEst(int carnetEst){
                     cout<<"Medio";
                 }
                 //Final de la lista
-                if((temp->sigEst) == NULL){
+                else if((temp->sigEst) == NULL){
                     temp->sigEst = nEst;
                     nEst->sigEst = NULL;
                     cout<<"Final";
-                    
                 }
                 temp = temp->sigEst;
-        }
-        //while(temp!=NULL){
-            if((temp->sigEst)->carnet > carnetEst){
-                nEst->sigEst= temp->sigEst;
-                temp-sigEst= nEst
-                
             }
-        }
-        cout<<"\nProfesor insertado exitosamente"<<endl;
-        
-            }
-        }
-            
+        }            
         cout<<"Estudiante ingresado exitosamente"<<endl;
     }
 } 
 */
 
-void menuAdminEst();
+
 
 void insertarEst(){
     int carnetEst;
@@ -355,6 +348,13 @@ void insertarEst(){
         cout<< "Ingrese el nombre del estudiante por agregar: ";
         cin>> nombreEst;   
 
+        estudiante*existe= buscarEst(carnetEst);
+        //cout<<existe->carnet<<endl;
+        if(existe != NULL){
+            cout<<"El carnet ya se encuentra registrado bajo otro estudiante"<<endl;
+            return;
+        }
+        cout<<"Exitoso, no existe el estudiante"<<endl;
         estudiante*nEst= new estudiante(nombreEst, carnetEst);
         //Lista vacia
         if(listaEstudiantes==NULL){
@@ -363,11 +363,7 @@ void insertarEst(){
             cout<<"Lista vacia";
             menuAdminEst();
         }
-        estudiante*existe= buscarEst(carnetEst);
-        cout<<existe->carnet<<endl;
-        if(existe != NULL){
-            cout<<"El carnet ya se encuentra registrado bajo otro estudiante"<<endl;
-        }
+        
         //Inicio de la lista
         cout<<"Valorando primer elemento"<<endl;
         estudiante*primero=listaEstudiantes;
@@ -414,6 +410,63 @@ void insertarEst(){
         menuAdminEst();
     
     
+}
+
+void modificarEstudiante(){
+    
+    int carnet;
+    cout<<"\nIngrese el carnet del estudiante a modificar: ";
+    cin>>carnet;
+    estudiante*buscado = buscarEst(carnet);
+    if(buscado == NULL){
+        cout<<"\nEstudiante no encontrado"<<endl;
+        return;
+    }
+    else{
+        string nuevoNom;
+        cout<<"\nIngrese el nuevo nombre del estudiante: ";
+        cin>>nuevoNom;
+
+        buscado->nombreEst = nuevoNom;
+        cout<<"\nNombre de estudiante modificado con exito"<<endl;
+        return;
+    }
+}
+
+void eliminarEstudiante(){
+
+    int carnetEst;
+    cout<<"\nIngrese el carnet del estudiante a eliminar: ";
+    cin>>carnetEst;
+    if(listaEstudiantes == NULL){
+        cout<<"Lista Vacia"<<endl;
+        return;
+    }
+    else{
+        estudiante*buscar = buscarEst(carnetEst);
+        if(buscar == NULL){
+            cout<<"\nEstudiante no encontrado"<<endl;
+            return;
+        }
+        else{
+            if(listaEstudiantes->carnet == carnetEst){
+                listaEstudiantes=listaEstudiantes->sigEst;
+                return;
+            }
+            else{
+                estudiante*temp = listaEstudiantes;
+                estudiante*tempAnt;
+                while(temp != NULL){
+                    if(temp->carnet == carnetEst){
+                        tempAnt->sigEst=temp->sigEst;
+                        return;
+                    }
+                    tempAnt=temp;
+                    temp=temp->sigEst;
+                }
+            }
+        }
+    }
 }
 
 //1235
@@ -525,7 +578,7 @@ void eliminarProf(){
     if(temp == NULL){
         cout<<"El profesor no existe, no se puede borrar"<<endl;
     }
-    else{
+    else{ //Eliminar inicio
         if(temp == listaProfesores){
             if(temp->sigProf == NULL)
                 listaProfesores = NULL;
@@ -534,10 +587,10 @@ void eliminarProf(){
                 listaProfesores->antProf = NULL;
             }
         }
-        else{
-            if(temp->sigProf == NULL)
+        else{//Recorrer lista
+            if(temp->sigProf == NULL)//Ultimo
                 temp->antProf->sigProf = NULL;
-            else{
+            else{//En medio
                 temp->antProf->sigProf = temp->sigProf;
                 temp->sigProf->antProf = temp->antProf;
             }
