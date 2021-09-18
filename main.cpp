@@ -269,17 +269,17 @@ struct charla{//Simple linked list
 
 //------------------Students' Methods---------------------------------
 estudiante* buscarEst(int carnetEst){
-    cout<<"t"<<endl;
+    //cout<<"t"<<endl;
     estudiante *temp = listaEstudiantes;
     while(temp != NULL){
         if (temp->carnet == carnetEst){
-            cout<< temp->carnet<<endl;
-            cout<<"u"<<endl;
+            //cout<< temp->carnet<<endl;
+            //cout<<"u"<<endl;
             return temp;
         }
         temp = temp->sigEst;
     }
-    cout<<"v"<<endl;
+    //cout<<"v"<<endl;
     return NULL;
 }
 void menuAdminEst();
@@ -341,9 +341,9 @@ void insertarEst(){
     int carnetEst;
     cout<< "Ingrese el carnet del estudiante por agregar:"<<endl;
     cin>> carnetEst;
-    cout<<"i"<<endl;
+    //cout<<"i"<<endl;
     
-        cout<<"j"<<endl;
+        //cout<<"j"<<endl;
         string nombreEst;
         cout<< "Ingrese el nombre del estudiante por agregar: ";
         cin>> nombreEst;   
@@ -354,62 +354,60 @@ void insertarEst(){
             cout<<"El carnet ya se encuentra registrado bajo otro estudiante"<<endl;
             return;
         }
-        cout<<"Exitoso, no existe el estudiante"<<endl;
+        //cout<<"Exitoso, no existe el estudiante"<<endl;
         estudiante*nEst= new estudiante(nombreEst, carnetEst);
         //Lista vacia
         if(listaEstudiantes==NULL){
             listaEstudiantes= nEst;
             nEst->sigEst=NULL;
-            cout<<"Lista vacia";
+            //cout<<"Lista vacia";
             menuAdminEst();
         }
         
         //Inicio de la lista
-        cout<<"Valorando primer elemento"<<endl;
+        //cout<<"Valorando primer elemento"<<endl;
         estudiante*primero=listaEstudiantes;
-        cout<<"b"<<endl;
+        //cout<<"b"<<endl;
         if(carnetEst< primero->carnet){
-            cout<<"e"<<endl;
+            //cout<<"e"<<endl;
             nEst->sigEst=listaEstudiantes;
             listaEstudiantes= nEst;
-            cout<<"Primer elemento insertado"<<endl;
+            //cout<<"Primer elemento insertado"<<endl;
             menuAdminEst();
         }
 
         //Final de la lista
-        cout<<"Valorando ultimo elemento"<<endl;
+        //cout<<"Valorando ultimo elemento"<<endl;
         estudiante*tempF= listaEstudiantes;
-        cout<<"c"<<endl;
+        //cout<<"c"<<endl;
         while(tempF->sigEst !=NULL){
-            cout<<"w"<<endl;
+            //cout<<"w"<<endl;
             tempF= tempF->sigEst;
         }
-        cout<<"a"<<endl;
+        //cout<<"a"<<endl;
         if(carnetEst> tempF->carnet){
-            cout<<"d"<<endl;
+            //cout<<"d"<<endl;
             tempF->sigEst= nEst;
             nEst->sigEst= NULL;
-            cout<<"ultimo elemento"<<endl;
+            //cout<<"ultimo elemento"<<endl;
         }
         
         //Media lista
-        cout<<"Valorando in elemento"<<endl;
+        //cout<<"Valorando in elemento"<<endl;
         estudiante*temp= listaEstudiantes;
         while(temp->sigEst!=NULL){
-            cout<<"y"<<endl;
+            //cout<<"y"<<endl;
             if((temp->sigEst)->carnet > carnetEst){
-                cout<<"z"<<endl;
+                //cout<<"z"<<endl;
                 nEst->sigEst= temp->sigEst;
                 temp->sigEst= nEst;
                 
-                cout<<"Elemento in lista"<<endl;
+                //cout<<"Elemento in lista"<<endl;
                 menuAdminEst();
             }
             temp= temp->sigEst;
         }
-        menuAdminEst();
-    
-    
+        cout<<"Estudiante agregado exitosamente"<<endl;
 }
 
 void modificarEst(){
@@ -469,9 +467,6 @@ void eliminarEst(){
     }
 }
 
-//1235
-//1,1 2,2, 3,3 5
-//1   2    3   5 
 
 //------------------Admin Methods---------------------------------
 
