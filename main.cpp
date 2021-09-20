@@ -5,6 +5,7 @@ Profesora: Lorena Valerio
 Estudiantes: Earl Areck Alvarado,       
              Brenda Badilla Rodriguez,  
 */
+
 #include <iostream>
 
 using namespace std;
@@ -84,7 +85,6 @@ struct enlazarGrupo{//Simple linked list
     enlazarGrupo *sigEn;
     struct grupo *enlaceGrupo; //Links to to the list of groups the user is in. Used by Estudiante and Profesor
     
-
     enlazarGrupo(grupo *nEnlaceGrupo){
         sigEn= NULL;
         enlaceGrupo= nEnlaceGrupo;
@@ -96,18 +96,19 @@ struct semestre{ //Simple linked list
     int numSemestre;
     int anno;
     int codigo;
+    int presupuesto;
     semestre *sigSem;
     semestre *antSem;
     struct enlazarCharla *sigCharla;
 
-    semestre(int nSemestre, int nAnno, int nCodigo){
-        numSemestre= nSemestre;
-        anno= nAnno;
-        codigo= nCodigo;
-        
-        listaCursos= NULL;
+    semestre(int nSemestre, int nAnno, int nCodigo, int nPresupuesto){
+        numSemestre = nSemestre;
+        anno = nAnno;
+        codigo = nCodigo;
+        presupuesto = nPresupuesto;
+        listaCursos = NULL;
         sigSem = NULL;
-        antSem= NULL;
+        antSem = NULL;
     }
 } *listaSemestres;
 
@@ -273,6 +274,7 @@ struct charla{//Simple linked list
 
 //------------------Periods' Methods---------------------------------
 void menuAdminSemestre();
+
 semestre* buscarSem(int nCodigo){
     semestre *temp = listaSemestres;
     while(temp != NULL){
@@ -293,11 +295,15 @@ void insertarSemestre(){
     int semS;
     cout<<"Ingrese el semestre del año: "<<endl;
     cin>>semS;
- 
+    
+    int presupuestoS;
+    cout<<"Ingrese el presupuesto del semestre: "<<endl;
+    cin>>presupuestoS;
+
     int codigoS;
     codigoS= 10*annoS+semS;
 
-    semestre *nS = new semestre(semS, annoS, codigoS);
+    semestre *nS = new semestre(semS, annoS, codigoS, presupuestoS);
 
     if(buscarSem(codigoS)!=NULL){
         cout<< "Ya existe un semestre con estas directrices."<<endl;
@@ -357,84 +363,6 @@ void insertarSemestre(){
     menuAdminSemestre();
 }    
 
-void insertarSemestreAutom(semestre*nS){
-    cout<<"Empezando insercion automatica."<<endl;
-    int annoS= nS->anno;
-    int semS= nS->numSemestre;
-
-    int codigoS;
-    codigoS= 10*annoS+semS;
-
-
-    //if list is empty
-    if(listaSemestres == NULL){
-        cout<<"Lista vacia"<<endl;
-        listaSemestres=nS;
-        nS->sigSem=NULL;
-        nS->antSem=NULL;
-        cout<<"Semestre modificado exitosamente."<<endl;
-        menuAdminSemestre();
-    }
-    //Item goes first
-    semestre *tempA= listaSemestres;
-    if(tempA-> codigo> codigoS){
-        cout<<"Primero"<< endl;
-        nS->antSem= NULL;
-        nS->sigSem= tempA;
-        tempA-> antSem= nS;
-        listaSemestres=nS;
-        cout<<"Semestre modificado exitosamente."<<endl;
-        menuAdminSemestre();
-    }
-    //Item goes last
-    semestre *tempB= listaSemestres;
-    while(tempB->sigSem!= NULL){
-        tempB= tempB-> sigSem;
-    }
-    if(tempB->codigo<codigoS){
-        cout<<"Ultimo"<< endl;
-        tempB->sigSem= nS;
-        nS->antSem= tempB;
-        nS-> sigSem= NULL;
-        cout<<"Semestre modificado exitosamente."<<endl;
-        menuAdminSemestre();
-    }
-    //Item goes in between
-    semestre *tempC= listaSemestres;
-    while(tempC->sigSem!= NULL){
-        if(tempC->codigo>codigoS){
-            cout<<"Centro"<< endl;
-            (tempC->antSem)->sigSem=nS;
-
-            nS-> antSem= tempC-> antSem;
-            nS-> sigSem= tempC;
-
-            tempC->antSem= nS;
-            cout<<"Semestre modificado exitosamente."<<endl;
-            menuAdminSemestre();
-        }
-        tempC= tempC->sigSem;
-    }
-    
-    cout<<"El semestre ya se encuentra previamente registrado"<<endl;
-    menuAdminSemestre();
-}    
-/*
-void eliminarSemestreAutom(int semS, int annoS){
-    cout<<"Iniciando eliminar"<<endl;
-    int codigoS;
-    codigoS= 10*annoS+semS;
-
-    semestre*temp= listaSemestres;
-    while(temp->codigo!= codigoS){
-        temp= temp->sigSem;
-    }
-
-    (temp->antSem)->sigSem= temp->sigSem;
-    (temp->sigSem)->antSem= temp->antSem;
-    cout<<"eliminado"<<endl;
-}
-*/
 void modificarSemestre(){
     int annoS;
     cout<<"Ingrese el año del semestre: "<<endl;
@@ -443,70 +371,20 @@ void modificarSemestre(){
     int semS;
     cout<<"Ingrese el semestre del año: "<<endl;
     cin>>semS;
- 
+
     int codigoS;
     codigoS= 10*annoS+semS;
 
-    semestre *nS = new semestre(semS, annoS, codigoS);
-
-    //Check if period doesn't exist
-    if(buscarSem(codigoS)==NULL){
-        cout<< "No existe el semestre indicado, por favor primero ingréselo antes de intentar modificarlo."<<endl;
-        menuAdminSemestre();
-    }
-    //if does...
-    int annoSCamb;
-    cout<<"Ingrese el nuevo año del semestre: "<<endl;
-    cin>>annoSCamb;
-
-    int semSCamb;
-    cout<<"Ingrese el nuevo periodo: "<<endl;
-    cin>>semSCamb;
- 
-    int codigoSCamb;
-    codigoSCamb= 10*annoSCamb+semSCamb;
-
-    if(buscarSem(codigoSCamb)!=NULL){
-        cout<< "Ya existe un semestre registrado con estos datos."<<endl;
-        menuAdminSemestre();
-    }else{
-        semestre*vS= buscarSem(codigoS);
-        cout<<"Eliminando de la lista."<<endl;
-        semestre*tempA= listaSemestres;
-        if(tempA->codigo==codigoSCamb){
-            cout<<"Primer elemento."<<endl;
-            tempA->sigSem= listaSemestres;
-            listaSemestres->antSem= NULL;
-
-            cout<<"A Asignando nuevas variables."<<endl;
-            vS->anno= annoSCamb;
-            vS->numSemestre= semSCamb;
-            vS->codigo= codigoSCamb;
-            insertarSemestreAutom(vS);
-        
-        semestre*tempB=listaSemestres;
-        int i=0;
-        while(tempB->sigSem!=NULL){
-            i+=1;
-            tempB= tempB->sigSem;
-        }
-        cout<<"Contador: "<< i << endl;
-        if(i==1){
-            listaSemestres= NULL;
-
-            cout<<"B Asignando nuevas variables."<<endl;
-            vS->anno= annoSCamb;
-            vS->numSemestre= semSCamb;
-            vS->codigo= codigoSCamb;
-            insertarSemestreAutom(vS);
-        }
-
-        
-    }
-    }
-
+    semestre*nSem= buscarSem(codigoS);
     
-    
+    int nPresupuestoS;
+    cout<<"Ingrese el nuevo presupuesto del semestre: "<<endl;
+    cin>>nPresupuestoS;
+
+    nSem->presupuesto= nPresupuestoS;
+    cout<<"Presupuesto modificado correctamente."<<endl;
+
+    menuAdminSemestre();
 }
 
 //------------------Courses' Methods---------------------------------
@@ -595,6 +473,7 @@ estudiante* buscarEst(int carnetEst){
     //cout<<"v"<<endl;
     return NULL;
 }
+
 void menuAdminEst();
 
 /*
