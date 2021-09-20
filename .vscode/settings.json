@@ -2,6 +2,7 @@
     "files.associations": {
         "*.asm": "asm-collection",
         "iosfwd": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "ostream": "cpp"
     }
 }

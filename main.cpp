@@ -66,12 +66,21 @@ struct estudiante{//Simple linked list
 
 struct grupo{//Simple linked list
     grupo *sigGrupo;
-    int numGrupo;    
+    // Al usuario se le pide el curso(abv+codigoNum) y el grupo(numGrupo)
+    //a partir de ellos se crea idCurso
+    int numGrupo;      //51 
+    string abreviatura;//IC
+    int codigoNum;     //3101
+    int idCurso;       //310151
     struct curso *cursoActual; //Links to the class the group is in
     struct evaluaciones *evaluacionesEst; //Links to the evaluations the group has
     
-    grupo(int nNumGrupo){
-        numGrupo= nNumGrupo;
+    grupo(int nNumGrupo, string nAbreviatura, int nCodigoNum){
+        numGrupo = nNumGrupo;
+        abreviatura = nAbreviatura;
+        codigoNum = nCodigoNum;
+        
+        
 
         cursoActual = NULL;
         evaluacionesEst = NULL;
@@ -95,7 +104,7 @@ struct semestre{ //Simple linked list
     struct curso *listaCursos; //Links to the list of courses given in that said semester
     int numSemestre;
     int anno;
-    int codigo;
+    int abreviatura;
     int presupuesto;
     semestre *sigSem;
     semestre *antSem;
@@ -104,7 +113,7 @@ struct semestre{ //Simple linked list
     semestre(int nSemestre, int nAnno, int nCodigo, int nPresupuesto){
         numSemestre = nSemestre;
         anno = nAnno;
-        codigo = nCodigo;
+        abreviatura = nCodigo;
         presupuesto = nPresupuesto;
         listaCursos = NULL;
         sigSem = NULL;
@@ -123,15 +132,17 @@ struct enlaceCurso{//Simple linked list
 };
 
 struct curso{ //Circular linked list 
-    string nombre;
-    string codigo;
+    string nombre;      //Arquitectura de Computadores
+    string abreviatura; //IC
+    int codigoNum;      //3101
     
     curso *sigCurso;
     struct grupo *grupoCursando; //Links to a list of groups that're taking the class
 
-    curso(string nNombre, string nCodigo){
+    curso(string nNombre, string nAbv, int nCodigo){
         nombre = nNombre;
-        codigo = nCodigo;
+        abreviatura = nAbv;
+        codigoNum = nCodigo;
 
         grupoCursando =  NULL;
         sigCurso      =  NULL;
@@ -272,13 +283,43 @@ struct charla{//Simple linked list
 
 //-----------------------------------------------------------------------------------Methods
 
+//------------------Group's Methods----------------------------------
+
+grupo* buscarGrupo(int nGrupo){
+    grupo *temp = listaGrupos;
+    while(temp != NULL){
+        if(temp->codigoNum == nGrupo){
+            return temp;
+        }
+        temp = temp->sigGrupo;
+    }
+    return NULL;
+}
+
+void insertarGrupo(){
+    int nGrupo;
+    string 
+    cout<<"Ingrese el codigo del grupo: ";
+    cin>>nGrupo;
+
+    grupo*buscar = buscarGrupo(nGrupo);
+    if(buscar != NULL){
+        cout<<"Grupo ya existente"<<endl;
+    }
+    else
+    {
+
+
+    }
+}
+
 //------------------Periods' Methods---------------------------------
 void menuAdminSemestre();
 
 semestre* buscarSem(int nCodigo){
     semestre *temp = listaSemestres;
     while(temp != NULL){
-        if(temp->codigo==nCodigo){
+        if(temp->abreviatura==nCodigo){
             return temp;
         }
         temp= temp->sigSem;
@@ -320,7 +361,7 @@ void insertarSemestre(){
     }
     //Item goes first
     semestre *tempA= listaSemestres;
-    if(tempA-> codigo> codigoS){
+    if(tempA-> abreviatura> codigoS){
         cout<<"Primero"<< endl;
         nS->antSem= NULL;
         nS->sigSem= tempA;
@@ -334,7 +375,7 @@ void insertarSemestre(){
     while(tempB->sigSem!= NULL){
         tempB= tempB-> sigSem;
     }
-    if(tempB->codigo<codigoS){
+    if(tempB->abreviatura<codigoS){
         cout<<"Ultimo"<< endl;
         tempB->sigSem= nS;
         nS->antSem= tempB;
@@ -345,7 +386,7 @@ void insertarSemestre(){
     //Item goes in between
     semestre *tempC= listaSemestres;
     while(tempC->sigSem!= NULL){
-        if(tempC->codigo>codigoS){
+        if(tempC->abreviatura>codigoS){
             cout<<"Centro"<< endl;
             (tempC->antSem)->sigSem=nS;
 
@@ -391,12 +432,15 @@ void modificarSemestre(){
 
 void insertarCurso(){
     string nombreC;
-    string codigoC;
-    cout<<"Ingrese el nombre del curso: "<<endl;
+    string abvC;//Abreviatura Curso 
+    int codigoNumC;
+    cout<<"Ingrese el nombre del curso: ";
     cin>>nombreC;
-    cout<<"Ingrese el codigo del curso: "<<endl;
-    cin>>codigoC;
-    curso *nC = new curso(nombreC, codigoC);
+    cout<<"Ingrese la abreviatura del curso: ";
+    cin>>abvC;
+    cout<<"Ingrese el codigo del curso: ";
+    cin>>codigoNumC;
+    curso *nC = new curso(nombreC, abvC, codigoNumC);
     if(listaCursos == NULL){
         listaCursos=nC;
         nC->sigCurso=nC;
@@ -408,21 +452,24 @@ void insertarCurso(){
             temp = temp->sigCurso;
         temp->sigCurso = nC;
     }
-
 }
 
 void modificarCurso(){
-    string codigoC;
+    int codigoC;
     string nuevoNom;
-    cout<<"Ingrese el codigo del curso: "<<endl;
+    string abvC;//Abreviatura curso 
+    cout<<"Ingrese el codigo del curso: ";
     cin>>codigoC;
+    cout<<"Ingrese la abreviatura del curso: ";
+    cin>>abvC;
+
     if(listaCursos == NULL){
         cout<<"Lista vacia!"<<endl;
     }
     else{
         curso *temp = listaCursos;
         while(temp->sigCurso != listaCursos){
-            if(temp->codigo == codigoC){
+            if((temp->codigoNum == codigoC) && (temp->abreviatura == abvC)){
                 cout<<"Ingrese el nuevo nombre del curso: "<<endl;
                 cin>>nuevoNom;
                 temp->nombre = nuevoNom;
@@ -436,16 +483,19 @@ void modificarCurso(){
 }
 
 void eliminarCurso(){
-    string codigoC;
+    int codigoC;
+    string abvC; //Abreviatura curso
     cout<<"Ingrese el codigo del curso a eliminar: "<<endl;
     cin>>codigoC;
+    cout<<"Ingrese la abreviatura del curso a eliminar: "<<endl;
+    cin>>abvC;
     if(listaCursos == NULL){
         cout<<"Lista vacia!"<<endl;
     }
     else{
         curso *temp = listaCursos;
         while(temp->sigCurso != listaCursos){
-            if((temp->sigCurso)->codigo == codigoC){
+            if(((temp->sigCurso)->codigoNum == codigoC) && ((temp->sigCurso)->abreviatura) == abvC){
                 temp->sigCurso = (temp->sigCurso)->sigCurso;
                 return;
             }
