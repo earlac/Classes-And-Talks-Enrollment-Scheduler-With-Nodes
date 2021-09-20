@@ -95,13 +95,15 @@ struct semestre{ //Simple linked list
     struct curso *listaCursos; //Links to the list of courses given in that said semester
     int numSemestre;
     int anno;
+    int codigo;
     semestre *sigSem;
     semestre *antSem;
     struct enlazarCharla *sigCharla;
 
-    semestre(int nSemestre, int nAnno){
-        nSemestre= nSemestre;
+    semestre(int nSemestre, int nAnno, int nCodigo){
+        numSemestre= nSemestre;
         anno= nAnno;
+        codigo= nCodigo;
         
         listaCursos= NULL;
         sigSem = NULL;
@@ -270,10 +272,11 @@ struct charla{//Simple linked list
 //-----------------------------------------------------------------------------------Methods
 
 //------------------Periods' Methods---------------------------------
-semestre* buscarSem(int nNumSem, int nAnno){
+void menuAdminSemestre();
+semestre* buscarSem(int nCodigo){
     semestre *temp = listaSemestres;
     while(temp != NULL){
-        if(temp->numSemestre==nNumSem && temp->anno==nAnno){
+        if(temp->codigo==nCodigo){
             return temp;
         }
         temp= temp->sigSem;
@@ -282,6 +285,7 @@ semestre* buscarSem(int nNumSem, int nAnno){
 }
 
 void insertarSemestre(){
+
     int annoS;
     cout<<"Ingrese el año del semestre: "<<endl;
     cin>>annoS;
@@ -289,103 +293,81 @@ void insertarSemestre(){
     int semS;
     cout<<"Ingrese el semestre del año: "<<endl;
     cin>>semS;
+ 
+    int codigoS;
+    codigoS= 10*annoS+semS;
+
+    semestre *nS = new semestre(semS, annoS, codigoS);
 
     //if list is empty
-    semestre *nS = new semestre(semS, annoS);
     if(listaSemestres == NULL){
         cout<<"Lista vacia"<<endl;
         listaSemestres=nS;
         nS->sigSem=NULL;
         nS->antSem=NULL;
-        return;
+        menuAdminSemestre();
     }
-    //if not, let's check if it exists
-    semestre *existe= buscarSem(semS, annoS);
-    if(existe != NULL){
-        cout<<"Este semestre ya se ha registrado antes"<<endl;
-        return;
-    }
-    
-    //Casos al inicio
+    //Item goes first
     semestre *tempA= listaSemestres;
-    //If chosen year goes first
-    if(tempA->anno==annoS){
-        cout<<"Inicio" << tempA->anno<<annoS<<endl;
-        if(tempA->numSemestre== 1){
-            //as there's only 2 cases, and one was already filtered:
-            (tempA->sigSem)->antSem= nS;//3 to 2
-
-            nS->sigSem= tempA->sigSem;  //2 to 3
-            nS->antSem= tempA;          //2 to 1
-
-            tempA->sigSem= nS;          //1 to 2
-        }else{
-            nS->antSem= NULL;
-            tempA->antSem= nS;
-            nS->sigSem= tempA;
-        }
-        return;
+    if(tempA-> codigo> codigoS){
+        cout<<"Primero"<< endl;
+        nS->antSem= NULL;
+        nS->sigSem= tempA;
+        tempA-> antSem= nS;
+        listaSemestres=nS;
+        menuAdminSemestre();
     }
-    //If chosen year goes last
+    //Item goes last
     semestre *tempB= listaSemestres;
-    while(tempB->sigSem != NULL){
-        tempB= tempB->sigSem;
+    while(tempB->sigSem!= NULL){
+        tempB= tempB-> sigSem;
     }
-    if(tempB->anno<=annoS){
-        cout<<"final"<<endl;
-        if(tempB->numSemestre== 1){
-            //as there's only 2 cases, and one was already filtered:
-            (tempB->sigSem)->antSem= nS;//3 to 2
-
-            nS->sigSem= tempB->sigSem;  //2 to 3
-            nS->antSem= tempB;          //2 to 1
-
-            tempB->sigSem= nS;          //1 to 2
-        }else{
-            tempB->sigSem= nS;          //1 to 2
-            nS->antSem= tempB;          //2 to 1
-            nS->sigSem= NULL;           //2 to NULL
-        }
-        return;
+    if(tempB->codigo<codigoS){
+        cout<<"Ultimo"<< endl;
+        tempB->sigSem= nS;
+        nS->antSem= tempB;
+        nS-> sigSem= NULL;
+        menuAdminSemestre();
     }
-    //let's check the in between of the lists
+    //Item goes in between
     semestre *tempC= listaSemestres;
-    while(tempC->sigSem != NULL){
-        cout<<"centro"<<endl;
-        if(tempC->anno >= annoS){
-            if(tempC->anno > annoS){
-                (tempC->antSem)->sigSem= nS;
+    while(tempC->sigSem!= NULL){
+        if(tempC->codigo>codigoS){
+            cout<<"Centro"<< endl;
+            (tempC->antSem)->sigSem=nS;
 
-                nS-> antSem= tempC->antSem;
-                nS-> sigSem= tempC;
+            nS-> antSem= tempC-> antSem;
+            nS-> sigSem= tempC;
 
-                tempC-> antSem= nS;
-            }else{
-                if(tempC->numSemestre== 1){
-                    //as there's only 2 cases, and one was already filtered:
-                    (tempC->sigSem)->antSem= nS;//3 to 2
-
-                    nS->sigSem= tempC->sigSem;  //2 to 3
-                    nS->antSem= tempC;          //2 to 1
-
-                    tempC->sigSem= nS;          //1 to 2
-                }else{
-                    (tempC->antSem)->sigSem= nS;
-
-                    nS->antSem= tempC-> antSem;
-                    nS->sigSem= tempC;
-
-                    tempC-> antSem= nS;
-                }
-
-            }
+            tempC->antSem= nS;
+            menuAdminSemestre();
         }
-
         tempC= tempC->sigSem;
     }
-    return;
-
+    
+    cout<<"El semestre ya se encuentra previamente registrado"<<endl;
+    menuAdminSemestre();
 }    
+
+void modificarSemestre(){
+    int annoS;
+    cout<<"Ingrese el año del semestre: "<<endl;
+    cin>>annoS;
+
+    int semS;
+    cout<<"Ingrese el semestre del año: "<<endl;
+    cin>>semS;
+ 
+    int codigoS;
+    codigoS= 10*annoS+semS;
+
+    semestre *nS = new semestre(semS, annoS, codigoS);
+
+    if(buscarSem!=NULL){
+        cout<< "Ya existe un semestre con estas directrices."<<endl;
+    }
+}
+
 //------------------Courses' Methods---------------------------------
 
 void insertarCurso(){
@@ -838,6 +820,7 @@ void imprimirSemestres(){
 
 void menuPrincipal();
 void menuAdmin();
+void menuAdminSemestre();
 
 void menuAdminSemestre(){
     cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
@@ -851,12 +834,12 @@ void menuAdminSemestre(){
         menuAdminSemestre();
     }
     else if(opcion == "b"){
-        //modificarCurso();
-        //menuAdminCurso();
+        modificarSemestre();
+        menuAdminSemestre();
     }
     else if(opcion == "z"){
         imprimirSemestres();
-        menuAdminEst();
+        menuAdminSemestre();
     }
     else if(opcion == "1")
         menuAdmin();
