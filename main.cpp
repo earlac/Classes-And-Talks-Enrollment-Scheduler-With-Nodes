@@ -267,6 +267,52 @@ struct charla{//Simple linked list
 
 //-----------------------------------------------------------------------------------Methods
 
+void insertarCurso(){
+    string nombreC;
+    string codigoC;
+    cout<<"Ingrese el nombre del curso: "<<endl;
+    cin>>nombreC;
+    cout<<"Ingrese el codigo del curso: "<<endl;
+    cin>>codigoC;
+    curso *nC = new curso(nombreC, codigoC);
+    if(listaCursos == NULL){
+        listaCursos=nC;
+        nC->sigCurso=nC;
+    }
+    else{
+        nC->sigCurso = listaCursos;
+        curso *temp = listaCursos;
+        while(temp->sigCurso != listaCursos)
+            temp = temp->sigCurso;
+        temp->sigCurso = nC;
+    }
+
+}
+
+void modificarCurso(){
+    string codigoC;
+    string nuevoNom;
+    cout<<"Ingrese el codigo del curso: "<<endl;
+    cin>>codigoC;
+    if(listaCursos == NULL){
+        cout<<"Lista vacia!"<<endl;
+    }
+    else{
+        curso *temp = listaCursos;
+        while(temp->sigCurso != listaCursos){
+            if(temp->codigo == codigoC){
+                cout<<"Ingrese el nuevo nombre del curso: "<<endl;
+                cin>>nuevoNom;
+                temp->nombre = nuevoNom;
+                return;
+            }
+            temp = temp->sigCurso;
+        }
+        cout<<"No se ha encontrado el curso"<<endl;
+        return;
+    } 
+}
+
 //------------------Students' Methods---------------------------------
 estudiante* buscarEst(int carnetEst){
     //cout<<"t"<<endl;
