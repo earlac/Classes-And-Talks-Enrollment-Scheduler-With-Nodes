@@ -267,6 +267,8 @@ struct charla{//Simple linked list
 
 //-----------------------------------------------------------------------------------Methods
 
+//------------------Courses' Methods---------------------------------
+
 void insertarCurso(){
     string nombreC;
     string codigoC;
@@ -304,6 +306,27 @@ void modificarCurso(){
                 cout<<"Ingrese el nuevo nombre del curso: "<<endl;
                 cin>>nuevoNom;
                 temp->nombre = nuevoNom;
+                return;
+            }
+            temp = temp->sigCurso;
+        }
+        cout<<"No se ha encontrado el curso"<<endl;
+        return;
+    } 
+}
+
+void eliminarCurso(){
+    string codigoC;
+    cout<<"Ingrese el codigo del curso a eliminar: "<<endl;
+    cin>>codigoC;
+    if(listaCursos == NULL){
+        cout<<"Lista vacia!"<<endl;
+    }
+    else{
+        curso *temp = listaCursos;
+        while(temp->sigCurso != listaCursos){
+            if((temp->sigCurso)->codigo == codigoC){
+                temp->sigCurso = (temp->sigCurso)->sigCurso;
                 return;
             }
             temp = temp->sigCurso;
@@ -688,6 +711,40 @@ void imprimirEstudiantes(){
 void menuPrincipal();
 void menuAdmin();
 
+void menuAdminCurso(){
+    cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
+    
+    cout<<"a- Insertar curso\nb- Modificar curso\nc- Borrar curso\n\n1- Volver al menu de administrador\n2- Volver al menu principal\n\n\nOpcion: ";
+    string opcion;
+    cin>> opcion;
+
+    if(opcion == "a"){
+        insertarCurso();
+        menuAdminCurso();
+    }
+    else if(opcion == "b"){
+        modificarCurso();
+        menuAdminCurso();
+    }
+    else if(opcion == "c"){
+        eliminarCurso();
+        menuAdminCurso();
+    }
+    else if(opcion == "z"){
+        imprimirEstudiantes();
+        menuAdminEst();
+    }
+    else if(opcion == "1")
+        menuAdmin();
+    else if(opcion == "2")
+        menuPrincipal();
+    else{
+        cout<<"Opcion Invalida"<<endl;
+        menuAdminCurso();
+    }
+}    
+
+
 void menuAdminEst(){
     cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
     
@@ -779,7 +836,7 @@ void menuAdmin(){
         cout<< "Semestres"<<endl;
     }
     else if(opcionMenuAdmin == "e"){
-        cout<< "Cursos"<<endl;
+        menuAdminCurso();
     }
     else if(opcionMenuAdmin == "f"){
         cout<< "Grupos"<<endl;
