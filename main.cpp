@@ -96,6 +96,7 @@ struct semestre{ //Simple linked list
     int numSemestre;
     int anno;
     semestre *sigSem;
+    semestre *antSem;
     struct enlazarCharla *sigCharla;
 
     semestre(int nSemestre, int nAnno){
@@ -104,6 +105,7 @@ struct semestre{ //Simple linked list
         
         listaCursos= NULL;
         sigSem = NULL;
+        antSem= NULL;
     }
 } *listaSemestres;
 
@@ -267,6 +269,123 @@ struct charla{//Simple linked list
 
 //-----------------------------------------------------------------------------------Methods
 
+//------------------Periods' Methods---------------------------------
+semestre* buscarSem(int nNumSem, int nAnno){
+    semestre *temp = listaSemestres;
+    while(temp != NULL){
+        if(temp->numSemestre==nNumSem && temp->anno==nAnno){
+            return temp;
+        }
+        temp= temp->sigSem;
+    }
+    return NULL;
+}
+
+void insertarSemestre(){
+    int annoS;
+    cout<<"Ingrese el año del semestre: "<<endl;
+    cin>>annoS;
+
+    int semS;
+    cout<<"Ingrese el semestre del año: "<<endl;
+    cin>>semS;
+
+    //if list is empty
+    semestre *nS = new semestre(semS, annoS);
+    if(listaSemestres == NULL){
+        cout<<"Lista vacia"<<endl;
+        listaSemestres=nS;
+        nS->sigSem=NULL;
+        nS->antSem=NULL;
+        return;
+    }
+    //if not, let's check if it exists
+    semestre *existe= buscarSem(semS, annoS);
+    if(existe != NULL){
+        cout<<"Este semestre ya se ha registrado antes"<<endl;
+        return;
+    }
+    
+    //Casos al inicio
+    semestre *tempA= listaSemestres;
+    //If chosen year goes first
+    if(tempA->anno==annoS){
+        cout<<"Inicio" << tempA->anno<<annoS<<endl;
+        if(tempA->numSemestre== 1){
+            //as there's only 2 cases, and one was already filtered:
+            (tempA->sigSem)->antSem= nS;//3 to 2
+
+            nS->sigSem= tempA->sigSem;  //2 to 3
+            nS->antSem= tempA;          //2 to 1
+
+            tempA->sigSem= nS;          //1 to 2
+        }else{
+            nS->antSem= NULL;
+            tempA->antSem= nS;
+            nS->sigSem= tempA;
+        }
+        return;
+    }
+    //If chosen year goes last
+    semestre *tempB= listaSemestres;
+    while(tempB->sigSem != NULL){
+        tempB= tempB->sigSem;
+    }
+    if(tempB->anno<=annoS){
+        cout<<"final"<<endl;
+        if(tempB->numSemestre== 1){
+            //as there's only 2 cases, and one was already filtered:
+            (tempB->sigSem)->antSem= nS;//3 to 2
+
+            nS->sigSem= tempB->sigSem;  //2 to 3
+            nS->antSem= tempB;          //2 to 1
+
+            tempB->sigSem= nS;          //1 to 2
+        }else{
+            tempB->sigSem= nS;          //1 to 2
+            nS->antSem= tempB;          //2 to 1
+            nS->sigSem= NULL;           //2 to NULL
+        }
+        return;
+    }
+    //let's check the in between of the lists
+    semestre *tempC= listaSemestres;
+    while(tempC->sigSem != NULL){
+        cout<<"centro"<<endl;
+        if(tempC->anno >= annoS){
+            if(tempC->anno > annoS){
+                (tempC->antSem)->sigSem= nS;
+
+                nS-> antSem= tempC->antSem;
+                nS-> sigSem= tempC;
+
+                tempC-> antSem= nS;
+            }else{
+                if(tempC->numSemestre== 1){
+                    //as there's only 2 cases, and one was already filtered:
+                    (tempC->sigSem)->antSem= nS;//3 to 2
+
+                    nS->sigSem= tempC->sigSem;  //2 to 3
+                    nS->antSem= tempC;          //2 to 1
+
+                    tempC->sigSem= nS;          //1 to 2
+                }else{
+                    (tempC->antSem)->sigSem= nS;
+
+                    nS->antSem= tempC-> antSem;
+                    nS->sigSem= tempC;
+
+                    tempC-> antSem= nS;
+                }
+
+            }
+        }
+
+        tempC= tempC->sigSem;
+    }
+    return;
+
+}    
 //------------------Courses' Methods---------------------------------
 
 void insertarCurso(){
@@ -336,6 +455,8 @@ void eliminarCurso(){
     } 
 }
 
+
+
 //------------------Students' Methods---------------------------------
 estudiante* buscarEst(int carnetEst){
     //cout<<"t"<<endl;
@@ -403,8 +524,6 @@ void insertarEst(){
     }
 } 
 */
-
-
 
 void insertarEst(){
     int carnetEst;
@@ -704,12 +823,50 @@ void imprimirEstudiantes(){
     }
 
 }
+void imprimirSemestres(){
+    semestre *temp = listaSemestres;
+    cout<<"Lista de semesetres: "<<endl;
+    while(temp != NULL){
+        cout<<"pasando al siguiente"<<endl;
+        cout<<"Periodo: "<<temp->numSemestre<<", Año: "<<temp->anno<<endl;
+        temp = temp->sigSem;
+    }
 
+}
 
 //------------------Menus---------------------------------
 
 void menuPrincipal();
 void menuAdmin();
+
+void menuAdminSemestre(){
+    cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
+    
+    cout<<"a- Insertar Semestre\nb- Modificar Semestre\n\n1- Volver al menu de administrador\n2- Volver al menu principal\n\n\nOpcion: ";
+    string opcion;
+    cin>> opcion;
+
+    if(opcion == "a"){
+        insertarSemestre();
+        menuAdminSemestre();
+    }
+    else if(opcion == "b"){
+        //modificarCurso();
+        //menuAdminCurso();
+    }
+    else if(opcion == "z"){
+        imprimirSemestres();
+        menuAdminEst();
+    }
+    else if(opcion == "1")
+        menuAdmin();
+    else if(opcion == "2")
+        menuPrincipal();
+    else{
+        cout<<"Opcion Invalida"<<endl;
+        menuAdminSemestre();
+    }
+}    
 
 void menuAdminCurso(){
     cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
@@ -743,7 +900,6 @@ void menuAdminCurso(){
         menuAdminCurso();
     }
 }    
-
 
 void menuAdminEst(){
     cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
@@ -833,7 +989,7 @@ void menuAdmin(){
         menuAdminEst();
     }
     else if(opcionMenuAdmin == "d"){
-        cout<< "Semestres"<<endl;
+        menuAdminSemestre();
     }
     else if(opcionMenuAdmin == "e"){
         menuAdminCurso();
