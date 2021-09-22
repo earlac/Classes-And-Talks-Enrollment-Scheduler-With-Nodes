@@ -4,7 +4,7 @@ una lista simple que muestre cada curso matriculado por cada estudiante.
 
          Juan <-> Maria <-> Pedro <-> Luis
            |        |         |        |
-       matricula matricula  matricula  matricula  (Casa uno apunta de un curso)
+       matricula matricula  matricula  matricula  (Cada uno apunta de un curso)
            
          Intro <-> POO <-> Arky <-> Datos
 */

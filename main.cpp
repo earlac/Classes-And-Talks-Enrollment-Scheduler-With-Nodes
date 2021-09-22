@@ -403,6 +403,33 @@ void modificarSemestre(){
 
 //------------------Courses' Methods---------------------------------
 
+string pedirNomCurso(){
+    string nombreC;
+    cout<<"Ingrese el nombre del curso: ";
+    cin>>nombreC;
+    return nombreC;
+}
+
+string pedirAbvCurso(){
+    string abvC;
+    cout<<"Ingrese la escuela del curso (Ej. IC, MA..): ";
+    cin>>abvC;
+    return abvC;
+}
+
+int pedirCodCurso(){
+    int codigoC;
+    cout<<"Ingrese el codigo del curso: ";
+    cin>>codigoC;
+    if(cin.fail()){
+        cout<<"Solo ingresar un numero de cuatro digitos: ";
+        pedirCodCurso();
+        return 0;
+    }else{
+        return codigoC;
+    }
+}
+
 curso* buscarCurso(string codigo){
     string abv = codigo.substr(0,2);
     int numCurso = stoi(codigo.substr(2,4));
@@ -422,18 +449,8 @@ curso* buscarCurso(string codigo){
     } 
 }
 
-void insertarCurso(){
-    string nombreC;
-    string abvC;//Abreviatura Curso 
-    int codigoNumC;
-    cout<<"Ingrese el nombre del curso: ";
-    cin>>nombreC;
-    cout<<"Ingrese la abreviatura del curso: ";
-    cin>>abvC;
-    cout<<"Ingrese el codigo del curso: ";
-    cin>>codigoNumC;
-    cout<<"Nombre: "<<nombreC<<"Abreviatura: "<<abvC<<"Codigo: "<<codigoNumC<<endl;
-    curso *nC = new curso(nombreC, abvC, codigoNumC);
+void insertarCurso(string nombreC, string abv, int codigoNumC){
+    curso *nC = new curso(nombreC, abv, codigoNumC);
     if(listaCursos == NULL){
         cout<<"Lista vacia"<<endl;
         listaCursos=nC;
@@ -450,6 +467,14 @@ void insertarCurso(){
         
         cout<<"Curso insertado existosamente"<<endl;
     }
+}
+
+void insertarCursoAux(){
+    string nombreC = pedirNomCurso();
+    string abvC = pedirAbvCurso();
+    int codigo = pedirCodCurso();
+
+    insertarCurso(nombreC, abvC, codigo);
 }
 
 void modificarCurso(){
@@ -709,6 +734,66 @@ void eliminarEst(){
     }
 }
 
+grupo* encontrarGrupo(string codigo, int numGrupo);
+
+void relacionarGrupoEst(){
+    int carnetEst;
+    cout<<"Escriba el carnet del estudiante: "<<endl;
+    cin>>carnetEst;
+
+    estudiante* tempE = buscarEst(carnetEst);
+
+    if(tempE == NULL){
+        cout<<"Estudiante no encontrado"<<endl;
+        return;
+    }
+    
+    string codigo;
+    int numG;
+
+    cout<<"Ingrese el codigo del curso (Ej. IC3101): ";
+    cin>>codigo;
+
+    cout<<"Ingrese el numero de grupo: ";
+    cin>>numG;
+
+    grupo* tempG = encontrarGrupo(codigo, numG);
+    if(tempG == NULL){
+        cout<<"Curso no encontrado"<<endl;
+        return;
+    }
+
+    enlazarGrupo* nE = new enlazarGrupo(tempG);
+    nE->sigEn = tempE->gruposEstAux;
+    tempE->gruposEstAux = nE;
+
+}
+
+
+
+void reporteGruposEst(){
+    int carnetEst;
+    cout<<"Escriba el carnet del estudiante: "<<endl;
+    cin>>carnetEst;
+
+    estudiante* tempEst = buscarEst(carnetEst);
+
+    if(tempEst == NULL){
+        cout<<"Estudiante no encontrado"<<endl;
+        return;
+    }else{
+        cout<<"Grupos asignados: "<<endl;
+        cout<<"Estudiante: "<<tempEst->nombreEst<<" Carnet: "<<tempEst->carnet<<endl;
+        enlazarGrupo* tempG = tempEst->gruposEstAux;
+        while(tempG != NULL){
+            cout<<"G"<<tempG->enlaceGrupo->numGrupo<<endl;
+            cout<<"Curso: "<<tempG->enlaceGrupo->cursoActual->nombre<<endl;
+            cout<<"ID de grupo: "<<tempG->enlaceGrupo->idCurso<<endl;
+            tempG = tempG->sigEn;
+        }
+        cout<<"\nFinal de reporte"<<endl;
+    }    
+}
 
 //------------------Group's Methods----------------------------------
 
@@ -742,7 +827,7 @@ void insertarGrupo(){
         struct grupo *nG = new grupo(numGrupo, abv, numCurso);
         //nG->sigGrupo = listaGrupos;//Lo agrego a los grupos
         //listaGrupos = nG;//Al inicio
-        nG->cursoActual = cursoG;//Lo linkeo al curso que pertenece
+        nG->cursoActual = cursoG; //Lo linkeo al curso que pertenece
 
         //enlaceCurso *nE = new enlaceCurso(nG);//Nuevo enlace
         nG->sigGrupo = cursoG->grupoCursando; //Inicio de la lista de grupos cursando el curso
@@ -770,6 +855,21 @@ void reporteGrupo(){
         tempGrupo = tempGrupo->sigGrupo;
     }
     cout<<"Fin de reporte"<<endl;
+
+}
+
+grupo* encontrarGrupo(string codigo, int numGrupo){
+
+    curso* tempCurso = buscarCurso(codigo);
+
+    grupo *tempGrupo = tempCurso->grupoCursando;
+
+    while(tempGrupo != NULL){
+        if(tempGrupo->numGrupo == numGrupo)
+            return tempGrupo;
+        tempGrupo = tempGrupo->sigGrupo;
+    }
+    return NULL;
 
 }
 
@@ -900,6 +1000,64 @@ void eliminarProf(){
     }
 }
 
+void relacionarGrupoProf(){
+    int cedulaP;
+    cout<<"Escriba la cedula del profesor: "<<endl;
+    cin>>cedulaP;
+
+    profesor* tempP = buscarProf(cedulaP);
+
+    if(tempP == NULL){
+        cout<<"Profesor no encontrado"<<endl;
+        return;
+    }
+    
+    string codigo;
+    int numG;
+
+    cout<<"Ingrese el codigo del curso (Ej. IC3101): ";
+    cin>>codigo;
+
+    cout<<"Ingrese el numero de grupo: ";
+    cin>>numG;
+
+    grupo* tempG = encontrarGrupo(codigo, numG);
+    if(tempG == NULL){
+        cout<<"Curso no encontrado"<<endl;
+        return;
+    }
+
+    enlazarGrupo* nE = new enlazarGrupo(tempG);
+    nE->sigEn = tempP->gruposProfAux;
+    tempP->gruposProfAux = nE;
+    cout<<"\nProfesor asignado a grupo satisfactoriamente"<<endl;
+
+}
+
+void reporteGruposProfe(){
+    int cedulaP;
+    cout<<"Escriba la cedula del profesor: "<<endl;
+    cin>>cedulaP;
+
+    profesor* tempP = buscarProf(cedulaP);
+
+    if(tempP == NULL){
+        cout<<"Profesor no encontrado"<<endl;
+        return;
+    }else{
+        cout<<"Grupos asignados: "<<endl;
+        cout<<"Profesor: "<<tempP->nombreProf<<" Cedula: "<<tempP->cedulaProf<<endl;
+        enlazarGrupo* tempG = tempP->gruposProfAux;
+        while(tempG != NULL){
+            cout<<"G"<<tempG->enlaceGrupo->numGrupo<<endl;
+            cout<<"Curso: "<<tempG->enlaceGrupo->cursoActual->nombre<<endl;
+            cout<<"ID de grupo: "<<tempG->enlaceGrupo->idCurso<<endl;
+            tempG = tempG->sigEn;
+        }
+        cout<<"\nFinal de reporte"<<endl;
+    }    
+}
+
 
 //------------------Printing Methods---------------------------------
 
@@ -994,7 +1152,7 @@ void menuAdminCurso(){
     cin>> opcion;
 
     if(opcion == "a"){
-        insertarCurso();
+        insertarCursoAux();
         menuAdminCurso();
     }
     else if(opcion == "b"){
@@ -1022,7 +1180,7 @@ void menuAdminCurso(){
 void menuAdminEst(){
     cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
     
-    cout<<"a- Insertar estudiante\nb- Modificar estudiante\nc- Borrar estudiante\n\n1- Volver al menu de administrador\n2- Volver al menu principal\n\n\nOpcion: ";
+    cout<<"a- Insertar estudiante\nb- Modificar estudiante\nc- Borrar estudiante\nd- Asignar a grupo\n\n1- Volver al menu de administrador\n2- Volver al menu principal\n\n\nOpcion: ";
     string opcion;
     cin>> opcion;
 
@@ -1038,8 +1196,11 @@ void menuAdminEst(){
         eliminarEst();
         menuAdminEst();
     }
-    else if(opcion == "z"){
-        imprimirEstudiantes();
+    else if(opcion == "d"){
+        relacionarGrupoEst();
+        menuAdminEst();
+    }else if(opcion == "z"){
+        reporteGruposEst();
         menuAdminEst();
     }
     else if(opcion == "1")
@@ -1054,7 +1215,7 @@ void menuAdminEst(){
 
 void menuAdminProf(){
     cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
-    cout<<"a- Insertar profesor\nb- Modificar profesor\nc- Borrar profesor\n\n1-Volver al menu de administrador \n2-Volver al menu principal \nOpcion: ";
+    cout<<"a- Insertar profesor\nb- Modificar profesor\nc- Borrar profesor\nd- Asignar a grupo\n\n1-Volver al menu de administrador \n2-Volver al menu principal \nOpcion: ";
     string opcionMenuAdminProf;
     cin>> opcionMenuAdminProf;
 
@@ -1069,6 +1230,8 @@ void menuAdminProf(){
         eliminarProf();
         //cout<< "Borrar"<<endl;
 
+    }else if(opcionMenuAdminProf=="d"){
+        relacionarGrupoProf();
     }else if(opcionMenuAdminProf=="1"){
         //cout<<"Salir"<<endl;
         menuAdmin();
@@ -1077,7 +1240,7 @@ void menuAdminProf(){
         menuPrincipal();
     }
     else if(opcionMenuAdminProf=="z"){
-        imprimirProfesores();
+        reporteGruposProfe();
 
     }else{
         cout<< "Ingrese una opcion valida"<<endl;
@@ -1188,6 +1351,9 @@ int main(){
     insertarAdmin("Maria", "123");
     insertarAdmin("Juan", "4567");
     insertarAdmin("Carlos", "930");
+    insertarCurso("Datos", "IC", 2040);
+    insertarCurso("Arqui", "IC", 3101);
+    insertarCurso("Discreta", "MA", 2089);
     imprimirAdmins();
     menuPrincipal();
 
