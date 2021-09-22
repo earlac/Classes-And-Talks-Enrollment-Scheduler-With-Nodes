@@ -103,15 +103,15 @@ struct enlazarGrupo{//Simple linked list
 };
 
 struct semestre{ //Simple linked list 
-    struct curso *listaCursos; //Links to the list of courses given in that said semester
+    //struct curso *listaCursos; //Links to the list of courses given in that said semester
     int numSemestre;
     int anno;
     int abreviatura;
     int presupuesto;
     semestre *sigSem;
     semestre *antSem;
-    struct enlazarCharla *sigCharla;
-
+    struct enlazarCharla *listaCharlas;
+    struct enlaceCurso *listaCursos; //Links to the list of courses given in said semester
     semestre(int nSemestre, int nAnno, int nCodigo, int nPresupuesto){
         numSemestre = nSemestre;
         anno = nAnno;
@@ -124,11 +124,11 @@ struct semestre{ //Simple linked list
 } *listaSemestres;
 
 struct enlaceCurso{//Simple linked list
-    struct grupo *sigGrupo; //Links to the course itself
+    struct curso *sigCurso; //Links to the course itself
     enlaceCurso *sig; //Orders the courses
 
-    enlaceCurso(grupo *nSigGrupo){
-        sigGrupo = nSigGrupo;
+    enlaceCurso(curso *nSigCurso){
+        sigCurso = nSigCurso;
         sig = NULL;
     }
 };
@@ -285,7 +285,26 @@ struct charla{//Simple linked list
 
 //-----------------------------------------------------------------------------------Methods
 
+int pedirAnnoSem(){
+    int annoS;
+    cout<<"Ingrese el anno del semestre: "<<endl;
+    cin>>annoS;   
+    return annoS; 
+}
 
+int pedirNumSem(){
+    int semS;
+    cout<<"Ingrese el semestre del anno: "<<endl;
+    cin>>semS;
+    return semS;
+}
+
+int pedirpresupuestoSem(){
+    int presupuestoS;
+    cout<<"Ingrese el presupuesto del semestre: "<<endl;
+    cin>>presupuestoS;
+    return presupuestoS;    
+}
 //------------------Periods' Methods---------------------------------
 void menuAdminSemestre();
 
@@ -300,20 +319,7 @@ semestre* buscarSem(int nCodigo){
     return NULL;
 }
 
-void insertarSemestre(){
-
-    int annoS;
-    cout<<"Ingrese el año del semestre: "<<endl;
-    cin>>annoS;
-
-    int semS;
-    cout<<"Ingrese el semestre del año: "<<endl;
-    cin>>semS;
-    
-    int presupuestoS;
-    cout<<"Ingrese el presupuesto del semestre: "<<endl;
-    cin>>presupuestoS;
-
+void insertarSemestre(int annoS, int semS, int presupuestoS){
     int codigoS;
     codigoS= 10*annoS+semS;
 
@@ -330,7 +336,7 @@ void insertarSemestre(){
         nS->sigSem=NULL;
         nS->antSem=NULL;
         cout<<"Semestre ingresado exitosamente."<<endl;
-        menuAdminSemestre();
+        return;
     }
     //Item goes first
     semestre *tempA= listaSemestres;
@@ -341,7 +347,7 @@ void insertarSemestre(){
         tempA-> antSem= nS;
         listaSemestres=nS;
         cout<<"Semestre ingresado exitosamente."<<endl;
-        menuAdminSemestre();
+        return;
     }
     //Item goes last
     semestre *tempB= listaSemestres;
@@ -354,7 +360,7 @@ void insertarSemestre(){
         nS->antSem= tempB;
         nS-> sigSem= NULL;
         cout<<"Semestre ingresado exitosamente."<<endl;
-        menuAdminSemestre();
+        return;
     }
     //Item goes in between
     semestre *tempC= listaSemestres;
@@ -368,27 +374,103 @@ void insertarSemestre(){
 
             tempC->antSem= nS;
             cout<<"Semestre ingresado exitosamente."<<endl;
-            menuAdminSemestre();
+            return;
         }
         tempC= tempC->sigSem;
     }
-    
     cout<<"El semestre ya se encuentra previamente registrado"<<endl;
-    menuAdminSemestre();
+    return;
 }    
 
-void modificarSemestre(){
-    int annoS;
-    cout<<"Ingrese el año del semestre: "<<endl;
-    cin>>annoS;
+/*
+void insertarSem(int annoS, int semS, int presupuestoS){
+    int codigo = 10*annoS + semS;
 
-    int semS;
-    cout<<"Ingrese el semestre del año: "<<endl;
-    cin>>semS;
+    semestre* buscar = buscarSem(codigo);
+    if(buscar != NULL){
+        cout<<"Semestre ya se encuentra registrado"<<endl;
+        return;
+    }else{  
+        semestre* nS = new semestre(semS, annoS, codigo, presupuestoS);
+        if(listaSemestres==NULL){//Empty list
+            listaSemestres = nS;
+            nS->sigSem = NULL;
+            cout<<"Semestre insertado exitosamente!"<<endl;
+            return;
+        }else{//Beginning of the list
+            semestre* tempSem = listaSemestres;
+            if(codigo < tempSem->abreviatura){
+                nS->sigSem = listaSemestres;
+                listaSemestres = nS;
+                cout<<"Semestre insertado satisfactoriamente!"<<endl;
+            }
 
-    int codigoS;
-    codigoS= 10*annoS+semS;
+        }
+    }
 
+    
+
+}
+*/
+
+/*
+
+        
+        //Inicio de la lista
+        //cout<<"Valorando primer elemento"<<endl;
+        estudiante*primero=listaEstudiantes;
+        //cout<<"b"<<endl;
+        if(carnetEst< primero->carnet){
+            //cout<<"e"<<endl;
+            nEst->sigEst=listaEstudiantes;
+            listaEstudiantes= nEst;
+            //cout<<"Primer elemento insertado"<<endl;
+            menuAdminEst();
+        }
+
+        //Final de la lista
+        //cout<<"Valorando ultimo elemento"<<endl;
+        estudiante*tempF= listaEstudiantes;
+        //cout<<"c"<<endl;
+        while(tempF->sigEst !=NULL){
+            //cout<<"w"<<endl;
+            tempF= tempF->sigEst;
+        }
+        //cout<<"a"<<endl;
+        if(carnetEst> tempF->carnet){
+            //cout<<"d"<<endl;
+            tempF->sigEst= nEst;
+            nEst->sigEst= NULL;
+            //cout<<"ultimo elemento"<<endl;
+        }
+        
+        //Media lista
+        //cout<<"Valorando in elemento"<<endl;
+        estudiante*temp= listaEstudiantes;
+        while(temp->sigEst!=NULL){
+            //cout<<"y"<<endl;
+            if((temp->sigEst)->carnet > carnetEst){
+                //cout<<"z"<<endl;
+                nEst->sigEst= temp->sigEst;
+                temp->sigEst= nEst;
+                
+                //cout<<"Elemento in lista"<<endl;
+                menuAdminEst();
+            }
+            temp= temp->sigEst;
+        }
+        cout<<"Estudiante agregado exitosamente"<<endl;
+}
+*/
+
+void insertarSemestreAux(){
+    int annoS = pedirAnnoSem();
+    int semS = pedirNumSem();
+    int presupuestoS = pedirpresupuestoSem();
+    insertarSemestre(annoS, semS, presupuestoS);
+}
+
+void modificarSemestre(int codigoS){
     semestre*nSem= buscarSem(codigoS);
     
     int nPresupuestoS;
@@ -397,9 +479,94 @@ void modificarSemestre(){
 
     nSem->presupuesto= nPresupuestoS;
     cout<<"Presupuesto modificado correctamente."<<endl;
-
-    menuAdminSemestre();
 }
+
+void modificarSemestreAux(){
+    int annoS = pedirAnnoSem();
+    int semS = pedirNumSem();
+    int codigoS = 10*annoS+semS;
+    modificarSemestre(codigoS);  
+}
+
+curso* buscarCurso(string codigo);
+
+void relacionarCurso(int codSem){   
+    semestre* tempS = buscarSem(codSem);         //Revisamos si semestre existe
+    if(tempS == NULL){
+        cout<<"Semestre no encontrado"<<endl;
+        return;
+    }
+    else{                                       //Revisamos si curso existe
+        string codigo;
+        cout<<"Ingrese el codigo del curso (Ej. IC3101): ";
+        cin>>codigo;
+
+        curso* tempC = buscarCurso(codigo);
+        if(tempC == NULL){
+            cout<<"Curso no encontrado"<<endl;
+            return;
+        }
+        else{                               //Semestre y curso existen, enlace
+            enlaceCurso* nE = new enlaceCurso(tempC); //Creo el nuevo enlace
+            nE->sig = tempS->listaCursos;           //Que apunte al primer elemento de la lista de cursos de semestre
+            tempS->listaCursos = nE;                //Insercion al inicio de lista simple
+            cout<<"\nCurso asignado satisfactoriamente"<<endl;
+        }
+    }
+}
+
+void relacionarCursoAux(){
+    int annoS = pedirAnnoSem();
+    int semS = pedirNumSem();
+    int codigoS = 10*annoS+semS;
+    relacionarCurso(codigoS);
+}
+
+int pedirCodigoSem(){
+    int codigoS;
+    cout<<"Inserte el codigo del semestre (Ej. 20201): ";
+    cin>>codigoS;
+    return codigoS;
+}
+
+void reporteCursosSem(){
+    int codigoS = pedirCodigoSem();
+    semestre* tempSem = buscarSem(codigoS);
+    if(tempSem == NULL){
+        cout<<"Semestre no encontrado"<<endl;
+        return;
+    }
+    else{
+        cout<<"Anno: "<<tempSem->anno<<" Semestre: "<<tempSem->numSemestre<<endl;
+        cout<<"Cursos: "<<endl;
+        enlaceCurso* tempCurso = tempSem->listaCursos;
+        while(tempCurso != NULL){
+            cout<<"Nombre: "<<tempCurso->sigCurso->nombre<<endl;
+            cout<<"Codigo: "<<tempCurso->sigCurso->abreviatura<<tempCurso->sigCurso->codigoNum<<endl;
+            tempCurso = tempCurso->sig;
+        }
+        cout<<"\nFinal de reporte"<<endl;
+    }
+
+}
+
+/*
+    if(tempEst == NULL){
+        cout<<"Estudiante no encontrado"<<endl;
+        return;
+    }else{
+        cout<<"Grupos asignados: "<<endl;
+        cout<<"Estudiante: "<<tempEst->nombreEst<<" Carnet: "<<tempEst->carnet<<endl;
+        enlazarGrupo* tempG = tempEst->gruposEstAux;
+        while(tempG != NULL){
+            cout<<"G"<<tempG->enlaceGrupo->numGrupo<<endl;
+            cout<<"Curso: "<<tempG->enlaceGrupo->cursoActual->nombre<<endl;
+            cout<<"ID de grupo: "<<tempG->enlaceGrupo->idCurso<<endl;
+            tempG = tempG->sigEn;
+        }
+        cout<<"\nFinal de reporte"<<endl;
+    }    
+*/
 
 //------------------Courses' Methods---------------------------------
 
@@ -452,12 +619,11 @@ curso* buscarCurso(string codigo){
 void insertarCurso(string nombreC, string abv, int codigoNumC){
     curso *nC = new curso(nombreC, abv, codigoNumC);
     if(listaCursos == NULL){
-        cout<<"Lista vacia"<<endl;
         listaCursos=nC;
         nC->sigCurso=nC;
+        cout<<"Curso insertado existosamente"<<endl;
     }
     else{
-        cout<<"No vacia"<<endl;
         nC->sigCurso = listaCursos;
         curso *temp = listaCursos;
         while(temp->sigCurso != listaCursos)
@@ -1106,7 +1272,7 @@ void imprimirSemestres(){
     cout<<"Lista de semesetres: "<<endl;
     while(temp != NULL){
         cout<<"pasando al siguiente"<<endl;
-        cout<<"Periodo: "<<temp->numSemestre<<", Año: "<<temp->anno<<endl;
+        cout<<"Periodo: "<<temp->numSemestre<<", Anno: "<<temp->anno<<", Presupuesto: "<<temp->presupuesto<<" millones de colones"<<endl;
         temp = temp->sigSem;
     }
 
@@ -1120,20 +1286,24 @@ void menuAdmin();
 void menuAdminSemestre(){
     cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
     
-    cout<<"a- Insertar Semestre\nb- Modificar Semestre\n\n1- Volver al menu de administrador\n2- Volver al menu principal\n\n\nOpcion: ";
+    cout<<"a- Insertar Semestre\nb- Modificar Semestre\nc- Insertar Curso\n\n1- Volver al menu de administrador\n2- Volver al menu principal\n\n\nOpcion: ";
     string opcion;
     cin>> opcion;
 
     if(opcion == "a"){
-        insertarSemestre();
+        insertarSemestreAux();
         menuAdminSemestre();
     }
     else if(opcion == "b"){
-        modificarSemestre();
+        modificarSemestreAux();
+        menuAdminSemestre();
+    }
+    else if(opcion == "c"){
+        relacionarCursoAux();
         menuAdminSemestre();
     }
     else if(opcion == "z"){
-        imprimirSemestres();
+        reporteCursosSem();
         menuAdminSemestre();
     }
     else if(opcion == "1")
@@ -1350,13 +1520,19 @@ void menuPrincipal(){
 }
 
 int main(){
+    cout<<"\n\n\t\tCargando Datos...\n\n";
     insertarAdmin("Maria", "123");
     insertarAdmin("Juan", "4567");
     insertarAdmin("Carlos", "930");
     insertarCurso("Datos", "IC", 2040);
     insertarCurso("Arqui", "IC", 3101);
     insertarCurso("Discreta", "MA", 2089);
+    insertarSemestre(2020, 1, 250);
+    insertarSemestre(2021, 1, 350);
+    insertarSemestre(2020, 2, 300);
+    insertarSemestre(2021, 2, 100);
     imprimirAdmins();
+    imprimirSemestres();
     menuPrincipal();
 
     return 0;
