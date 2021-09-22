@@ -704,6 +704,13 @@ void mostrarCurso(){
 
 
 //------------------Students' Methods---------------------------------
+int pedirCarnetEst(){
+    int carnetEst;
+    cout<<"Ingrese el carnet del estudiante: ";
+    cin>>carnetEst;
+    return carnetEst;
+}
+
 estudiante* buscarEst(int carnetEst){
     //cout<<"t"<<endl;
     estudiante *temp = listaEstudiantes;
@@ -773,22 +780,19 @@ void insertarEst(){
 */
 
 void insertarEst(){
-    int carnetEst;
-    cout<< "Ingrese el carnet del estudiante por agregar:"<<endl;
-    cin>> carnetEst;
-    //cout<<"i"<<endl;
-    
-        //cout<<"j"<<endl;
+
+    int carnetEst = pedirCarnetEst();
+
+    estudiante*existe= buscarEst(carnetEst);
+    //cout<<existe->carnet<<endl;
+    if(existe != NULL){
+        cout<<"El carnet ya se encuentra registrado bajo otro estudiante"<<endl;
+        return;
+    }else{
         string nombreEst;
         cout<< "Ingrese el nombre del estudiante por agregar: ";
         cin>> nombreEst;   
 
-        estudiante*existe= buscarEst(carnetEst);
-        //cout<<existe->carnet<<endl;
-        if(existe != NULL){
-            cout<<"El carnet ya se encuentra registrado bajo otro estudiante"<<endl;
-            return;
-        }
         //cout<<"Exitoso, no existe el estudiante"<<endl;
         estudiante*nEst= new estudiante(nombreEst, carnetEst);
         //Lista vacia
@@ -843,13 +847,13 @@ void insertarEst(){
             temp= temp->sigEst;
         }
         cout<<"Estudiante agregado exitosamente"<<endl;
+    }
 }
+
 
 void modificarEst(){
     
-    int carnet;
-    cout<<"\nIngrese el carnet del estudiante a modificar: ";
-    cin>>carnet;
+    int carnet = pedirCarnetEst();
     estudiante*buscado = buscarEst(carnet);
     if(buscado == NULL){
         cout<<"\nEstudiante no encontrado"<<endl;
@@ -866,11 +870,9 @@ void modificarEst(){
     }
 }
 
-void eliminarEst(){
+void eliminarEst(){//Delete on simple linked list
 
-    int carnetEst;
-    cout<<"\nIngrese el carnet del estudiante a eliminar: ";
-    cin>>carnetEst;
+    int carnetEst = pedirCarnetEst();
     if(listaEstudiantes == NULL){
         cout<<"Lista Vacia"<<endl;
         return;
@@ -905,9 +907,7 @@ void eliminarEst(){
 grupo* encontrarGrupo(string codigo, int numGrupo);
 
 void relacionarGrupoEst(){
-    int carnetEst;
-    cout<<"Escriba el carnet del estudiante: "<<endl;
-    cin>>carnetEst;
+    int carnetEst = pedirCarnetEst();
 
     estudiante* tempE = buscarEst(carnetEst);
 
@@ -937,7 +937,56 @@ void relacionarGrupoEst(){
 
 }
 
+void borrarGrupoEst(){
+    if(listaEstudiantes == NULL){
+        cout<<"No hay estudiantes registrados"<<endl;
+        return;
+    }else{
+        int carnetEst = pedirCarnetEst();
+        estudiante* tempEst = buscarEst(carnetEst);
+        if(tempEst == NULL){
+        cout<<"Estudiante no encontrado"<<endl;
+        return;
+        }else{
+            string codigo;
+            int numG;
 
+            cout<<"Ingrese el codigo del curso (Ej. IC3101): ";
+            cin>>codigo;
+
+            cout<<"Ingrese el numero de grupo: ";
+            cin>>numG;
+
+            grupo* tempG = encontrarGrupo(codigo, numG);
+            if(tempG == NULL){
+                cout<<"Grupo no encontrado"<<endl;
+                return;
+            }else{//Group and student exist
+                int idG = 100*(stoi(codigo.substr(2,4))) + numG;
+                if(tempEst->gruposEstAux->enlaceGrupo->idCurso == idG){//Delet the beginning of the list
+                    tempEst->gruposEstAux = tempEst->gruposEstAux->sigEn; 
+                    cout<<"Curso desvinculado del estudiante exitosamente"<<endl;
+                    return;
+                }else{                                                  //Delete middle or end of list
+                    enlazarGrupo* tempEn = tempEst->gruposEstAux;
+                    while(tempEn->sigEn != NULL){
+                        if(tempEn->sigEn->enlaceGrupo->idCurso == idG){
+                            tempEn->sigEn = tempEn->sigEn->sigEn;
+                            cout<<"Curso desvinculado del estudiante exitosamente"<<endl;
+                            return;
+                        }
+                        tempEn = tempEn->sigEn;
+                    }
+                    cout<<"Ha occurrido un error al desvincular el grupo"<<endl;
+                }
+            
+            }
+
+        }   
+
+    }
+
+}
 
 void reporteGruposEst(){
     int carnetEst;
@@ -1083,6 +1132,13 @@ void insertarAdminAux(){
 
 //------------------Teachers' Methods---------------------------------
 
+int pedirCedulaProf(){
+    int cedulaP;
+    cout<<"Ingrese la cedula del profesor a ingresar: ";
+    cin>>cedulaP;
+    return cedulaP;
+}
+
 profesor* buscarProf(int cedulaP){
     profesor *temp = listaProfesores;
     while(temp != NULL){
@@ -1094,9 +1150,7 @@ profesor* buscarProf(int cedulaP){
 }
 
 void insertarProf(){
-    int cedulaP;
-    cout<< "Ingrese la cedula del profesor a ingresar:"<<endl;
-    cin>> cedulaP;
+    int cedulaP = pedirCedulaProf();
 
     if((buscarProf(cedulaP)) != NULL){
         cout<<"El profesor ya se encuentra registrado"<<endl;
@@ -1119,10 +1173,7 @@ void insertarProf(){
 }
 
 void modificarProf(){
-    cout<< "Ingrese la cedula del profesor a modificar: "<<endl;
-    int cedulaP;
-    cin>> cedulaP;
-
+    int cedulaP = pedirCedulaProf();
     profesor *temp = buscarProf(cedulaP);
     
     if(temp == NULL){
@@ -1138,10 +1189,7 @@ void modificarProf(){
 }
 
 void eliminarProf(){
-    cout<< "Ingrese la cedula del profesor a eliminar: "<<endl;
-    int cedProf;
-    cin>>cedProf;
-    
+    int cedProf = pedirCedulaProf();
     profesor *temp = buscarProf(cedProf);
 
     if(temp == NULL){
@@ -1169,9 +1217,7 @@ void eliminarProf(){
 }
 
 void relacionarGrupoProf(){
-    int cedulaP;
-    cout<<"Escriba la cedula del profesor: "<<endl;
-    cin>>cedulaP;
+    int cedulaP = pedirCedulaProf();
 
     profesor* tempP = buscarProf(cedulaP);
 
@@ -1199,6 +1245,58 @@ void relacionarGrupoProf(){
     nE->sigEn = tempP->gruposProfAux;
     tempP->gruposProfAux = nE;
     cout<<"\nProfesor asignado a grupo satisfactoriamente"<<endl;
+
+}
+
+void borrarGrupoProf(){
+    if(listaProfesores == NULL){
+        cout<<"No hay profesores registrados"<<endl;
+        return;
+    }else{
+        int cedulaP = pedirCedulaProf();
+        profesor* tempProf = buscarProf(cedulaP);
+
+        if(tempProf == NULL){
+        cout<<"Profesor no encontrado"<<endl;
+        return;
+        }else{
+            string codigo;
+            int numG;
+
+            cout<<"Ingrese el codigo del curso (Ej. IC3101): ";
+            cin>>codigo;
+
+            cout<<"Ingrese el numero de grupo: ";
+            cin>>numG;
+
+            grupo* tempG = encontrarGrupo(codigo, numG);
+            if(tempG == NULL){
+                cout<<"Grupo no encontrado"<<endl;
+                return;
+            }else{//Group and student exist
+                int idG = 100*(stoi(codigo.substr(2,4))) + numG;
+                if(tempProf->gruposProfAux->enlaceGrupo->idCurso == idG){//Delet the beginning of the list
+                    tempProf->gruposProfAux = tempProf->gruposProfAux->sigEn; 
+                    cout<<"Curso desvinculado del estudiante exitosamente"<<endl;
+                    return;
+                }else{                                                  //Delete middle or end of list
+                    enlazarGrupo* tempEn = tempProf->gruposProfAux;
+                    while(tempEn->sigEn != NULL){
+                        if(tempEn->sigEn->enlaceGrupo->idCurso == idG){
+                            tempEn->sigEn = tempEn->sigEn->sigEn;
+                            cout<<"Curso desvinculado del estudiante exitosamente"<<endl;
+                            return;
+                        }
+                        tempEn = tempEn->sigEn;
+                    }
+                    cout<<"Ha occurrido un error al desvincular el grupo"<<endl;
+                }
+            
+            }
+
+        }   
+
+    }
 
 }
 
@@ -1352,7 +1450,7 @@ void menuAdminCurso(){
 void menuAdminEst(){
     cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
     
-    cout<<"a- Insertar estudiante\nb- Modificar estudiante\nc- Borrar estudiante\nd- Asignar a grupo\n\n1- Volver al menu de administrador\n2- Volver al menu principal\n\n\nOpcion: ";
+    cout<<"a- Insertar estudiante\nb- Modificar estudiante\nc- Borrar estudiante\nd- Asignar a grupo\ne- Desvincular a grupo\n\n1- Volver al menu de administrador\n2- Volver al menu principal\n\n\nOpcion: ";
     string opcion;
     cin>> opcion;
 
@@ -1370,6 +1468,9 @@ void menuAdminEst(){
     }
     else if(opcion == "d"){
         relacionarGrupoEst();
+        menuAdminEst();
+    }else if(opcion == "e"){
+        borrarGrupoEst();
         menuAdminEst();
     }else if(opcion == "z"){
         reporteGruposEst();
@@ -1394,16 +1495,23 @@ void menuAdminProf(){
     if (opcionMenuAdminProf== "a"){
         //cout<< "Insertar"<<endl;
         insertarProf();
+        menuAdminProf();
     }else if(opcionMenuAdminProf=="b"){
         //cout<< "Modificar"<<endl;
         modificarProf();
+        menuAdminProf();
         
     }else if(opcionMenuAdminProf=="c"){
         eliminarProf();
+        menuAdminProf();
         //cout<< "Borrar"<<endl;
 
     }else if(opcionMenuAdminProf=="d"){
         relacionarGrupoProf();
+        menuAdminProf();
+    }else if(opcionMenuAdminProf=="e"){
+        borrarGrupoProf();
+        menuAdminProf();
     }else if(opcionMenuAdminProf=="1"){
         //cout<<"Salir"<<endl;
         menuAdmin();
@@ -1413,7 +1521,7 @@ void menuAdminProf(){
     }
     else if(opcionMenuAdminProf=="z"){
         reporteGruposProfe();
-
+        menuAdminProf();
     }else{
         cout<< "Ingrese una opcion valida"<<endl;
         menuAdminProf();
