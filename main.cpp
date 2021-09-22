@@ -496,13 +496,7 @@ void modificarCurso(){
     } 
 }
 
-void eliminarCurso(){
-    int codigoC;
-    string abvC; //Abreviatura curso
-    cout<<"Ingrese el codigo del curso a eliminar: "<<endl;
-    cin>>codigoC;
-    cout<<"Ingrese la abreviatura del curso a eliminar: "<<endl;
-    cin>>abvC;
+void eliminarCurso(int codigoC, string abvC){
     if(listaCursos == NULL){
         cout<<"Lista vacia!"<<endl;
     }
@@ -519,6 +513,14 @@ void eliminarCurso(){
         return;
     } 
 }
+
+void eliminarCursoAux(){
+    string abv = pedirAbvCurso();
+    int codigo = pedirCodCurso();
+
+    eliminarCurso(codigo, abv); 
+}
+
 
 void mostrarCurso(){
     cout<<"Lista de cursos"<<endl;
@@ -1160,7 +1162,7 @@ void menuAdminCurso(){
         menuAdminCurso();
     }
     else if(opcion == "c"){
-        eliminarCurso();
+        eliminarCursoAux();
         menuAdminCurso();
     }
     else if(opcion == "z"){
