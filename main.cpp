@@ -7,6 +7,7 @@ Estudiantes: Earl Areck Alvarado,
 */
 
 #include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -74,17 +75,18 @@ struct grupo{//Simple linked list
     int idCurso;       //310151
     struct curso *cursoActual; //Links to the class the group is in
     struct evaluaciones *evaluacionesEst; //Links to the evaluations the group has
-    
+    struct enlaceCurso *enlazarCurso; //Next group in the course
+
     grupo(int nNumGrupo, string nAbreviatura, int nCodigoNum){
         numGrupo = nNumGrupo;
         abreviatura = nAbreviatura;
         codigoNum = nCodigoNum;
-        
-        
+        idCurso = (100*nCodigoNum) + nNumGrupo;
 
         cursoActual = NULL;
         evaluacionesEst = NULL;
         sigGrupo= NULL;
+        enlazarCurso = NULL;
     }
 
 } *listaGrupos;
@@ -122,11 +124,11 @@ struct semestre{ //Simple linked list
 } *listaSemestres;
 
 struct enlaceCurso{//Simple linked list
-    struct curso *sigCurso; //Links to the course itself
+    struct grupo *sigGrupo; //Links to the course itself
     enlaceCurso *sig; //Orders the courses
 
-    enlaceCurso(curso *nSigCurso){
-        sigCurso= nSigCurso;
+    enlaceCurso(grupo *nSigGrupo){
+        sigGrupo = nSigGrupo;
         sig = NULL;
     }
 };
@@ -283,35 +285,6 @@ struct charla{//Simple linked list
 
 //-----------------------------------------------------------------------------------Methods
 
-//------------------Group's Methods----------------------------------
-
-grupo* buscarGrupo(int nGrupo){
-    grupo *temp = listaGrupos;
-    while(temp != NULL){
-        if(temp->codigoNum == nGrupo){
-            return temp;
-        }
-        temp = temp->sigGrupo;
-    }
-    return NULL;
-}
-
-void insertarGrupo(){
-    int nGrupo;
-    string 
-    cout<<"Ingrese el codigo del grupo: ";
-    cin>>nGrupo;
-
-    grupo*buscar = buscarGrupo(nGrupo);
-    if(buscar != NULL){
-        cout<<"Grupo ya existente"<<endl;
-    }
-    else
-    {
-
-
-    }
-}
 
 //------------------Periods' Methods---------------------------------
 void menuAdminSemestre();
@@ -430,6 +403,25 @@ void modificarSemestre(){
 
 //------------------Courses' Methods---------------------------------
 
+curso* buscarCurso(string codigo){
+    string abv = codigo.substr(0,2);
+    int numCurso = stoi(codigo.substr(2,4));
+    if(listaCursos == NULL){
+        return NULL;
+    }
+    else{
+        curso *temp = listaCursos;
+        do{
+            if((temp->codigoNum == numCurso) && (temp->abreviatura == abv)){
+                //cout<<"Encontrado: "<<temp->nombre<<endl;
+                return temp;
+            }
+            temp = temp->sigCurso;
+        }while(temp != listaCursos);
+        return NULL;
+    } 
+}
+
 void insertarCurso(){
     string nombreC;
     string abvC;//Abreviatura Curso 
@@ -440,45 +432,42 @@ void insertarCurso(){
     cin>>abvC;
     cout<<"Ingrese el codigo del curso: ";
     cin>>codigoNumC;
+    cout<<"Nombre: "<<nombreC<<"Abreviatura: "<<abvC<<"Codigo: "<<codigoNumC<<endl;
     curso *nC = new curso(nombreC, abvC, codigoNumC);
     if(listaCursos == NULL){
+        cout<<"Lista vacia"<<endl;
         listaCursos=nC;
         nC->sigCurso=nC;
     }
     else{
+        cout<<"No vacia"<<endl;
         nC->sigCurso = listaCursos;
         curso *temp = listaCursos;
         while(temp->sigCurso != listaCursos)
             temp = temp->sigCurso;
         temp->sigCurso = nC;
+        nC->sigCurso = listaCursos;
+        
+        cout<<"Curso insertado existosamente"<<endl;
     }
 }
 
 void modificarCurso(){
-    int codigoC;
-    string nuevoNom;
-    string abvC;//Abreviatura curso 
-    cout<<"Ingrese el codigo del curso: ";
-    cin>>codigoC;
-    cout<<"Ingrese la abreviatura del curso: ";
-    cin>>abvC;
+    string codigo;
+    cout<<"Ingrese el codigo del curso (Ej. IC3101): ";
+    cin>>codigo;
 
-    if(listaCursos == NULL){
-        cout<<"Lista vacia!"<<endl;
+    curso* buscado = buscarCurso(codigo);
+    
+    if(buscado == NULL){
+        cout<<"Elemento no encontrado"<<endl;
     }
     else{
-        curso *temp = listaCursos;
-        while(temp->sigCurso != listaCursos){
-            if((temp->codigoNum == codigoC) && (temp->abreviatura == abvC)){
-                cout<<"Ingrese el nuevo nombre del curso: "<<endl;
-                cin>>nuevoNom;
-                temp->nombre = nuevoNom;
-                return;
-            }
-            temp = temp->sigCurso;
-        }
-        cout<<"No se ha encontrado el curso"<<endl;
-        return;
+        string nuevoNom;
+        cout<<"Escriba el nuevo nombre: ";
+        cin>>nuevoNom;
+        buscado->nombre = nuevoNom;
+        cout<<"Nombre del curso cambiado con exito"<<endl;
     } 
 }
 
@@ -494,18 +483,31 @@ void eliminarCurso(){
     }
     else{
         curso *temp = listaCursos;
-        while(temp->sigCurso != listaCursos){
+        do{
             if(((temp->sigCurso)->codigoNum == codigoC) && ((temp->sigCurso)->abreviatura) == abvC){
                 temp->sigCurso = (temp->sigCurso)->sigCurso;
                 return;
             }
             temp = temp->sigCurso;
-        }
+        }while(temp != listaCursos);
         cout<<"No se ha encontrado el curso"<<endl;
         return;
     } 
 }
 
+void mostrarCurso(){
+    cout<<"Lista de cursos"<<endl;
+    if(listaCursos == NULL){
+        cout<<"Lista vacia!"<<endl;
+    }
+    else{
+        curso *temp = listaCursos;
+        do{
+            cout<<temp->nombre<<endl;
+            temp = temp->sigCurso;
+        }while(temp != listaCursos);
+    }
+}
 
 
 //------------------Students' Methods---------------------------------
@@ -708,6 +710,70 @@ void eliminarEst(){
 }
 
 
+//------------------Group's Methods----------------------------------
+
+grupo* buscarGrupo(int nGrupo){
+    grupo *temp = listaGrupos;
+    while(temp != NULL){
+        if(temp->codigoNum == nGrupo){
+            return temp;
+        }
+        temp = temp->sigGrupo;
+    }
+    return NULL;
+}
+
+void insertarGrupo(){
+    string codigo;
+    cout<<"Ingrese el codigo del curso (Ej. IC3101): ";
+    cin>>codigo;
+
+    curso* cursoG = buscarCurso(codigo);
+    if(cursoG == NULL){
+        cout<<"No se ha encontrado el curso"<<endl;
+    }else{
+        int numGrupo;
+        cout<<"Ingrese el numero de grupo: ";
+        cin>>numGrupo;
+
+        string abv = codigo.substr(0,2);
+        int numCurso = stoi(codigo.substr(2,4));
+
+        struct grupo *nG = new grupo(numGrupo, abv, numCurso);
+        //nG->sigGrupo = listaGrupos;//Lo agrego a los grupos
+        //listaGrupos = nG;//Al inicio
+        nG->cursoActual = cursoG;//Lo linkeo al curso que pertenece
+
+        //enlaceCurso *nE = new enlaceCurso(nG);//Nuevo enlace
+        nG->sigGrupo = cursoG->grupoCursando; //Inicio de la lista de grupos cursando el curso
+        cursoG->grupoCursando = nG;
+
+        cout<<"Grupo insertado con exito"<<endl;
+    }
+
+}
+
+void reporteGrupo(){
+    string codigo;
+    cout<<"Ingrese el codigo del curso (Ej. IC3101): ";
+    cin>>codigo;
+
+    curso* tempCurso = buscarCurso(codigo);
+
+    cout<<"Nombre del curso: "<<tempCurso->nombre<<endl;
+    cout<<"Grupos actuales: "<<endl;
+
+    grupo *tempGrupo = tempCurso->grupoCursando;
+    while(tempGrupo != NULL){
+        cout<<"G"<<tempGrupo->numGrupo<<endl;
+        cout<<"ID del curso: "<<tempGrupo->idCurso<<endl;
+        tempGrupo = tempGrupo->sigGrupo;
+    }
+    cout<<"Fin de reporte"<<endl;
+
+}
+
+
 //------------------Admin Methods---------------------------------
 
 administrador* buscarAdmin(string nombreA){
@@ -890,7 +956,6 @@ void imprimirSemestres(){
 
 void menuPrincipal();
 void menuAdmin();
-void menuAdminSemestre();
 
 void menuAdminSemestre(){
     cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
@@ -941,8 +1006,8 @@ void menuAdminCurso(){
         menuAdminCurso();
     }
     else if(opcion == "z"){
-        imprimirEstudiantes();
-        menuAdminEst();
+        mostrarCurso();
+        menuAdminCurso();
     }
     else if(opcion == "1")
         menuAdmin();
@@ -1023,7 +1088,7 @@ void menuAdminProf(){
 }
 void menuAdmin(){
     cout<<"\nEscoja e ingrese el caracter del objeto que desea modificar:"<<endl;
-    cout<<"a- Insertar Administrador\nb- Profesores\nc- Estudiantes\nd- Semestres\ne- Cursos\nf- Grupos\n\n0- Volver al menu principal\nOpcion: ";
+    cout<<"a- Insertar Administrador\nb- Profesores\nc- Estudiantes\nd- Semestres\ne- Cursos\nf- Insertar grupo\n\n0- Volver al menu principal\nOpcion: ";
     
     string opcionMenuAdmin;
     
@@ -1048,11 +1113,18 @@ void menuAdmin(){
         menuAdminCurso();
     }
     else if(opcionMenuAdmin == "f"){
-        cout<< "Grupos"<<endl;
+        insertarGrupo();
+        menuAdmin();
+        //reporteGrupo();
     }
     else if(opcionMenuAdmin == "0"){
         menuPrincipal();
-    }else{
+    }
+    else if(opcionMenuAdmin == "z"){
+        reporteGrupo();
+        menuAdmin();
+    }
+    else{
         cout<<"Ingrese una opcion valida."<<endl;
         menuAdmin();
     }
