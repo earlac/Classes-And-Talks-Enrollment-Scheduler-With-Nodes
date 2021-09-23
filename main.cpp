@@ -74,7 +74,7 @@ struct grupo{//Simple linked list
     int codigoNum;     //3101
     int idCurso;       //310151
     struct curso *cursoActual; //Links to the class the group is in
-    struct evaluaciones *evaluacionesEst; //Links to the evaluations the group has
+    struct evaluacion *listaEvaluacion; //Links to the evaluations the group has
     struct enlaceCurso *enlazarCurso; //Next group in the course
 
     grupo(int nNumGrupo, string nAbreviatura, int nCodigoNum){
@@ -84,7 +84,7 @@ struct grupo{//Simple linked list
         idCurso = (100*nCodigoNum) + nNumGrupo;
 
         cursoActual = NULL;
-        evaluacionesEst = NULL;
+        listaEvaluacion = NULL;
         sigGrupo= NULL;
         enlazarCurso = NULL;
     }
@@ -163,98 +163,25 @@ struct evaluacionesEntregadas{//Simple linked list
 };
 
 struct evaluacion{//Simple linked list. Links to the different evaluations the group has 
-    
-    struct tarea    *sigTarea;
-    struct examen   *sigExamen;
-    struct proyecto *sigProyecto;
-    struct gira     *sigGira;
-    
+    int     fechaEntrega; //Format: yyyy/mm/dd
+    int     hora; //Format: militar, ie. 1600 = 4p.m
+    string idActividad; //Format: Tarea#, ie. Tarea3
+    string tipo;
+    string numeroAct;
+    bool    entregado = false; //If the student did it or not. Default is false.     
     evaluacion *sigEv;
+    evaluacion(int fecha, int nHora, string nTipo, string nNumAct){
+        fechaEntrega = fecha;
+        hora = nHora;
+        tipo = nTipo;
+        numeroAct = nNumAct;
+        idActividad = tipo.append(numeroAct);
+        entregado = false;
 
-    evaluacion(tarea *nSigTarea, examen *nSigExamen, proyecto *nSigProyecto, gira *nSigGira){
-
-        sigTarea=   nSigTarea;
-        sigExamen = nSigExamen;
-        sigProyecto=nSigProyecto;
-        sigGira=    nSigGira;
-        sigEv =     NULL;
+        sigEv = NULL;
     }
 };
 
-struct tarea{//Simple linked list.
-    int     fechaEntrega; //Format: dd/mm/yyyy
-    int     hora; //Format: militar, ie. 1600 = 4p.m
-    string  idActividad; //Format: Tarea##, ie. Tarea#3
-    bool    entregado = false; //If the student did it or not. Default is false. 
-
-    tarea *sigTarea;
-    
-    tarea(int nFechaEntrega, string nIdActividad, int nHora, bool nEntregado){
-        fechaEntrega=   nFechaEntrega;
-        hora =          nHora;
-        idActividad=    nIdActividad;
-        entregado=      nEntregado;
-        
-        sigTarea= NULL;
-
-    }
-} *listaTareas;
-
-struct examen{
-    int fechaEntrega;
-    int hora;
-    string idActividad;//Format: Examen#
-    bool entregado = false;
-    
-    examen *sigExamen;
-
-    examen(int nfechaEntrega, string nIdAct, int nHora, bool nEntregado){
-        fechaEntrega = nfechaEntrega;
-        hora = nHora;
-        idActividad = nIdAct;
-        entregado = nEntregado;
-        
-        sigExamen = NULL;
-    }
-}*listaExamenes;
-
-struct proyecto{
-    int fechaEntrega;
-    int hora;
-    string idActividad;
-    bool entregado = false;
-
-    proyecto *sigProyecto;
-
-    proyecto(int nFechaEntrega, string nIdAct, int nHora, bool nEntregado){
-        fechaEntrega = nFechaEntrega;
-        hora = nHora;
-        idActividad = nIdAct;
-        entregado = nEntregado;
-
-        sigProyecto= NULL;
-    }
-}*listaProyectos;
-
-struct gira{
-    
-    int fechaEntrega;
-    int hora;
-    string idActividad;
-    bool entregado = false;
-
-    gira *sigGira;
-    
-    gira(int nFechaEntrega, string nIdAct, int nHora, bool nEntregado){
-        fechaEntrega = nFechaEntrega;
-        hora = nHora;
-        idActividad = nIdAct;
-        entregado = nEntregado;
-
-        sigGira = NULL;
-
-    }
-}*listaGiras;
 
 struct enlaceCharla{
     struct charla *sigCharla; //Links to the course itself
@@ -1134,7 +1061,7 @@ void insertarAdminAux(){
 
 int pedirCedulaProf(){
     int cedulaP;
-    cout<<"Ingrese la cedula del profesor a ingresar: ";
+    cout<<"Ingrese la cedula del profesor: ";
     cin>>cedulaP;
     return cedulaP;
 }
@@ -1149,6 +1076,13 @@ profesor* buscarProf(int cedulaP){
     return NULL;
 }
 
+string pedirNombreProf(){
+    string nombreProf;
+    cout<<"Ingrese el nombre del profesor: ";
+    cin>>nombreProf;
+    return nombreProf;
+}
+
 void insertarProf(){
     int cedulaP = pedirCedulaProf();
 
@@ -1157,9 +1091,7 @@ void insertarProf(){
     }
     else
     {
-        string nombreP;
-        cout<< "Ingrese el nombre del profesor a ingresar: ";
-        cin>> nombreP;   
+        string nombreP = pedirNombreProf(); 
 
         profesor*nP = new profesor(nombreP, cedulaP);
 
@@ -1180,9 +1112,7 @@ void modificarProf(){
         cout<<"\nEl profesor no existe, no se puede modificar"<<endl;
     }
     else{
-        string nomProf;
-        cout<<"Ingrese el nuevo nombre del profesor: "<<endl;
-        cin>>nomProf;
+        string nomProf = pedirNombreProf();
         temp->nombreProf = nomProf;
         cout<<"Nombre del profesor modificado existosamente"<<endl;
     }
@@ -1216,6 +1146,12 @@ void eliminarProf(){
     }
 }
 
+int pedirNumGrupo(){
+    int numGrupoBuscar;
+    cout<<"Ingrese el número del grupo por buscar: "<<endl;
+    cin>> numGrupoBuscar;
+    return numGrupoBuscar;
+}
 void relacionarGrupoProf(){
     int cedulaP = pedirCedulaProf();
 
@@ -1301,9 +1237,7 @@ void borrarGrupoProf(){
 }
 
 void reporteGruposProfe(){
-    int cedulaP;
-    cout<<"Escriba la cedula del profesor: "<<endl;
-    cin>>cedulaP;
+    int cedulaP = pedirCedulaProf();
 
     profesor* tempP = buscarProf(cedulaP);
 
@@ -1323,6 +1257,8 @@ void reporteGruposProfe(){
         cout<<"\nFinal de reporte"<<endl;
     }    
 }
+
+
 
 
 //------------------Printing Methods---------------------------------
@@ -1376,9 +1312,245 @@ void imprimirSemestres(){
 
 }
 
+//------------------------------------------------Teacher's Methods---------------------------
+
+/*
+void ingresarAdmin(){
+    string nombreA;
+    string contrasennaA;
+    string opcion;
+    administrador* temp = listaAdministradores;
+    
+    cout<<"Nombre de usuario: ";
+    cin>>nombreA;
+
+    if ((buscarAdmin(nombreA)) == NULL){
+        cout<<"El usuario ingresado no existe. Si desea volver al menu principal digite 1"<<endl;
+        cin>>opcion;
+        if(opcion == "1"){
+            menuPrincipal();
+        }
+        else{
+            ingresarAdmin();
+        }
+    }
+    else{
+        cout<<"Contrasena: ";
+        cin>>contrasennaA;
+    
+        temp = (buscarAdmin(nombreA));
+        if ((temp->contrasenna != contrasennaA)){
+            cout<<"Usuario o contrasena incorrecta"<<endl;
+            menuPrincipal();
+        }else{
+            menuAdmin();
+        }
+    }
+}
+*/
+void menuPrincipal();
+void menuProfesor();
+
+void ingresarProfesor(){
+    string nombreP = pedirNombreProf();
+    int cedulaProf = pedirCedulaProf();
+    string opcion;
+    
+    profesor* tempProf = buscarProf(cedulaProf);
+
+    if(tempProf == NULL){
+        cout<<"Usuario no encontrado"<<endl;
+    }
+    else{
+        if (nombreP != tempProf->nombreProf){
+            cout<<"Usuario o contrasenna incorrectos /nDesea volver al menu principal? (S/n): "; 
+            cin>>opcion;
+            if(opcion == "S"){
+                menuPrincipal();
+            }else{
+                ingresarProfesor();
+            }
+        }else{
+            menuProfesor();
+        }
+    }
+
+}
+
+grupo* buscarGrupoProfe(){
+    int cedulaP = pedirCedulaProf();
+
+    profesor* tempP = buscarProf(cedulaP);
+
+    if(tempP == NULL){
+        cout<<"Profesor no encontrado"<<endl;
+        return NULL;
+    }else{
+        enlazarGrupo* tempG = tempP->gruposProfAux;
+        int numG = pedirNumGrupo();
+        while(tempG != NULL){
+            if(tempG->enlaceGrupo->numGrupo = numG){
+                return tempG->enlaceGrupo;
+            }
+            tempG = tempG->sigEn;
+        }
+        return NULL;
+    }    
+}
+
+
+string pedirTipoAct(){
+    string tipoAct;
+    string opcion;
+    cout<<"\nIngrese el numero correspondiente al tipo de actividad: \n1-Tarea\n2-Proyecto\n3-Examen\n4-Giras\nOpcion: ";
+    cin>>opcion;
+    if(opcion=="1"){
+        tipoAct = "Tarea";
+    }else if(opcion=="2"){
+        tipoAct = "Proyecto";
+    }else if(opcion=="3"){
+        tipoAct = "Examen";
+    }else if(opcion=="4"){
+        tipoAct = "Gira";
+    }else{
+        cout<<"Ingrese una opción valida por favor.";
+        pedirTipoAct();
+    }
+    return tipoAct;
+}
+
+string pedirNumAct(){
+    string num;
+    cout<<"Ingrese el numero de actividad: ";
+    cin>>num;
+    return num;
+}
+
+int pedirFechaAct(){
+    int anno;
+    int mes;
+    int dia;
+    int fecha;
+    cout<<"Dia de entrega: ";
+    cin>>dia;
+    cout<<""<<endl;
+    cout<<"Mes de entrega: ";
+    cin>>mes;
+    cout<<""<<endl;
+    cout<<"Año de entrega: ";
+    cin>>anno;
+    cout<<""<<endl;
+    
+    int codigo;
+    codigo= anno*10000 + mes*100 + dia;
+    
+    return codigo;
+}
+
+int pedirHoraAct(){
+    int hora;
+    cout<<"Ingrese la hora de entrega (Formato militar. Ejemplo: 1600 (4:00p.m.)): ";
+    cin>>hora;
+    return hora;
+}
+
+void insertarActividad(){
+    grupo* tempG = buscarGrupoProfe();
+
+    if(tempG == NULL){
+        cout<<"Grupo no encontrado"<<endl;
+        return;
+    }
+    else{
+        string tipoAct = pedirTipoAct();
+        string numAct = pedirNumAct();        
+        int fechaAct = pedirFechaAct();
+        int horaAct = pedirHoraAct();
+        
+        evaluacion* nEv = new evaluacion(fechaAct, horaAct, tipoAct, numAct);
+    
+        if(tempG->listaEvaluacion == NULL){//Empty list
+            tempG->listaEvaluacion = nEv;
+            cout<<"Actividad creada con exito vacia"<<endl;
+            return;
+        }else{
+            evaluacion* tempEv = tempG->listaEvaluacion;
+
+            if(tempEv->fechaEntrega >= nEv->fechaEntrega){//Insert beginning of linked list
+                nEv->sigEv = tempEv;
+                tempEv->sigEv = nEv;
+                cout<<"Actividad creada con exito inicio"<<endl;
+                return;
+            }
+            while(tempEv->sigEv != NULL){//Insert in the middle
+                if(tempEv->sigEv->fechaEntrega <= nEv->fechaEntrega){
+                    nEv->sigEv = tempEv->sigEv;
+                    tempEv->sigEv = nEv;
+                    cout<<"Actividad creada con exito medio"<<endl;
+                    return;
+                }
+                tempEv = tempEv->sigEv;
+            }
+            tempEv->sigEv = nEv;
+            nEv->sigEv = NULL;
+            cout<<"Actividad creada con exito final"<<endl;
+            return;
+        }        
+    }
+}
+
+void imprimirActProf(){
+    grupo* tempG = buscarGrupoProfe();
+    if(tempG == NULL){
+        cout<<"Grupo no encontrado"<<endl;
+        return;
+    }
+    else{
+        evaluacion* tempEv = tempG->listaEvaluacion;
+        while(tempEv != NULL){
+            cout<<"Actividades: "<<endl;
+            cout<<"Tipo: "<<tempEv->tipo<<" Numero: "<<tempEv->numeroAct<< " Fecha de Entrega: "<<tempEv->fechaEntrega<<" Hora: "<<tempEv->hora<<endl;
+            tempEv = tempEv->sigEv;
+        }
+        cout<<"Fin de reporte"<<endl;
+    }
+}
+
 //------------------Menus---------------------------------
 
 void menuPrincipal();
+
+void menuProfesor(){
+    cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
+    cout<<"a- Crear Actividad\nb- Modificar Actividad\nc- Borrar Actividad\n\n1- Volver al menu principal\n\n\nOpcion: ";
+    string opcion;
+    cin>> opcion;    
+
+    if(opcion == "a"){
+        insertarActividad();
+        menuProfesor();
+    }
+    else if(opcion == "b"){
+        menuProfesor();
+    }
+    else if(opcion == "c"){
+        menuProfesor();
+    }
+    else if(opcion == "1"){
+        menuProfesor();
+    }
+    else if(opcion == "z"){
+        imprimirActProf();
+        menuProfesor();
+    }
+    else{
+        cout<<"Opcion invalida"<<endl;
+        menuProfesor();
+    }
+}
+
+
+
 void menuAdmin();
 
 void menuAdminSemestre(){
@@ -1485,6 +1657,8 @@ void menuAdminEst(){
         menuAdminEst();
     }
 }
+//Brenda tengo el cepillo en laboca babosa. El problema es la validacion.
+
 
 void menuAdminProf(){
     cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
@@ -1613,14 +1787,14 @@ void menuPrincipal(){
     O: Respective function in the system.
     */
     cout<<"Bienvenido al sistema de Gestion de Actividades Curriculares"<<endl;
-    cout<<"Ingrese el numero de la seccion deseada: \n 1- Administrador\n 2- Usuario \nNumero:";
+    cout<<"Ingrese el numero de la seccion deseada: \n 1- Administrador\n 2- Usuario: Profesor\n 3- Usuario: Estudiante \nNumero:";
     int opcion;
     cin>>opcion;
     if(opcion==1){
         //cout<<"Administrador: "<<endl;
         ingresarAdmin();
     }else if(opcion==2){
-        cout<<"Usuario: "<<endl;
+        menuProfesor();
     }else{
         cout<<"Ingrese una opcion valida.";
         menuPrincipal();
@@ -1635,9 +1809,9 @@ int main(){
     insertarCurso("Datos", "IC", 2040);
     insertarCurso("Arqui", "IC", 3101);
     insertarCurso("Discreta", "MA", 2089);
+    insertarSemestre(2020, 2, 300);
     insertarSemestre(2020, 1, 250);
     insertarSemestre(2021, 1, 350);
-    insertarSemestre(2020, 2, 300);
     insertarSemestre(2021, 2, 100);
     imprimirAdmins();
     imprimirSemestres();
