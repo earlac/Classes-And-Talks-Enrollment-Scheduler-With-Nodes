@@ -524,6 +524,13 @@ int pedirCodCurso(){
     }
 }
 
+string pedirCodigoCurso(){
+    string codigo;
+    cout<<"Ingrese el codigo del curso (Ej. IC3101): ";
+    cin>>codigo;
+    return codigo;
+}
+
 curso* buscarCurso(string codigo){
     string abv = codigo.substr(0,2);
     int numCurso = stoi(codigo.substr(2,4));
@@ -1148,7 +1155,7 @@ void eliminarProf(){
 
 int pedirNumGrupo(){
     int numGrupoBuscar;
-    cout<<"Ingrese el número del grupo por buscar: "<<endl;
+    cout<<"Ingrese el numero del grupo por buscar: ";
     cin>> numGrupoBuscar;
     return numGrupoBuscar;
 }
@@ -1387,14 +1394,23 @@ grupo* buscarGrupoProfe(){
         return NULL;
     }else{
         enlazarGrupo* tempG = tempP->gruposProfAux;
-        int numG = pedirNumGrupo();
-        while(tempG != NULL){
-            if(tempG->enlaceGrupo->numGrupo = numG){
-                return tempG->enlaceGrupo;
-            }
-            tempG = tempG->sigEn;
+        string codigoC = pedirCodigoCurso();
+        if(buscarCurso(codigoC) == NULL){
+            cout<<"Curso no encontrado"<<endl;
+            return NULL;
         }
-        return NULL;
+        else{
+            int numG = pedirNumGrupo();
+            int idG = 100*(stoi(codigoC.substr(2,4))) + numG;
+            while(tempG != NULL){
+                if(tempG->enlaceGrupo->idCurso == idG){
+                    return tempG->enlaceGrupo;
+                }
+                tempG = tempG->sigEn;
+            }
+            cout<<"Grupo no encontrado"<<endl;
+            return NULL;
+        } 
     }    
 }
 
@@ -1430,14 +1446,13 @@ int pedirFechaAct(){
     int anno;
     int mes;
     int dia;
-    int fecha;
     cout<<"Dia de entrega: ";
     cin>>dia;
     cout<<""<<endl;
     cout<<"Mes de entrega: ";
     cin>>mes;
     cout<<""<<endl;
-    cout<<"Año de entrega: ";
+    cout<<"Anno de entrega: ";
     cin>>anno;
     cout<<""<<endl;
     
@@ -1453,7 +1468,7 @@ int pedirHoraAct(){
     cin>>hora;
     return hora;
 }
-
+/*
 void insertarActividad(){
     grupo* tempG = buscarGrupoProfe();
 
@@ -1468,33 +1483,85 @@ void insertarActividad(){
         int horaAct = pedirHoraAct();
         
         evaluacion* nEv = new evaluacion(fechaAct, horaAct, tipoAct, numAct);
-    
+        
         if(tempG->listaEvaluacion == NULL){//Empty list
             tempG->listaEvaluacion = nEv;
             cout<<"Actividad creada con exito vacia"<<endl;
             return;
         }else{
             evaluacion* tempEv = tempG->listaEvaluacion;
-
-            if(tempEv->fechaEntrega >= nEv->fechaEntrega){//Insert beginning of linked list
+            cout<<tempEv->fechaEntrega<<" vs "<<nEv->fechaEntrega<<endl;
+            if(tempEv->fechaEntrega > nEv->fechaEntrega){//Insert beginning of linked list
+                cout<<tempEv->fechaEntrega<<" > "<<nEv->fechaEntrega<<endl;
                 nEv->sigEv = tempEv;
-                tempEv->sigEv = nEv;
+                tempEv = nEv;
                 cout<<"Actividad creada con exito inicio"<<endl;
                 return;
             }
-            while(tempEv->sigEv != NULL){//Insert in the middle
-                if(tempEv->sigEv->fechaEntrega <= nEv->fechaEntrega){
-                    nEv->sigEv = tempEv->sigEv;
-                    tempEv->sigEv = nEv;
-                    cout<<"Actividad creada con exito medio"<<endl;
-                    return;
-                }
+            while(tempEv->sigEv != NULL){
                 tempEv = tempEv->sigEv;
             }
-            tempEv->sigEv = nEv;
+            if(tempEv->fechaEntrega < nEv->fechaEntrega){
+                cout<<tempEv->fechaEntrega<<" < "<<nEv->fechaEntrega<<endl;
+                tempEv->sigEv = nEv;
+                nEv->sigEv = NULL;
+                cout<<"Actividad creada con exito al final"<<endl;
+                return;
+            }
+            evaluacion* temp = tempG->listaEvaluacion;
+            while(tempEv->sigEv != NULL){
+                if(temp->sigEv->fechaEntrega > nEv->fechaEntrega){
+                    cout<<tempEv->fechaEntrega<<" > "<<nEv->fechaEntrega<<endl;
+                    nEv->sigEv = temp->sigEv;
+                    temp->sigEv = nEv;
+                    cout<<"Actividad creada con exito en el medio"<<endl;
+                    return;
+                }
+                temp = temp->sigEv;
+            }
+            cout<<"Algo paso"<<endl;
+        }        
+    }
+}
+*/
+void insertarActividadProf(){
+    grupo* tempG = buscarGrupoProfe();
+
+    if(tempG == NULL){
+        cout<<"Grupo no encontrado"<<endl;
+        return;
+    }
+    else{
+        string tipoAct = pedirTipoAct();
+        string numAct = pedirNumAct();        
+        int fechaAct = pedirFechaAct();
+        int horaAct = pedirHoraAct();
+        
+        evaluacion* nEv = new evaluacion(fechaAct, horaAct, tipoAct, numAct);
+
+        if(tempG->listaEvaluacion == NULL){//Empty list
+            tempG->listaEvaluacion = nEv;
             nEv->sigEv = NULL;
-            cout<<"Actividad creada con exito final"<<endl;
+            cout<<"Actividad creada con exito"<<endl;
             return;
+        }else{
+            evaluacion* tempEv = tempG->listaEvaluacion;
+            
+            if(nEv->fechaEntrega < tempEv->fechaEntrega){//Insert beginning of linked list
+                nEv->sigEv = tempG->listaEvaluacion;
+                tempG->listaEvaluacion = nEv;
+                cout<<"Actividad creada con exito"<<endl;
+                return;
+            }
+            else{
+                while((tempEv->sigEv != NULL) && (tempEv->sigEv->fechaEntrega < nEv->fechaEntrega)){//Insert in the middle or the end
+                    tempEv = tempEv->sigEv;
+                }
+                nEv->sigEv = tempEv->sigEv;
+                tempEv->sigEv = nEv;
+                cout<<"Actividad creada con exito"<<endl;
+                return;
+            }
         }        
     }
 }
@@ -1507,8 +1574,8 @@ void imprimirActProf(){
     }
     else{
         evaluacion* tempEv = tempG->listaEvaluacion;
+        cout<<"Actividades: "<<endl;
         while(tempEv != NULL){
-            cout<<"Actividades: "<<endl;
             cout<<"Tipo: "<<tempEv->tipo<<" Numero: "<<tempEv->numeroAct<< " Fecha de Entrega: "<<tempEv->fechaEntrega<<" Hora: "<<tempEv->hora<<endl;
             tempEv = tempEv->sigEv;
         }
@@ -1527,7 +1594,7 @@ void menuProfesor(){
     cin>> opcion;    
 
     if(opcion == "a"){
-        insertarActividad();
+        insertarActividadProf();
         menuProfesor();
     }
     else if(opcion == "b"){
