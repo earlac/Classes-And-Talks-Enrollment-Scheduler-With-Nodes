@@ -171,15 +171,15 @@ struct evaluacion{//Simple linked list. Links to the different evaluations the g
     string numeroAct;
     bool    entregado = false; //If the student did it or not. Default is false.     
     evaluacion *sigEv;
-    int porcentaje;
-    evaluacion(int fecha, int nHora, string nTipo, string nNumAct, int nPorcentaje){
+    int nota;                 //The grade of the student. Default is zero
+    evaluacion(int fecha, int nHora, string nTipo, string nNumAct){
         fechaEntrega = fecha;
         hora = nHora;
         tipo = nTipo;
         numeroAct = nNumAct;
         idActividad = tipo.append(numeroAct);
         entregado = false;
-        porcentaje = nPorcentaje;
+        nota = 0;
 
         sigEv = NULL;
     }
@@ -1322,7 +1322,7 @@ void imprimirSemestres(){
 
 }
 
-//------------------------------------------------Teacher's Methods---------------------------
+//------------------------------------------------Evaluation's Methods---------------------------
 
 /*
 void ingresarAdmin(){
@@ -1358,6 +1358,8 @@ void ingresarAdmin(){
     }
 }
 */
+
+//---------------------------------------------------Teacher's Methods---------------------------------------------
 void menuPrincipal();
 void menuProfesor();
 
@@ -1472,11 +1474,11 @@ int pedirHoraAct(){
     return hora;
 }
 
-int pedirPorcentaje(){
-    int porcentaje;
-    cout<<"Ingrese el porcentaje de la actividad: ";
-    cin>>porcentaje;
-    return porcentaje;
+int pedirNota(){
+    int nota;
+    cout<<"Ingrese la nota del estudiante: ";
+    cin>>nota;
+    return nota;
 }
 
 string mostrarMesAct(evaluacion* actividad){
@@ -1582,9 +1584,8 @@ void insertarActProf(){
         string numAct = pedirNumAct();        
         int fechaAct = pedirFechaAct();
         int horaAct = pedirHoraAct();
-        int porcentaje = pedirPorcentaje();
         
-        evaluacion* nEv = new evaluacion(fechaAct, horaAct, tipoAct, numAct, porcentaje);
+        evaluacion* nEv = new evaluacion(fechaAct, horaAct, tipoAct, numAct);
 
         if(tempG->listaEvaluacion == NULL){//Empty list
             tempG->listaEvaluacion = nEv;
@@ -1642,9 +1643,9 @@ void modificarActProf(){
     if(tempEv == NULL){
         cout<<"Actividad no encontrada"<<endl;
     }else{
-        int nPorcentaje = pedirPorcentaje();
-        tempEv->porcentaje = nPorcentaje;
-        cout<<"\nPorcentaje de la actividad cambiado con exito"<<endl;
+        int nNota = pedirNota();
+        tempEv->nota = nNota;
+        cout<<"\nNota de la actividad cambiada con exito"<<endl;
     }   
 }
 
@@ -1694,6 +1695,9 @@ void imprimirActProf(){
         cout<<"Fin de reporte"<<endl;
     }
 }
+
+//---------------------------------------------------Student's Methods---------------------------------------------
+
 
 //------------------Menus---------------------------------
 
@@ -1838,8 +1842,6 @@ void menuAdminEst(){
         menuAdminEst();
     }
 }
-//Brenda tengo el cepillo en laboca babosa. El problema es la validacion.
-
 
 void menuAdminProf(){
     cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
@@ -1991,15 +1993,15 @@ int main(){
     insertarAdmin("Maria", "123");
     insertarAdmin("Juan", "4567");
     insertarAdmin("Carlos", "930");
-    cout<<"\tInsertando Cursos\n"; 
-    insertarCurso("Datos", "IC", 2040);
-    insertarCurso("Arqui", "IC", 3101);
-    insertarCurso("Discreta", "MA", 2089);
     cout<<"\tInsertando Semestres\n"; 
     insertarSemestre(2020, 2, 300);
     insertarSemestre(2020, 1, 250);
     insertarSemestre(2021, 1, 350);
     insertarSemestre(2021, 2, 100);
+    cout<<"\tInsertando Cursos\n"; 
+    insertarCurso("Datos", "IC", 2040);
+    insertarCurso("Arqui", "IC", 3101);
+    insertarCurso("Discreta", "MA", 2089);
     imprimirAdmins();
     imprimirSemestres();
     menuPrincipal();
