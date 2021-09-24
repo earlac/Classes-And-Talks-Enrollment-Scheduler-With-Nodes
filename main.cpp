@@ -8,6 +8,7 @@ Estudiantes: Earl Areck Alvarado,
 
 #include <iostream>
 #include <string>
+#include <ctime>
 
 using namespace std;
 
@@ -165,18 +166,20 @@ struct evaluacionesEntregadas{//Simple linked list
 struct evaluacion{//Simple linked list. Links to the different evaluations the group has 
     int     fechaEntrega; //Format: yyyy/mm/dd
     int     hora; //Format: militar, ie. 1600 = 4p.m
-    string idActividad; //Format: Tarea#, ie. Tarea3
+    string idActividad; //Format: Tarea#, ie. Tarea3 Identificador
     string tipo;
     string numeroAct;
     bool    entregado = false; //If the student did it or not. Default is false.     
     evaluacion *sigEv;
-    evaluacion(int fecha, int nHora, string nTipo, string nNumAct){
+    int porcentaje;
+    evaluacion(int fecha, int nHora, string nTipo, string nNumAct, int nPorcentaje){
         fechaEntrega = fecha;
         hora = nHora;
         tipo = nTipo;
         numeroAct = nNumAct;
         idActividad = tipo.append(numeroAct);
         entregado = false;
+        porcentaje = nPorcentaje;
 
         sigEv = NULL;
     }
@@ -258,7 +261,7 @@ void insertarSemestre(int annoS, int semS, int presupuestoS){
 
     //if list is empty
     if(listaSemestres == NULL){
-        cout<<"Lista vacia"<<endl;
+        //cout<<"Lista vacia"<<endl;
         listaSemestres=nS;
         nS->sigSem=NULL;
         nS->antSem=NULL;
@@ -268,7 +271,7 @@ void insertarSemestre(int annoS, int semS, int presupuestoS){
     //Item goes first
     semestre *tempA= listaSemestres;
     if(tempA-> abreviatura> codigoS){
-        cout<<"Primero"<< endl;
+        //cout<<"Primero"<< endl;
         nS->antSem= NULL;
         nS->sigSem= tempA;
         tempA-> antSem= nS;
@@ -282,7 +285,7 @@ void insertarSemestre(int annoS, int semS, int presupuestoS){
         tempB= tempB-> sigSem;
     }
     if(tempB->abreviatura<codigoS){
-        cout<<"Ultimo"<< endl;
+        //cout<<"Ultimo"<< endl;
         tempB->sigSem= nS;
         nS->antSem= tempB;
         nS-> sigSem= NULL;
@@ -293,7 +296,7 @@ void insertarSemestre(int annoS, int semS, int presupuestoS){
     semestre *tempC= listaSemestres;
     while(tempC->sigSem!= NULL){
         if(tempC->abreviatura>codigoS){
-            cout<<"Centro"<< endl;
+            //cout<<"Centro"<< endl;
             (tempC->antSem)->sigSem=nS;
 
             nS-> antSem= tempC-> antSem;
@@ -1042,7 +1045,7 @@ void insertarAdmin(string nombreA, string contrasennaA){
     administrador *nA = new administrador(nombreA, contrasennaA);
     nA->sigAdmin = listaAdministradores;
     listaAdministradores = nA;     
-    cout<<"\nAdministrador insertado existosamente"<<endl;
+    cout<<"Administrador insertado existosamente"<<endl;
 }
 
 void insertarAdminAux(){
@@ -1312,7 +1315,7 @@ void imprimirSemestres(){
     semestre *temp = listaSemestres;
     cout<<"Lista de semesetres: "<<endl;
     while(temp != NULL){
-        cout<<"pasando al siguiente"<<endl;
+        //cout<<"pasando al siguiente"<<endl;
         cout<<"Periodo: "<<temp->numSemestre<<", Anno: "<<temp->anno<<", Presupuesto: "<<temp->presupuesto<<" millones de colones"<<endl;
         temp = temp->sigSem;
     }
@@ -1468,6 +1471,49 @@ int pedirHoraAct(){
     cin>>hora;
     return hora;
 }
+
+int pedirPorcentaje(){
+    int porcentaje;
+    cout<<"Ingrese el porcentaje de la actividad: ";
+    cin>>porcentaje;
+    return porcentaje;
+}
+
+string mostrarMesAct(evaluacion* actividad){
+    string meses[12] = {"Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Setiembre", "Octubre", "Noviembre", "Diciembre"};
+    string mes = meses[(((actividad->fechaEntrega)%10000)/100)-1];
+    return mes;
+}
+
+int calcularMesAct(evaluacion* actividad){
+    int mes = ((actividad->fechaEntrega)%10000)/100;
+    return mes;
+}
+
+int calcularDiaAct(evaluacion* actividad){
+    int dia = (actividad->fechaEntrega)%100;
+    return dia;
+}
+
+int calcularAnnoAct(evaluacion* actividad){
+    int anno = (actividad->fechaEntrega)/10000;
+    return anno;
+}
+
+int calcularSemAct(evaluacion* actividad){
+    int anno = calcularAnnoAct(actividad);
+    int mes = calcularMesAct(actividad);
+    int dia = calcularDiaAct(actividad);
+    
+    tm date={};
+    date.tm_year=anno-1900;
+    date.tm_mon=mes-1;
+    date.tm_mday=dia;
+    mktime(&date);
+
+    return ((date.tm_yday-date.tm_wday+7)/7);
+}
+
 /*
 void insertarActividad(){
     grupo* tempG = buscarGrupoProfe();
@@ -1524,7 +1570,7 @@ void insertarActividad(){
     }
 }
 */
-void insertarActividadProf(){
+void insertarActProf(){
     grupo* tempG = buscarGrupoProfe();
 
     if(tempG == NULL){
@@ -1536,8 +1582,9 @@ void insertarActividadProf(){
         string numAct = pedirNumAct();        
         int fechaAct = pedirFechaAct();
         int horaAct = pedirHoraAct();
+        int porcentaje = pedirPorcentaje();
         
-        evaluacion* nEv = new evaluacion(fechaAct, horaAct, tipoAct, numAct);
+        evaluacion* nEv = new evaluacion(fechaAct, horaAct, tipoAct, numAct, porcentaje);
 
         if(tempG->listaEvaluacion == NULL){//Empty list
             tempG->listaEvaluacion = nEv;
@@ -1563,6 +1610,71 @@ void insertarActividadProf(){
                 return;
             }
         }        
+    }
+}
+
+evaluacion* buscarEvaluacionProf(string idAct){
+    grupo* tempG = buscarGrupoProfe();
+
+    if(tempG == NULL){
+        cout<<"Grupo no encontrado"<<endl;
+        return NULL;
+    }
+    else{
+        evaluacion *tempEv = tempG->listaEvaluacion;
+        while(tempEv != NULL){
+            if(tempEv->idActividad == idAct){
+                return tempEv;
+            }
+            tempEv = tempEv->sigEv;
+        }
+        return NULL;
+    }
+}
+
+void modificarActProf(){
+    string tipo = pedirTipoAct();
+    string numAct = pedirNumAct();
+    string idAct = tipo.append(numAct);
+    
+    evaluacion* tempEv = buscarEvaluacionProf(idAct);
+    
+    if(tempEv == NULL){
+        cout<<"Actividad no encontrada"<<endl;
+    }else{
+        int nPorcentaje = pedirPorcentaje();
+        tempEv->porcentaje = nPorcentaje;
+        cout<<"\nPorcentaje de la actividad cambiado con exito"<<endl;
+    }   
+}
+
+void borrarActProf(){    
+    grupo* tempG = buscarGrupoProfe();
+
+    if(tempG == NULL){
+        cout<<"Grupo no encontrado"<<endl;
+        return;
+    }
+    else{
+        string tipo = pedirTipoAct();
+        string numAct = pedirNumAct();
+        string idAct = tipo.append(numAct);
+        if(tempG->listaEvaluacion->idActividad == idAct){
+            tempG->listaEvaluacion = tempG->listaEvaluacion->sigEv;
+            cout<<"Actividad eliminada con exito"<<endl;
+            return;
+        }else{
+            evaluacion *tempEv = tempG->listaEvaluacion;
+            evaluacion *tempAnt;
+            while(tempEv != NULL){
+                if(tempEv->idActividad == idAct){
+                    tempAnt->sigEv = tempEv->sigEv;
+                    cout<<"Actividad eliminada con exito"<<endl;
+                }
+                tempAnt = tempEv;
+                tempEv = tempEv->sigEv;
+            }
+        }
     }
 }
 
@@ -1594,17 +1706,19 @@ void menuProfesor(){
     cin>> opcion;    
 
     if(opcion == "a"){
-        insertarActividadProf();
+        insertarActProf();
         menuProfesor();
     }
     else if(opcion == "b"){
+        modificarActProf();
         menuProfesor();
     }
     else if(opcion == "c"){
+        borrarActProf();
         menuProfesor();
     }
     else if(opcion == "1"){
-        menuProfesor();
+        menuPrincipal();
     }
     else if(opcion == "z"){
         imprimirActProf();
@@ -1854,14 +1968,17 @@ void menuPrincipal(){
     O: Respective function in the system.
     */
     cout<<"Bienvenido al sistema de Gestion de Actividades Curriculares"<<endl;
-    cout<<"Ingrese el numero de la seccion deseada: \n 1- Administrador\n 2- Usuario: Profesor\n 3- Usuario: Estudiante \nNumero:";
-    int opcion;
+    cout<<"Ingrese el numero de la seccion deseada: \n 1- Administrador\n 2- Usuario: Profesor\n 3- Usuario: Estudiante \n 4- Salir\nNumero:";
+    string opcion;
     cin>>opcion;
-    if(opcion==1){
+    if(opcion=="1"){
         //cout<<"Administrador: "<<endl;
         ingresarAdmin();
-    }else if(opcion==2){
+    }else if(opcion=="2"){
         menuProfesor();
+    }else if(opcion=="4"){
+        cout<<"\n\nSaliendo...";
+        return;
     }else{
         cout<<"Ingrese una opcion valida.";
         menuPrincipal();
@@ -1870,12 +1987,15 @@ void menuPrincipal(){
 
 int main(){
     cout<<"\n\n\t\tCargando Datos...\n\n";
+    cout<<"\tInsertando Administradores\n";    
     insertarAdmin("Maria", "123");
     insertarAdmin("Juan", "4567");
     insertarAdmin("Carlos", "930");
+    cout<<"\tInsertando Cursos\n"; 
     insertarCurso("Datos", "IC", 2040);
     insertarCurso("Arqui", "IC", 3101);
     insertarCurso("Discreta", "MA", 2089);
+    cout<<"\tInsertando Semestres\n"; 
     insertarSemestre(2020, 2, 300);
     insertarSemestre(2020, 1, 250);
     insertarSemestre(2021, 1, 350);
