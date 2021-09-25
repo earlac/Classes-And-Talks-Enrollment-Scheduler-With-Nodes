@@ -103,26 +103,7 @@ struct enlazarGrupo{//Simple linked list
     }
 };
 
-struct semestre{ //Simple linked list 
-    //struct curso *listaCursos; //Links to the list of courses given in that said semester
-    int numSemestre;
-    int anno;
-    int abreviatura;
-    int presupuesto;
-    semestre *sigSem;
-    semestre *antSem;
-    struct enlazarCharla *listaCharlas;
-    struct enlaceCurso *listaCursos; //Links to the list of courses given in said semester
-    semestre(int nSemestre, int nAnno, int nCodigo, int nPresupuesto){
-        numSemestre = nSemestre;
-        anno = nAnno;
-        abreviatura = nCodigo;
-        presupuesto = nPresupuesto;
-        listaCursos = NULL;
-        sigSem = NULL;
-        antSem = NULL;
-    }
-} *listaSemestres;
+
 
 struct enlaceCurso{//Simple linked list
     struct curso *sigCurso; //Links to the course itself
@@ -185,33 +166,52 @@ struct evaluacion{//Simple linked list. Links to the different evaluations the g
     }
 };
 
+struct charla{//Simple linked list 
+    string nombreCharla;
+    string idCharla;
+    int fecha; //Format: yyyy/mm/dd
+    int hora;  //Militar: 1630 = 4p.m
+    //Duracion puede ser fija, evaluaciones tambien
+    charla* sigCharla = NULL;
+    charla(string nNombreCharla, int nFecha, int nHora, int semestre){
+        nombreCharla= nNombreCharla;
+        fecha= nFecha;
+        hora = nHora;
+        idCharla = (to_string(semestre)).append(nombreCharla);
+    }
+
+};
 
 struct enlaceCharla{
-    struct charla *sigCharla; //Links to the course itself
+    charla *enCharla; //Links to the course itself
     enlaceCharla *sig; //Orders the courses
 
-    enlaceCharla(struct charla *nSigCharla){
-        sigCharla= nSigCharla;
+    enlaceCharla(struct charla *nEnCharla){
+        enCharla= nEnCharla;
         sig = NULL;
     }
 };
 
-struct charla{//Simple linked list 
-    string nombreCharla;
-    int fecha; //Format: dd/mm/yy
-    int hora; //Militar: 1630 = 4p.m
-    //Duracion puede ser fija, evaluaciones tambien 
-
-    charla *sig;
-    struct asistente *asistentes; //Links to list of students who went 
-
-    charla(string nNombreCharla, int nFecha, int nHora, bool nAsistencia){
-        nombreCharla= nNombreCharla;
-        fecha= nFecha;
-        hora = nHora;
+struct semestre{ //Simple linked list 
+    //struct curso *listaCursos; //Links to the list of courses given in that said semester
+    int numSemestre;
+    int anno;
+    int abreviatura;
+    int presupuesto;
+    semestre *sigSem;
+    semestre *antSem;
+    charla *listaCharlas;
+    enlaceCurso *listaCursos; //Links to the list of courses given in said semester
+    semestre(int nSemestre, int nAnno, int nCodigo, int nPresupuesto){
+        numSemestre = nSemestre;
+        anno = nAnno;
+        abreviatura = nCodigo;
+        presupuesto = nPresupuesto;
+        listaCursos = NULL;
+        sigSem = NULL;
+        antSem = NULL;
     }
-
-}*listaCharlas;
+} *listaSemestres;
 
 //-----------------------------------------------------------------------------------Methods
 
@@ -1358,8 +1358,6 @@ void ingresarAdmin(){
     }
 }
 */
-
-//---------------------------------------------------Teacher's Methods---------------------------------------------
 void menuPrincipal();
 void menuProfesor();
 
@@ -1656,7 +1654,7 @@ void borrarActProf(){
         cout<<"Grupo no encontrado"<<endl;
         return;
     }
-    else{
+    else{//Agregar si la lista de actividades esta vacia
         string tipo = pedirTipoAct();
         string numAct = pedirNumAct();
         string idAct = tipo.append(numAct);
@@ -1696,6 +1694,178 @@ void imprimirActProf(){
     }
 }
 
+//-------------------------------------------------------Conferences' Methords--------
+
+string pedirNomCharla(){
+    string nom;
+    cout<<"Ingrese el nombre de la charla: ";
+    cin>>nom;
+    return nom;
+}
+
+charla* buscarCharla(int codigoS, string idCh){
+    semestre* tempSem = buscarSem(codigoS);
+    if(tempSem == NULL){
+        return NULL;
+    }else{
+        if(tempSem->listaCharlas == NULL){
+            return NULL;
+        }
+        charla* tempCh = tempSem->listaCharlas;
+        while(tempCh != NULL){
+            if(tempCh->idCharla == idCh){
+                return tempCh;
+            }
+            tempCh = tempCh->sigCharla;
+        }
+        return NULL;
+    }
+}
+
+void insertarCharlaProf(){//Inserts conference on semester
+
+    int codigoS = pedirCodigoSem();
+    semestre* tempSem = buscarSem(codigoS);
+
+    if(tempSem == NULL){
+        cout<<"Semestre no encontrado";
+        return;
+    }else{
+        string nomCh = pedirNomCharla();
+        
+        string idCh = (to_string(tempSem->abreviatura)).append(nomCh);
+        charla* buscar = buscarCharla(codigoS, idCh);
+        if(buscar != NULL){
+            cout<<"La charla llamada "<<nomCh<<" ya se encuentra registrada en el semestre"<<endl;
+            return;
+        }else{
+            int fechaCh = pedirFechaAct();
+            int horaCh = pedirHoraAct();
+            charla* nCh = new charla(nomCh, fechaCh, horaCh, tempSem->abreviatura);
+
+            if(tempSem->listaCharlas == NULL){//Empty list
+                tempSem->listaCharlas = nCh;
+                nCh->sigCharla = NULL;
+                cout<<"Charla creada con exito"<<endl;
+                return;
+            }else{//There's conferences in the list, we must go through it 
+                
+                charla* tempCh = tempSem->listaCharlas;
+
+                if(nCh->fecha < tempCh->fecha){//Sonner than the first date, goes in the beginning of the list
+                    nCh->sigCharla = tempSem->listaCharlas;
+                    tempSem->listaCharlas = nCh;
+                    cout<<"Charla creada con exito"<<endl;
+                    return;
+                }else{//Either the middle or the end of the list
+                    //Find the element right before the one the conference is later, or the end of the list
+                    while((tempCh->sigCharla != NULL)&&(tempCh->sigCharla->fecha < nCh->fecha)){
+                        tempCh = tempCh->sigCharla;
+                    }
+                    nCh->sigCharla = tempCh->sigCharla;
+                    tempCh->sigCharla = nCh;
+                    cout<<"Actividad creada con exito"<<endl;
+                    return;
+                }
+            }
+        }
+    }
+}
+
+void modificarChProf(){//Inserts conference on semester
+
+    int codigoS = pedirCodigoSem();
+    semestre* tempSem = buscarSem(codigoS);
+
+    if(tempSem == NULL){
+        cout<<"Semestre no encontrado";
+        return;
+    }else{
+        string nomCh = pedirNomCharla();
+        
+        string idCh = (to_string(tempSem->abreviatura)).append(nomCh);
+        charla* buscar = buscarCharla(codigoS, idCh);
+
+        if(buscar == NULL){
+            cout<<"La charla llamada "<<nomCh<<" no se encuentra registrada en el semestre"<<endl;
+            return;
+        }else{
+            string nuevoNom;
+            cout<<"Ingrese el nuevo nombre de la charla"<<endl;
+            cin>>nuevoNom;
+            string nuevoId = (to_string(tempSem->abreviatura)).append(nuevoNom);
+            buscar->nombreCharla = nuevoNom;
+            buscar->idCharla = nuevoId;
+            cout<<"Nombre de charla cambiado con exito"<<endl;
+            return;
+        }
+    }
+}
+
+void borrarChProf(){//Deletes conference on semester
+
+    int codigoS = pedirCodigoSem();
+    semestre* tempSem = buscarSem(codigoS);
+
+    if(tempSem == NULL){
+        cout<<"Semestre no encontrado";
+        return;
+    }else{
+        string nomCh = pedirNomCharla();
+        
+        string idCh = (to_string(tempSem->abreviatura)).append(nomCh);
+        charla* buscar = buscarCharla(codigoS, idCh);
+
+        if(buscar == NULL){
+            cout<<"La charla llamada "<<nomCh<<" no se encuentra registrada en el semestre"<<endl;
+            return;
+        }else{
+            if(tempSem->listaCharlas == NULL){//Empty list
+                cout<<"No hay charlas registradas"<<endl;
+                return;
+            }else if(tempSem->listaCharlas->idCharla == idCh){
+                tempSem->listaCharlas = tempSem->listaCharlas->sigCharla;
+                cout<<"Charla eliminada con exito"<<endl;
+                return;
+            }else{//We must go through the list 
+                charla* tempCh = tempSem->listaCharlas;
+                charla* tempAnt;
+                while(tempCh != NULL){
+                    if(tempCh->idCharla == idCh){
+                        tempAnt->sigCharla = tempCh->sigCharla;
+                        cout<<"Charla eliminada con exito"<<endl;
+                    }
+                    tempAnt = tempCh;
+                    tempCh = tempCh->sigCharla;
+                }
+            }
+        }
+    }
+}
+
+void mostrarCharlas(){
+    int codigoS = pedirCodigoSem();
+    semestre* tempSem = buscarSem(codigoS);
+    if(tempSem == NULL){
+        cout<<"Semestre no encontrado"<<endl;
+        return;
+    }else{
+        if(tempSem->listaCharlas == NULL){
+            cout<<"Lista vacia"<<endl;
+            return;
+        }
+        charla* tempCh = tempSem->listaCharlas;
+        cout<<"Charlas del semestre "<<tempSem->abreviatura<<endl;
+        while(tempCh != NULL){
+            cout<<"Nombre de la charla: "<<tempCh->nombreCharla<<" ID: "<<tempCh->idCharla<< "Fecha y hora: "<< tempCh->fecha<< " "<<tempCh->hora;
+            tempCh = tempCh->sigCharla;
+        }
+        cout<<"Fin de reporte"<<endl;
+        return;
+    }
+}
+
+
 //---------------------------------------------------Student's Methods---------------------------------------------
 
 
@@ -1703,9 +1873,9 @@ void imprimirActProf(){
 
 void menuPrincipal();
 
-void menuProfesor(){
+void menuProfesorAct(){
     cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
-    cout<<"a- Crear Actividad\nb- Modificar Actividad\nc- Borrar Actividad\n\n1- Volver al menu principal\n\n\nOpcion: ";
+    cout<<"a- Crear Actividad\nb- Modificar Actividad\nc- Borrar Actividad\n\n1- Volver al menu de profesor\n2- Volver al menu principal\n\n\nOpcion: ";
     string opcion;
     cin>> opcion;    
 
@@ -1721,11 +1891,10 @@ void menuProfesor(){
         borrarActProf();
         menuProfesor();
     }
-    else if(opcion == "1"){
+    else if(opcion == "2"){
         menuPrincipal();
     }
-    else if(opcion == "z"){
-        imprimirActProf();
+    else if(opcion == "1"){
         menuProfesor();
     }
     else{
@@ -1734,8 +1903,62 @@ void menuProfesor(){
     }
 }
 
+void menuProfesorCh(){
+    cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
+    cout<<"a- Crear Charla\nb- Modificar Charla\nc- Borrar Charla\n\n1- Volver al menu de profesor\n2- Volver al menu principal\n\n\nOpcion: ";
+    string opcion;
+    cin>> opcion;    
 
+    if(opcion == "a"){
+        insertarCharlaProf();
+        menuProfesorCh();
+    }
+    else if(opcion == "b"){
+        modificarChProf();
+        menuProfesorCh();
+    }
+    else if(opcion == "c"){
+        borrarChProf();
+        menuProfesorCh();
+    }
+    else if(opcion == "2"){
+        menuPrincipal();
+    }
+    else if(opcion == "1"){
+        menuProfesor();
+    }
+    else if(opcion == "z"){
+        mostrarCharlas();
+        menuProfesorCh();
+    }
+    else{
+        cout<<"Opcion invalida"<<endl;
+        menuProfesor();
+    }
+}
 
+void menuProfesor(){
+    cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
+    cout<<"a- Actividades\nb- Charlas\n\n1- Volver al menu principal\n\n\nOpcion: ";
+    string opcion;
+    cin>> opcion;    
+
+    if(opcion == "a"){
+        menuProfesorAct();
+        //menuProfesor();
+    }
+    else if(opcion == "b"){
+        menuProfesorCh();
+        //menuProfesor();
+    }
+    else if(opcion == "1"){
+        menuPrincipal();
+    }
+    else{
+        cout<<"Opcion invalida"<<endl;
+        menuProfesor();
+    }
+}
 void menuAdmin();
 
 void menuAdminSemestre(){
