@@ -54,7 +54,7 @@ struct estudiante{//Simple linked list
     estudiante *sigEst;
     struct enlazarGrupo *gruposEstAux;//Links to list of groups the student is in. Uses the same struct as Profesor
 
-    struct enlazarCharla *charla;
+    struct enlaceCharla *charla;
     struct evaluacionesEntregadas *evaluacionEst; 
 
     estudiante(string nNombreEst, int nCarnet){
@@ -192,9 +192,9 @@ struct enlaceCharla{
 
 struct semestre{ //Simple linked list 
     //struct curso *listaCursos; //Links to the list of courses given in that said semester
-    int numSemestre;
-    int anno;
-    int abreviatura;
+    int numSemestre;//1 o 2
+    int anno;//2020
+    int abreviatura;//20201
     int presupuesto;
     semestre *sigSem;
     semestre *antSem;
@@ -1746,11 +1746,43 @@ charla* buscarCharla(int codigoS, string idCh){
     }
 }
 
-void insertarCharlaProf(){//Inserts conference on semester
+void insertarCharlaProf(semestre* tempSem, string nomCh, int fechaCh, int horaCh){//Inserts conference on semester
+    charla* nCh = new charla(nomCh, fechaCh, horaCh, tempSem->abreviatura);
+    
+    if(tempSem->listaCharlas == NULL){//Empty list
+        tempSem->listaCharlas = nCh;
+        nCh->sigCharla = NULL;
+        cout<<"Charla creada con exito"<<endl;
+        return;
+    
+    }else{//There're conferences in the list, we must go through it 
+        charla* tempCh = tempSem->listaCharlas;
 
-    int codigoS = pedirCodigoSem();
+        if(nCh->fecha < tempCh->fecha){//Sonner than the first date, goes in the beginning of the list
+            nCh->sigCharla = tempSem->listaCharlas;
+            tempSem->listaCharlas = nCh;
+            cout<<"Charla creada con exito"<<endl;
+            return;
+        
+        }else{//Either the middle or the end of the list
+            
+            //Find the element right before the one the conference is later, or the end of the list
+            while((tempCh->sigCharla != NULL)&&(tempCh->sigCharla->fecha < nCh->fecha)){
+                tempCh = tempCh->sigCharla;
+            }
+            
+            nCh->sigCharla = tempCh->sigCharla;
+            tempCh->sigCharla = nCh;
+            cout<<"Actividad creada con exito"<<endl;
+            return;
+        }
+    }
+}
+
+void insertarChProfAux(){
+    int codigoS = pedirCodigoSem();//20201
     semestre* tempSem = buscarSem(codigoS);
-
+    
     if(tempSem == NULL){
         cout<<"Semestre no encontrado";
         return;
@@ -1758,42 +1790,18 @@ void insertarCharlaProf(){//Inserts conference on semester
         string nomCh = pedirNomCharla();
         
         string idCh = (to_string(tempSem->abreviatura)).append(nomCh);
-        charla* buscar = buscarCharla(codigoS, idCh);
+        cout<<"ID CHARLA: "<<tempSem->abreviatura;
+        charla* buscar = buscarCharla(tempSem->abreviatura, idCh);
         if(buscar != NULL){
             cout<<"La charla llamada "<<nomCh<<" ya se encuentra registrada en el semestre"<<endl;
             return;
         }else{
             int fechaCh = pedirFechaAct();
             int horaCh = pedirHoraAct();
-            charla* nCh = new charla(nomCh, fechaCh, horaCh, tempSem->abreviatura);
-
-            if(tempSem->listaCharlas == NULL){//Empty list
-                tempSem->listaCharlas = nCh;
-                nCh->sigCharla = NULL;
-                cout<<"Charla creada con exito"<<endl;
-                return;
-            }else{//There's conferences in the list, we must go through it 
-                
-                charla* tempCh = tempSem->listaCharlas;
-
-                if(nCh->fecha < tempCh->fecha){//Sonner than the first date, goes in the beginning of the list
-                    nCh->sigCharla = tempSem->listaCharlas;
-                    tempSem->listaCharlas = nCh;
-                    cout<<"Charla creada con exito"<<endl;
-                    return;
-                }else{//Either the middle or the end of the list
-                    //Find the element right before the one the conference is later, or the end of the list
-                    while((tempCh->sigCharla != NULL)&&(tempCh->sigCharla->fecha < nCh->fecha)){
-                        tempCh = tempCh->sigCharla;
-                    }
-                    nCh->sigCharla = tempCh->sigCharla;
-                    tempCh->sigCharla = nCh;
-                    cout<<"Actividad creada con exito"<<endl;
-                    return;
-                }
-            }
+            
+            insertarCharlaProf(tempSem, nomCh, fechaCh, horaCh);
         }
-    }
+    }    
 }
 
 void modificarChProf(){//Inserts conference on semester
@@ -1911,7 +1919,7 @@ void agregarActEst(){
     if(tempEst == NULL){//Check if student exists
         cout<<"Estudiante no encontrado"<<endl;
         return;
-    }else{//Check if course and group exist
+    }else{//group exists
         int codigoNum = pedirCodCurso();
         int numGp = pedirNumGrupo();
         int idC = (100*codigoNum)+numGp;
@@ -1959,6 +1967,44 @@ void agregarActEst(){
     }
 }
 
+void insertarCharlaEst(){
+    int carnetEst = pedirCarnetEst();
+    estudiante* tempEst = buscarEst(carnetEst);
+    if(tempEst == NULL){//Check if student exists
+        cout<<"Estudiante no encontrado"<<endl;
+        return;
+    }else{//Check if semester exists
+        int codigoS = pedirCodigoSem();
+        semestre* tempSem = buscarSem(codigoS);
+
+        if(tempSem == NULL){
+            cout<<"Semestre no encontrado"<<endl;
+            return;
+        }else{
+            string nomCh = pedirNomCharla();
+            string idCh = (to_string(tempSem->abreviatura)).append(nomCh);
+            charla* tempCh = buscarCharla(codigoS, idCh);
+            if(tempCh == NULL){
+                cout<<"Charla no encontrada";
+                return;
+            }else{
+                enlaceCharla* nEnCh = new enlaceCharla(tempCh); 
+                
+                if(tempEst->charla == NULL){//Empty list
+                    tempEst->charla = nEnCh;
+                    cout<<"Charla asistida con exito"<<endl;
+                    return;    
+                }else{//Insert at the beginning
+                    nEnCh->sig = tempEst->charla->sig;
+                    tempEst->charla->sig = nEnCh;
+                    cout<<"Charla asistida con exito"<<endl;
+                    return;
+                }
+            }
+        }
+    }
+}
+
 //------------------Menus---------------------------------
 
 void menuPrincipal();
@@ -1974,6 +2020,7 @@ void menuEstudiante(){
         menuEstudiante();
     }
     else if(opcion == "b"){
+        insertarCharlaEst();
         menuEstudiante();
     }
     else if(opcion == "1"){
@@ -2022,7 +2069,7 @@ void menuProfesorCh(){
     cin>> opcion;    
 
     if(opcion == "a"){
-        insertarCharlaProf();
+        insertarChProfAux();
         menuProfesorCh();
     }
     else if(opcion == "b"){
@@ -2335,18 +2382,25 @@ int main(){
     insertarSemestre(2020, 1, 250);
     insertarSemestre(2021, 1, 350);
     insertarSemestre(2021, 2, 100);
+    insertarSemestre(2022, 1, 300);
     cout<<"\tInsertando Cursos\n"; 
     insertarCurso("Datos", "IC", 2040);
     insertarCurso("Arqui", "IC", 3101);
     insertarCurso("Discreta", "MA", 2089);
+    insertarCurso("Probabilidad", "MA", 3098);
+    insertarCurso("POO", "IC", 5021);
     cout<<"\tInsertando Profesores\n";
     insertarProf(11833, "Jose");
     insertarProf(12345, "Marta");
     insertarProf(48503, "Pedro");
+    insertarProf(84728, "Gerardo");
+    insertarProf(40284, "Lucia");
     cout<<"\tInsertando Estudiantes\n";
     insertarEst(202006, "Brenda");
     insertarEst(202105, "Earl");
     insertarEst(201935, "Crystel");
+    insertarEst(201919, "Josefina");
+    insertarEst(201705, "Carmen");
     cout<<"\tInsertanto Grupos\n";
     insertarGrupo("IC3101", buscarCurso("IC3101"), 50);
     insertarGrupo("IC3101", buscarCurso("IC3101"), 51);
@@ -2359,7 +2413,9 @@ int main(){
     cout<<"\tCreando actividades\n";
     insertarActProf(encontrarGrupo("IC3101", 50), "Tarea", "1", 20211020, 1400);
     insertarActProf(encontrarGrupo("IC3101", 50), "Tarea", "2", 20210515, 1600);
-    
+    cout<<"\tCreando charlas\n";
+    insertarCharlaProf(buscarSem(20211), "Charla1", 20211030, 1300);
+    insertarCharlaProf(buscarSem(20211), "Charla2", 20210503, 1600);   
     //imprimirAdmins();
     //imprimirSemestres();
     menuPrincipal();
