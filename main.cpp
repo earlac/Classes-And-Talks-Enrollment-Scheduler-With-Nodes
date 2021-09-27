@@ -2004,6 +2004,41 @@ void insertarCharlaEst(){
         }
     }
 }
+//------------------Reports---------------------------------
+
+void reporte2(){
+    int numSem= pedirNumSem();
+    int annoSem= pedirAnnoSem();
+    int codigoS = 10*annoSem+numSem;
+
+    semestre*tempS= listaSemestres;
+    while(tempS!=NULL){
+        if(tempS->abreviatura==codigoS){
+            int cedulaP = pedirCedulaProf();
+            string codCurso = pedirCodigoCurso();
+            grupo* tempG = buscarGrupoProfe(cedulaP, codCurso);
+            if(tempG == NULL){
+                cout<<"Grupo no encontrado"<<endl;
+                return;
+            }
+            else{
+                evaluacion* tempEv = tempG->listaEvaluacion;
+                cout<<"Actividades: "<<endl;
+                while(tempEv != NULL){
+                    cout<<"Tipo: "<<tempEv->tipo<<" Numero: "<<tempEv->numeroAct<< " Fecha de Entrega: "<<tempEv->fechaEntrega<<" Hora: "<<tempEv->hora<<endl;
+                    tempEv = tempEv->sigEv;
+                }
+                cout<<"Fin de reporte"<<endl;
+                return;
+            }
+        }
+        tempS=tempS->sigSem;
+    }
+    cout<<"No existe este semestre indicado, o bien ningún profesor tiene actividades registradas."<<endl;
+
+    
+}
+
 
 //------------------Reportes--------------------------------------------------------------------------------------------------
 
@@ -2033,7 +2068,7 @@ void menuEstudiante(){
     }
     else{
         cout<<"Opcion invalida"<<endl;
-        menuProfesor();
+        menuEstudiante();
     }
 }
 
@@ -2117,6 +2152,9 @@ void menuProfesor(){
     }
     else if(opcion == "1"){
         menuPrincipal();
+    }
+    else if(opcion == "z"){
+        reporte2();
     }
     else{
         cout<<"Opcion invalida"<<endl;
