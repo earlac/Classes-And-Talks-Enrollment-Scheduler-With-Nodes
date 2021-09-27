@@ -2416,7 +2416,7 @@ void menuProfesorRep(){
         menuProfesorRep();
     }
     else if(opcion == "d"){
-        relacionarGrupoEstAux();
+        reporte4();
         menuProfesorRep();
     }else if(opcion == "e"){
         borrarGrupoEst();
