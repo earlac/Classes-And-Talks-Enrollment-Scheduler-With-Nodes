@@ -2057,11 +2057,11 @@ void reporte1(){
         while(tempG != NULL){
                 
             evaluacion* tempEv = tempG->enlaceGrupo->listaEvaluacion;    
-
+            
             while(tempEv != NULL){
                     
                 if(tempEv->fechaEntrega == anno*10000 + mes*100 + tempDia){//If the due date equals today's date
-                    cout<<"\n\tEntrega de "<<tempEv->tipo<<" en "<<tempG->enlaceGrupo->cursoActual;
+                    cout<<"\n\tEntrega de "<<tempEv->tipo<<" en "<<tempG->enlaceGrupo->cursoActual->nombre<<" con el grupo "<<tempG->enlaceGrupo->numGrupo;
                     contAct = contAct + 1;
                 }
                 tempEv = tempEv->sigEv;
@@ -2069,7 +2069,7 @@ void reporte1(){
             tempG = tempG->sigEn;
         }
         if(contAct == 0){
-            cout<<"\n\tNo hay actividades programadas"<<endl;
+            cout<<"\n\tNo hay actividades programadas";
         }
         contAct = 0; 
         tempDia = tempDia+1;
@@ -2542,11 +2542,11 @@ int main(){
     insertarSemestre(2021, 2, 100);
     insertarSemestre(2022, 1, 300);
     cout<<"\tInsertando Cursos\n"; 
-    insertarCurso("Datos", "IC", 2040);
-    insertarCurso("Arqui", "IC", 3101);
-    insertarCurso("Discreta", "MA", 2089);
+    insertarCurso("Estructuras de Datos", "IC", 2040);
+    insertarCurso("Arquitectura de Computadoras", "IC", 3101);
+    insertarCurso("Matematica Discreta", "MA", 2089);
     insertarCurso("Probabilidad", "MA", 3098);
-    insertarCurso("POO", "IC", 5021);
+    insertarCurso("Programacion Orientada a Objetos", "IC", 5021);
     cout<<"\tInsertando Profesores\n";
     insertarProf(11833, "Jose");
     insertarProf(12345, "Marta");
