@@ -51,7 +51,7 @@ int dayofweekaux()
 }
 
 int main(){
-    //cout<<semana(2021, 9, 19)<<endl;
+    cout<<semana(2021, 9, 19)<<endl;
     dayofweekaux();
     cout<<date()<<endl;
     return 0;
