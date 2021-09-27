@@ -1287,6 +1287,7 @@ void reporteGruposProfe(){
 
 
 
+
 //------------------Printing Methods---------------------------------
 
 void imprimirProfesores(){
@@ -2006,6 +2007,86 @@ void insertarCharlaEst(){
 }
 //------------------Reports---------------------------------
 
+int fechaHoy(){
+//Retorna la fecha de hoy en formato yyyy/mm/dd
+    time_t t = time(0);   // consigue la fecha de hoy (formato internacional)
+    tm* now = localtime(&t); //la convierte a nuestra zona horaria
+    return 10000*(now->tm_year + 1900) + 100*(now->tm_mon + 1)+ (now->tm_mday);//lo retorna en forma yyyy/mm/dd
+}
+
+int numSemana(int d, int m, int y)
+{//Recibe dia, mes y anno
+//Retorna el numero correspondiente al dia de la semana: 0 domingo, 1 lunes...
+    int t[] = { 0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4 };
+    y -= m < 3;
+    return ( y + y / 4 - y / 100 + y / 400 + t[m - 1] + d) % 7;
+}
+
+string nomSemana(int numSem){
+//Recibe el numero de la semana y retorna su nombre
+    string diasSem[7] = {"Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"};
+    return diasSem[numSem];
+}
+ 
+void reporte1(){
+    //DESPUES SUMARLE 7 A DIA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    int fecha = fechaHoy();
+    int dia = (fecha%100);//We go to next week according to the project's instructions
+    int mes = (fecha%10000)/100;
+    int anno = fecha/10000;
+
+    int numSem = numSemana(dia, mes, anno);
+    if(numSem < 0){//If today isn't sunday
+        dia = dia - numSem; //We need it to be sunday to start checking every day of the week  
+    }
+    int tempDia = dia; //Safe the value so that we can iterate it 
+    int contAct = 0; //We need to know how many activities we have for each day
+    
+    int cedulaP = pedirCedulaProf();//First check if the teacher exists
+    profesor* tempP = buscarProf(cedulaP);
+
+    if(tempP == NULL){
+        cout<<"No se ha encontrado al profesor"<<endl;
+        return;
+    }
+    
+    while(tempDia <= dia + 6){//Keep going until we reach saturday
+        cout<<"\n"<<nomSemana(numSemana(tempDia, mes, anno))<<" "<<tempDia;//Print the day of the week. Ie. Lunes 27
+        
+        enlazarGrupo* tempG = tempP->gruposProfAux; //Now we need to go through all of his groups
+        while(tempG != NULL){
+                
+            evaluacion* tempEv = tempG->enlaceGrupo->listaEvaluacion;    
+
+            while(tempEv != NULL){
+                    
+                if(tempEv->fechaEntrega == anno*10000 + mes*100 + tempDia){//If the due date equals today's date
+                    cout<<"\n\tEntrega de "<<tempEv->tipo<<" en "<<tempG->enlaceGrupo->cursoActual;
+                    contAct = contAct + 1;
+                }
+                tempEv = tempEv->sigEv;
+            }
+            tempG = tempG->sigEn;
+        }
+        if(contAct == 0){
+            cout<<"\n\tNo hay actividades programadas"<<endl;
+        }
+        contAct = 0; 
+        tempDia = tempDia+1;
+    }
+}
+
+/*
+
+evaluacion* tempEv = tempG->listaEvaluacion;
+        
+            while((tempEv->sigEv != NULL) && (tempEv->sigEv->fechaEntrega < nEv->fechaEntrega)){//Insert in the middle or the end
+                tempEv = tempEv->sigEv;
+            }
+
+*/
+
+
 void reporte2(){
     int numSem= pedirNumSem();
     int annoSem= pedirAnnoSem();
@@ -2038,12 +2119,6 @@ void reporte2(){
 
     
 }
-
-
-//------------------Reportes--------------------------------------------------------------------------------------------------
-
-
-
 
 //------------------Menus-----------------------------------------------------------------------------------------------------
 
@@ -2136,9 +2211,46 @@ void menuProfesorCh(){
     }
 }
 
+void menuProfesorRep(){
+    cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
+    cout<<"a- Actividades para la proxima semana\nb- Actividades para todo el semestre\nc- Actividades concluidas\nd- Estudiantes que participaron en todas las charlas \ne- Estudiantes que no han entregado asignaciones\n\n1- Volver al menu de profesor\n2- Volver al menu principal\n\n\nOpcion: ";
+    string opcion;
+    cin>> opcion;    
+    if(opcion == "a"){
+        reporte1();
+        menuProfesorRep();
+    }
+    else if(opcion == "b"){
+        modificarEst();
+        menuProfesorRep();
+    }
+    else if(opcion == "c"){
+        eliminarEst();
+        menuProfesorRep();
+    }
+    else if(opcion == "d"){
+        relacionarGrupoEstAux();
+        menuProfesorRep();
+    }else if(opcion == "e"){
+        borrarGrupoEst();
+        menuProfesorRep();
+    }else if(opcion == "z"){
+        reporteGruposProfe();
+        menuProfesorRep();
+    }
+    else if(opcion == "1")
+        menuProfesor();
+    else if(opcion == "2")
+        menuPrincipal();
+    else{
+        cout<<"Opcion Invalida"<<endl;
+        menuAdminEst();
+    }
+}
+
 void menuProfesor(){
     cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
-    cout<<"a- Actividades\nb- Charlas\n\n1- Volver al menu principal\n\n\nOpcion: ";
+    cout<<"a- Actividades\nb- Charlas\nc- Reportes\n\n1- Volver al menu principal\n\n\nOpcion: ";
     string opcion;
     cin>> opcion;    
 
@@ -2149,6 +2261,9 @@ void menuProfesor(){
     else if(opcion == "b"){
         menuProfesorCh();
         //menuProfesor();
+    }
+    else if(opcion == "c"){
+        menuProfesorRep();
     }
     else if(opcion == "1"){
         menuPrincipal();
@@ -2447,15 +2562,23 @@ int main(){
     cout<<"\tInsertanto Grupos\n";
     insertarGrupo("IC3101", buscarCurso("IC3101"), 50);
     insertarGrupo("IC3101", buscarCurso("IC3101"), 51);
+    insertarGrupo("IC2040", buscarCurso("IC2040"), 20);
+    insertarGrupo("IC2040", buscarCurso("IC2040"), 35);
+    insertarGrupo("MA2089", buscarCurso("MA2089"), 43);
     cout<<"\tAsignado profesores a grupos\n";
     relacionarGrupoProf(buscarProf(11833), encontrarGrupo("IC3101", 50));
     relacionarGrupoProf(buscarProf(11833), encontrarGrupo("IC3101", 51));
+    relacionarGrupoProf(buscarProf(11833), encontrarGrupo("IC2040", 20));
+    relacionarGrupoProf(buscarProf(11833), encontrarGrupo("IC2040", 35));
     cout<<"\tAsignado estudiantes a grupos\n";
     relacionarGrupoEst(buscarEst(202006), encontrarGrupo("IC3101", 50));
     relacionarGrupoEst(buscarEst(202105), encontrarGrupo("IC3101", 51));
     cout<<"\tCreando actividades\n";
-    insertarActProf(encontrarGrupo("IC3101", 50), "Tarea", "1", 20211020, 1400);
-    insertarActProf(encontrarGrupo("IC3101", 50), "Tarea", "2", 20210515, 1600);
+    insertarActProf(encontrarGrupo("IC3101", 50), "Tarea", "1", 20210927, 1400);
+    insertarActProf(encontrarGrupo("IC3101", 51), "Proyecto", "1", 20210927, 1600);
+    insertarActProf(encontrarGrupo("IC2040", 20), "Gira", "1", 20210930, 1600);
+    insertarActProf(encontrarGrupo("IC2040", 35), "Examen", "1", 20210931, 1600);
+    insertarActProf(encontrarGrupo("IC2040", 35), "Examen", "2", 20210928, 1600);
     cout<<"\tCreando charlas\n";
     insertarCharlaProf(buscarSem(20211), "Charla1", 20211030, 1300);
     insertarCharlaProf(buscarSem(20211), "Charla2", 20210503, 1600);   

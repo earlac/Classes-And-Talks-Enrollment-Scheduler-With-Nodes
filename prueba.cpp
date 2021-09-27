@@ -30,19 +30,19 @@ int dayofweek(int d, int m, int y)
 // Driver Code
 int dayofweekaux()
 {
-    int dia = 27;
-    int mes = 9;
+    int dia = 6;
+    int mes = 10;
     int anno = 2021;
     string diasSem[7] = {"Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"};
     int day = dayofweek(dia, mes, anno);
-    //cout<<day;
-    //cout<<diasSem[day];
+    cout<<"\n"<<day;
+    cout<<"\n"<<diasSem[day];
     if(day>0){
         dia = dia-day;
         //cout<<dia;
         int domD = dia; 
-        while(domD < dia + 6){
-            int sem = dayofweek(domD, 9, 2021);
+        while(domD <= dia + 6){
+            int sem = dayofweek(domD, mes, anno);//bruta
             cout<<domD<<" es "<<diasSem[sem]<<endl;
             domD = domD+1;
         }
