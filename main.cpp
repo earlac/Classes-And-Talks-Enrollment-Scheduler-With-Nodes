@@ -1033,7 +1033,7 @@ grupo* buscarGrupoEst(int carnetEst, int codG){
         }else{
             enlazarGrupo* tempG = tempEst->gruposEstAux;
             while(tempG->enlaceGrupo != NULL){
-                if(tempG->enlaceGrupo->idCurso = codG){
+                if(tempG->enlaceGrupo->idCurso == codG){
                     return tempG->enlaceGrupo;
                 }
                 tempG = tempG->sigEn;
@@ -2245,7 +2245,7 @@ void reporte4(){
         while(tempS!=NULL){
             if(tempS->abreviatura==codigoS){
                 charla*tempC= tempS->listaCharlas;
-                while(charla!=NULL){
+                while(tempC!=NULL){
                     cantCharlas+=1;
                 }
             }
@@ -2260,11 +2260,11 @@ void reporte4(){
         while(tempE!=NULL){
             int cantCharlasEst=0;
 
-            charla*tempC= tempE->charla;
+            enlaceCharla*tempC= tempE->charla;
 
-            int fechaCharla= tempC->idCharla
-            int mesCharlaAux= fechaCharla/100; //202009XX
-            int mesCharlaAux= fechaCharla%100; //09
+            int fechaCharla= tempC->enCharla->fecha;
+            int mesCharlaPreAux= fechaCharla/100; //202009XX
+            int mesCharlaAux= mesCharlaPreAux%100; //09
 
             int annoCharla= fechaCharla/10000; //2020
 
@@ -2276,16 +2276,16 @@ void reporte4(){
                 numSemTemp=2;
             }
 
-            int codigoSemCharla= (annoCharla*10)+numSemTemp
+            int codigoSemCharla= (annoCharla*10)+numSemTemp;
 
             while (tempC!=NULL){
                 if(codigoS==codigoSemCharla){   //CodS 20212, CodSemCh sem+mes
                     cantCharlasEst+=1;
                 }
-                tempC = tempC->sigCharla; //Revisar como se llama siguiente charla
+                tempC = tempC->sig; //Revisar como se llama siguiente charla
             }
             if(cantCharlasEst== cantCharlas){
-                cout<<"Nombre: "<<NombreEst<< "\t"<<"Carnet: "<<carnet<<endl;
+                cout<<"Nombre: "<<tempE->nombreEst<< "\t"<<"Carnet: "<<tempE->carnet<<endl;
             }
             tempE=tempE->sigEst; //Revisar como se llama siguiente estudiante 
 
