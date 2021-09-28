@@ -6,10 +6,9 @@ Estudiantes: Earl Areck Alvarado,
              Brenda Badilla Rodriguez,  
 */
 
-#include <iostream>
 #include <string>
 #include <ctime>
-
+#include <iostream>
 using namespace std;
 
 //-----------------------------------------------------------------------------------Estructuras
@@ -1024,7 +1023,6 @@ grupo* encontrarGrupo(string codigo, int numGrupo){
 
 grupo* buscarGrupoEst(int carnetEst, int codG){
     estudiante* tempEst = buscarEst(carnetEst);
-
     if(tempEst == NULL){
         return NULL;
     }else{
@@ -1032,7 +1030,7 @@ grupo* buscarGrupoEst(int carnetEst, int codG){
             return NULL;
         }else{
             enlazarGrupo* tempG = tempEst->gruposEstAux;
-            while(tempG->enlaceGrupo != NULL){
+            while(tempG != NULL){
                 if(tempG->enlaceGrupo->idCurso == codG){
                     return tempG->enlaceGrupo;
                 }
@@ -1705,21 +1703,22 @@ void borrarActProf(){
 
 void imprimirActProf(){
     int cedulaP = pedirCedulaProf();
-    string codCurso = pedirCodigoCurso();
-    grupo* tempG = buscarGrupoProfe(cedulaP, codCurso);
-    if(tempG == NULL){
-        cout<<"Grupo no encontrado"<<endl;
-        return;
-    }
-    else{
-        evaluacion* tempEv = tempG->listaEvaluacion;
+    profesor* tempP = buscarProf(cedulaP);
+    //string codCurso = pedirCodigoCurso();
+    enlazarGrupo* tempEnG = tempP->gruposProfAux;
+    
+    while(tempEnG != NULL){
+        cout<<"Grupo: "<<tempEnG->enlaceGrupo->idCurso<<endl;
+    
+        evaluacion* tempEv = tempEnG->enlaceGrupo->listaEvaluacion;
         cout<<"Actividades: "<<endl;
         while(tempEv != NULL){
             cout<<"Tipo: "<<tempEv->tipo<<" Numero: "<<tempEv->numeroAct<< " Fecha de Entrega: "<<tempEv->fechaEntrega<<" Hora: "<<tempEv->hora<<endl;
             tempEv = tempEv->sigEv;
         }
-        cout<<"Fin de reporte"<<endl;
-    }
+        tempEnG = tempEnG->sigEn;
+    }    
+    cout<<"Fin de reporte"<<endl;
 }
 
 void imprimirActEst(){
@@ -2175,73 +2174,96 @@ void reporte2(){
     return;
 }
 
-void reporte3(){
-//Goes through all the groups the teacher has, and thorugh all the evaluations in each group
-//if their due date is before today's date, then it's already done
-//then we go through all the students and check who has that evaluation done 
-    int fecha = fechaHoy();//today's date in yyyy/mm/dd format
+bool buscarActEst(estudiante* tempEst, evaluacion* tempEv){
+/*
+Inputs: 
+        estudiante* tempEst: the student
+        evaluacion* tempEv: the activity
+Process: 
+        Goes through the list of activities the student has done, if one of them is the activity we're
+        looking for, then it returns it. Else, it returns NULL.
 
-    int cedulaP = pedirCedulaProf();//First check if the teacher exists
-    profesor* tempP = buscarProf(cedulaP);
+OutPut:
+        NULL: If the student didn't do the activity
+        evaluacionesEntregadas* tempEv: If the student did the activity
+*/
 
+    evaluacionesEntregadas* tempEvaEn = tempEst->evaluacionEst;
+
+    if(tempEvaEn == NULL){
+        return false;
+    }else{
+
+        while(tempEvaEn != NULL){
+
+            if(tempEvaEn->sigEvaluacion == tempEv){
+                return true; 
+            }
+
+            tempEvaEn = tempEvaEn->sig;
+        }
+        return false;
+    }
+}
+
+void reporte3(profesor* tempP, int fecha){
+/*Goes through all the groups the teacher has, and thorugh all the evaluations in each group
+if their due date is before today's date, then it's already done
+then we go through all the students and check who has that evaluation done
+*/
     int cantEst = 0;
 
-    if(tempP == NULL){
-        cout<<"No se ha encontrado al profesor"<<endl;
+    if(tempP->gruposProfAux == NULL){
+        cout<<"El profesor no tiene grupos asignados"<<endl;
         return;
     }
+    
     enlazarGrupo* tempG = tempP->gruposProfAux; //Now we need to go through all of his groups
+    
     while(tempG != NULL){
-                
+
+        cout<<"\nGrupo: "<<tempG->enlaceGrupo->idCurso<<endl;
+         
         evaluacion* tempEv = tempG->enlaceGrupo->listaEvaluacion;    
 
         while(tempEv != NULL){
                     
             if(tempEv->fechaEntrega <= fecha){//If the due date has already passed. It's a done activity. So we must check who did it and who didn't
-                cout<<"\n\t"<<tempEv->tipo<<" "<< nomSemana(numSemana(calcularDiaAct(tempEv), calcularMesAct(tempEv), calcularAnnoAct(tempEv)))<<" "<<calcularDiaAct(tempEv)<<" de "<<mostrarMesAct(tempEv)<<" del "<<calcularAnnoAct(tempEv);
+                cout<<"\n\t"<<tempEv->tipo<<" "<< nomSemana(numSemana(calcularDiaAct(tempEv), calcularMesAct(tempEv), calcularAnnoAct(tempEv)))<<" "<<calcularDiaAct(tempEv)<<" de "<<mostrarMesAct(tempEv)<<" del "<<calcularAnnoAct(tempEv)<<" a las "<<tempEv->hora<<" de "<<tempG->enlaceGrupo->cursoActual->nombre<<endl;
+                
                 cout<<"\nEntregaron: "<<endl;
 
                 estudiante* tempEst = listaEstudiantes;
                 
                 while(tempEst != NULL){//Go through the list checking who did it
-                    if(tempG->enlaceGrupo == buscarGrupoEst(tempEst->carnet, tempG->enlaceGrupo->idCurso)){
-                        evaluacionesEntregadas* tempEvEnt = tempEst->evaluacionEst;
-                        while(tempEvEnt != NULL){//Checks every activity the student has done
-                            
-                            if(tempEvEnt->sigEvaluacion->idActividad == tempEv->idActividad){//If he has that activity, then they did it
-                                cout<<tempEst->nombreEst<<endl;
-                                cantEst = cantEst + 1;
-                            }
-                            tempEvEnt = tempEvEnt->sig;
+                    if(tempG->enlaceGrupo == buscarGrupoEst(tempEst->carnet, tempG->enlaceGrupo->idCurso)){//if student is in the group
+        
+                        if(buscarActEst(tempEst, tempEv) == true){
+                            cout<<tempEst->nombreEst<<endl;
+                            cantEst = cantEst + 1;
                         }
                     }
                     tempEst = tempEst->sigEst;
                 }
                 if(cantEst == 0){
-                    cout<<"\nNingun estudiante entrego la actividad"<<endl;
+                    cout<<"Ningun estudiante entrego la actividad"<<endl;
                 }
-
                 tempEst = listaEstudiantes;//After going through all the students, we reset to do it again 
                 cantEst = 0;
                 cout<<"\nNo Entregaron: "<<endl;
 
                 while(tempEst != NULL){//Same logic but with the students who don't have it donee
-                    
                     if(tempG->enlaceGrupo == buscarGrupoEst(tempEst->carnet, tempG->enlaceGrupo->idCurso)){
-                        evaluacionesEntregadas* tempEvEnt = tempEst->evaluacionEst;
-                        while(tempEvEnt != NULL){
-
-                            if(tempEvEnt->sigEvaluacion->idActividad != tempEv->idActividad){
-                                cout<<tempEst->nombreEst<<endl;
-                                cantEst = cantEst + 1;
-                            }
-                            tempEvEnt = tempEvEnt->sig;
+                        
+                        if(buscarActEst(tempEst, tempEv) == false){
+                            cout<<tempEst->nombreEst<<endl;
+                            cantEst = cantEst + 1;
                         }
                     }
                     tempEst = tempEst->sigEst;
                 }
                 if(cantEst == 0){
-                    cout<<"\nTodos los estudiantes entregaron la actividad"<<endl;
+                    cout<<"Todos los estudiantes entregaron la actividad"<<endl;
                 }
             }
             //tempEst = listaEstudiantes;//Resets the student again, to go through it all again
@@ -2249,6 +2271,18 @@ void reporte3(){
         }
         tempG = tempG->sigEn;//After going through all the activities, we check the activities of the next group 
     }    
+}
+
+void reporte3Aux(){
+    int fecha = fechaHoy();//today's date in yyyy/mm/dd format
+    int cedulaP = pedirCedulaProf();//First check if the teacher exists
+    profesor* tempP = buscarProf(cedulaP);
+    if(tempP == NULL){
+        cout<<"No se ha encontrado al profesor"<<endl;
+        return;
+    }else{
+        reporte3(tempP, fecha); 
+    }   
 }
 
 void reporte4(){
@@ -2436,7 +2470,7 @@ void menuProfesorRep(){
         menuProfesorRep();
     }
     else if(opcion == "c"){
-        reporte3();
+        reporte3Aux();
         menuProfesorRep();
     }
     else if(opcion == "d"){
@@ -2480,7 +2514,8 @@ void menuProfesor(){
         menuPrincipal();
     }
     else if(opcion == "z"){
-        reporte2();
+        imprimirActProf();
+        menuProfesor();
     }
     else{
         cout<<"Opcion invalida"<<endl;
@@ -2777,8 +2812,8 @@ int main(){
     insertarGrupo("IC2040", buscarCurso("IC2040"), 35);
     insertarGrupo("MA2089", buscarCurso("MA2089"), 43);
     cout<<"\tAsignado profesores a grupos\n";
-    relacionarGrupoProf(buscarProf(11833), encontrarGrupo("IC3101", 50));
     relacionarGrupoProf(buscarProf(11833), encontrarGrupo("IC3101", 51));
+    relacionarGrupoProf(buscarProf(11833), encontrarGrupo("IC3101", 50));
     relacionarGrupoProf(buscarProf(11833), encontrarGrupo("IC2040", 20));
     relacionarGrupoProf(buscarProf(11833), encontrarGrupo("IC2040", 35));
     cout<<"\tAsignado estudiantes a grupos\n";
@@ -2798,8 +2833,9 @@ int main(){
     agregarActEst(buscarEst(202006), buscarAct(encontrarGrupo("IC3101", 50), "Gira", "1"));//Brenda 
     //agregarActEst(buscarEst(202006), buscarAct(encontrarGrupo("IC3101", 50), "Examen", "1"));//Brenda
     agregarActEst(buscarEst(201935), buscarAct(encontrarGrupo("IC3101", 50), "Gira", "1"));//Crystel 50 IC3101
-    agregarActEst(buscarEst(201935), buscarAct(encontrarGrupo("IC3101", 50), "Examen", "1"));//Crystel
+    //agregarActEst(buscarEst(201935), buscarAct(encontrarGrupo("IC3101", 50), "Examen", "1"));//Crystel
     agregarActEst(buscarEst(202105), buscarAct(encontrarGrupo("IC3101", 51), "Proyecto", "1"));//Earl 51 IC3101
+    agregarActEst(buscarEst(201705), buscarAct(encontrarGrupo("IC3101", 51), "Proyecto", "1"));//Earl 51 IC3101
     agregarActEst(buscarEst(201705), buscarAct(encontrarGrupo("IC3101", 51), "Examen", "2"));//Carmen 51 IC3101
     cout<<"\tCreando charlas\n";
     insertarCharlaProf(buscarSem(20212), "Charla1", 20211030, 1300); //2021 octubre 30                         
