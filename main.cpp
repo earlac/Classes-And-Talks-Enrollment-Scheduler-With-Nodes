@@ -2004,7 +2004,26 @@ void agregarActEstAux(){
         }
     }
 }
+void insertarcharlaEstAux(int carnetEst, int codigoS, string idCh){
+    estudiante* tempEst = buscarEst(carnetEst);
+    if(tempEst == NULL){//Check if student exists
+        cout<<"Estudiante no encontrado"<<endl;
+        return;
+    }else{//Check if semester exists
+        semestre* tempSem = buscarSem(codigoS);
 
+        if(tempSem == NULL){
+            cout<<"Semestre no encontrado"<<endl;
+            return;
+        }else{
+            charla* tempCh = buscarCharla(codigoS, idCh);
+            if(tempCh == NULL){
+                cout<<"Charla no encontrada";
+                return;
+            }
+        }
+    }
+}
 void insertarCharlaEst(){
     int carnetEst = pedirCarnetEst();
     estudiante* tempEst = buscarEst(carnetEst);
@@ -2157,9 +2176,9 @@ void reporte2(){
 }
 
 void reporte3(){
-//Goes through all the groups the teacher has, and thorugh all the evaluations
+//Goes through all the groups the teacher has, and thorugh all the evaluations in each group
 //if their due date is before today's date, then it's already done
-//then we go through all the students and check go has that evaluation done 
+//then we go through all the students and check who has that evaluation done 
     int fecha = fechaHoy();//today's date in yyyy/mm/dd format
 
     int cedulaP = pedirCedulaProf();//First check if the teacher exists
@@ -2176,13 +2195,14 @@ void reporte3(){
                 
         evaluacion* tempEv = tempG->enlaceGrupo->listaEvaluacion;    
 
-        estudiante* tempEst = listaEstudiantes;
-
         while(tempEv != NULL){
                     
             if(tempEv->fechaEntrega <= fecha){//If the due date has already passed. It's a done activity. So we must check who did it and who didn't
                 cout<<"\n\t"<<tempEv->tipo<<" "<< nomSemana(numSemana(calcularDiaAct(tempEv), calcularMesAct(tempEv), calcularAnnoAct(tempEv)))<<" "<<calcularDiaAct(tempEv)<<" de "<<mostrarMesAct(tempEv)<<" del "<<calcularAnnoAct(tempEv);
                 cout<<"\nEntregaron: "<<endl;
+
+                estudiante* tempEst = listaEstudiantes;
+                
                 while(tempEst != NULL){//Go through the list checking who did it
                     if(tempG->enlaceGrupo == buscarGrupoEst(tempEst->carnet, tempG->enlaceGrupo->idCurso)){
                         evaluacionesEntregadas* tempEvEnt = tempEst->evaluacionEst;
@@ -2253,7 +2273,7 @@ void reporte4(){
             }
             tempS= tempS->sigSem;
         }
-
+        cout<<cantCharlas<<endl;
         if(cantCharlas==0){
             cout<<"No hubo charlas registradas el semestre indicado"<<endl;
             return;
@@ -2261,18 +2281,24 @@ void reporte4(){
         cout<<"Estudiantes que asistieron a todas las charlas el semestre indicado"<<endl;
         estudiante*tempE= listaEstudiantes;
         while(tempE!=NULL){
+            cout<< tempE->nombreEst<<endl;
             int cantCharlasEst=0;
-
+            //hey hey hey, le hice cout a la cantCharlas y dice que 0. Hay charlas el 2do semestre 2021? vamos a ver el main, creo que si? lo  averiguaremos.
             enlaceCharla*tempC= tempE->charla;
-
+            cout<< "d"<<endl;
+            if(tempC==NULL){
+                cout<<"Brenda la sabia"<<endl;
+            }
             int fechaCharla= tempC->enCharla->fecha;
-            int mesCharlaPreAux= fechaCharla/100; //202009XX
-            int mesCharlaAux= mesCharlaPreAux%100; //09
-
+            cout<< "e"<<endl;
+            int mesCharlaPreAux= fechaCharla/100; //202009XX  
+            cout<< "f"<<endl;
+            int mesCharlaAux= mesCharlaPreAux%100; //09 ve, la vara es que se supone que el mae ya corre por todo, pero no esta detectando las charlas
+            cout<< "g"<<endl;
             int annoCharla= fechaCharla/10000; //2020
-
+            cout<< "h"<<endl;
             int numSemTemp=0;
-
+            cout<< "a"<<endl;
             if(mesCharlaAux<=7){
                 numSemTemp=1;
             }else{
@@ -2280,7 +2306,7 @@ void reporte4(){
             }
 
             int codigoSemCharla= (annoCharla*10)+numSemTemp;
-
+            cout<< "b"<<endl;
             while (tempC!=NULL){
                 if(codigoS==codigoSemCharla){   //CodS 20212, CodSemCh sem+mes
                     cantCharlasEst+=1;
@@ -2288,7 +2314,7 @@ void reporte4(){
                 tempC = tempC->sig; //Revisar como se llama siguiente charla
             }
             if(cantCharlasEst== cantCharlas){
-                cout<<"Nombre: "<<tempE->nombreEst<< "\t"<<"Carnet: "<<tempE->carnet<<endl;
+                cout<<"Nombre: "<<tempE->nombreEst<<endl; //<< "\tCarnet: "<<tempE->carnet
             }
             tempE=tempE->sigEst; //Revisar como se llama siguiente estudiante 
 
@@ -2299,7 +2325,9 @@ void reporte4(){
 }
         
       
-        
+void reporte5(){
+    
+}      
 
 
 
@@ -2781,8 +2809,14 @@ int main(){
     agregarActEst(buscarEst(202105), buscarAct(encontrarGrupo("IC3101", 51), "Proyecto", "1"));//Earl 51 IC3101
     agregarActEst(buscarEst(201705), buscarAct(encontrarGrupo("IC3101", 51), "Examen", "2"));//Carmen 51 IC3101
     cout<<"\tCreando charlas\n";
-    insertarCharlaProf(buscarSem(20211), "Charla1", 20211030, 1300);
-    insertarCharlaProf(buscarSem(20211), "Charla2", 20210503, 1600);   
+    insertarCharlaProf(buscarSem(20212), "Charla1", 20211030, 1300); //2021 octubre 30                              Correlo así o.o
+    insertarCharlaProf(buscarSem(20212), "Charla2", 20211103, 1600); //Cambiemos esta a noviembre para tener dos 
+    insertarCharlaProf(buscarSem(20212), "Charla3", 20210713, 1500); //Julio 13
+    insertarCharlaProf(buscarSem(20212), "Charla4", 20210910, 1700); //Setiembre 10
+    insertarCharlaProf(buscarSem(20212), "Charla5", 20211227, 1200); //Diciembre 27
+    cout<<"\tInsertando estudiantes en charlas\t"<<endl;
+    insertarcharlaEstAux(202105, int 20212, string idCh);
+
     //imprimirAdmins();
     //imprimirSemestres();
     menuPrincipal();
