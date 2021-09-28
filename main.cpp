@@ -2322,14 +2322,7 @@ void reporte4(){
         
 
         
-}
-        
-      
-void reporte5(){
-    
-}      
-
-
+} 
 
         
 
@@ -2809,13 +2802,23 @@ int main(){
     agregarActEst(buscarEst(202105), buscarAct(encontrarGrupo("IC3101", 51), "Proyecto", "1"));//Earl 51 IC3101
     agregarActEst(buscarEst(201705), buscarAct(encontrarGrupo("IC3101", 51), "Examen", "2"));//Carmen 51 IC3101
     cout<<"\tCreando charlas\n";
-    insertarCharlaProf(buscarSem(20212), "Charla1", 20211030, 1300); //2021 octubre 30                              Correlo así o.o
-    insertarCharlaProf(buscarSem(20212), "Charla2", 20211103, 1600); //Cambiemos esta a noviembre para tener dos 
+    insertarCharlaProf(buscarSem(20212), "Charla1", 20211030, 1300); //2021 octubre 30                         
+    insertarCharlaProf(buscarSem(20212), "Charla2", 20211103, 1600); //Noviembre 3
     insertarCharlaProf(buscarSem(20212), "Charla3", 20210713, 1500); //Julio 13
     insertarCharlaProf(buscarSem(20212), "Charla4", 20210910, 1700); //Setiembre 10
     insertarCharlaProf(buscarSem(20212), "Charla5", 20211227, 1200); //Diciembre 27
     cout<<"\tInsertando estudiantes en charlas\t"<<endl;
-    insertarcharlaEstAux(202105, int 20212, string idCh);
+    insertarcharlaEstAux(201935, 20212, "Charla1");
+    insertarcharlaEstAux(201935, 20212, "Charla2");
+    insertarcharlaEstAux(201935, 20212, "Charla3");
+    insertarcharlaEstAux(201935, 20212, "Charla4");
+    insertarcharlaEstAux(201935, 20212, "Charla5");
+
+    insertarcharlaEstAux(202006, 20212, "Charla1");
+    insertarcharlaEstAux(202006, 20212, "Charla2");
+    insertarcharlaEstAux(202006, 20212, "Charla3");
+    insertarcharlaEstAux(202006, 20212, "Charla4");
+    insertarcharlaEstAux(202006, 20212, "Charla5");
 
     //imprimirAdmins();
     //imprimirSemestres();
