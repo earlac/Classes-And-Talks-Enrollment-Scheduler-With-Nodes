@@ -2247,8 +2247,11 @@ void reporte4(){
                 charla*tempC= tempS->listaCharlas;
                 while(tempC!=NULL){
                     cantCharlas+=1;
+                    tempC= tempC->sigCharla;
                 }
+
             }
+            tempS= tempS->sigSem;
         }
 
         if(cantCharlas==0){

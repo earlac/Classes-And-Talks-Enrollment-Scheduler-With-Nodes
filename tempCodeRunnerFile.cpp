@@ -1,1 +1,2 @@
-insertarGrupo
+
+        while(tempS!=NULL){
