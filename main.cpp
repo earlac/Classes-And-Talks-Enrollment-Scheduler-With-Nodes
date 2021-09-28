@@ -2351,13 +2351,83 @@ void reporte4(){
                 cout<<"Nombre: "<<tempE->nombreEst<<endl; //<< "\tCarnet: "<<tempE->carnet
             }
             tempE=tempE->sigEst; //Revisar como se llama siguiente estudiante 
-
         }
-        
-
-        
 } 
 
+void reporte5(profesor* tempP, curso* tempC){
+/*
+Inputs: 
+        profesor* tempP: teacher 
+        curso* tempC: subject 
+Process:
+        With the teacher and subject, we must go through all the groups the teacher is giving classes of that subject. 
+        Then, in every group, we look for the students in that group. 
+        We look for all of the activities, and check if the student has it in his evaluacionesEntregadas list.
+        if not, then that evaluation is printed. 
+Outputs:
+        Prints the teacher, the course, the student, and every activity that said student hasn't done. 
+*/
+    int cantEv = 0;
+
+    if(tempP->gruposProfAux == NULL){
+        cout<<"El profesor no tiene grupos asignados"<<endl;
+        return;
+    }
+
+    cout<<"\tProfesor: "<<tempP->nombreProf<<endl;
+    cout<<"\t\t"<<tempC->nombre<<endl;
+    
+    enlazarGrupo* tempEnG = tempP->gruposProfAux; //Now we need to go through all of his groups
+    
+    while(tempEnG != NULL){
+
+        if(tempEnG->enlaceGrupo->cursoActual == tempC){
+            estudiante* tempEst = listaEstudiantes;
+            
+            while(tempEst != NULL){//Go through the list of students
+            
+                if(tempEnG->enlaceGrupo == buscarGrupoEst(tempEst->carnet, tempEnG->enlaceGrupo->idCurso)){//if student is in the group
+                    cout<<"\n\t\t\t"<<tempEst->nombreEst<<" (G"<<tempEnG->enlaceGrupo->numGrupo<<")"<<" no ha entregado o participado en: \n"<<endl;
+
+                    evaluacion* tempEv = tempEnG->enlaceGrupo->listaEvaluacion;
+                    while(tempEv != NULL){
+
+                        if(buscarActEst(tempEst, tempEv) == false){
+                            cout<<"\t\t\t\t"<<tempEv->tipo<<" del "<<nomSemana(numSemana(calcularDiaAct(tempEv), calcularMesAct(tempEv), calcularAnnoAct(tempEv)))<<" "<<calcularDiaAct(tempEv)<<" de "<<mostrarMesAct(tempEv)<<endl;
+                            cantEv = cantEv + 1;
+                        }
+                        tempEv = tempEv->sigEv;
+                    }   
+                    if(cantEv == 0){
+                        cout<<"\t\t\t\t"<<"Ha entregado o participado en todas las actividades"<<endl;
+                    }
+                }
+                tempEst = tempEst->sigEst;
+                cantEv = 0;
+            }            
+        }
+        tempEnG = tempEnG->sigEn;
+    }
+}
+
+void reporte5Aux(){
+    int cedula = pedirCedulaProf();
+    profesor* tempP = buscarProf(cedula);
+
+    if(tempP == NULL){
+        cout<<"Profesor no encontrado"<<endl;
+        return;
+    }else{
+        string idC = pedirCodigoCurso();
+        curso* tempC = buscarCurso(idC);
+        if(tempC == NULL){
+            cout<<"Curso no encontrado"<<endl;
+            return;
+        }else{
+            reporte5(tempP, tempC);
+        }
+    }
+}
         
 
 
@@ -2477,7 +2547,7 @@ void menuProfesorRep(){
         reporte4();
         menuProfesorRep();
     }else if(opcion == "e"){
-        borrarGrupoEst();
+        reporte5Aux();
         menuProfesorRep();
     }else if(opcion == "z"){
         reporteGruposProfe();
@@ -2794,17 +2864,17 @@ int main(){
     insertarCurso("Probabilidad", "MA", 3098);
     insertarCurso("Programacion Orientada a Objetos", "IC", 5021);
     cout<<"\tInsertando Profesores\n";
-    insertarProf(11833, "Jose");
-    insertarProf(12345, "Marta");
-    insertarProf(48503, "Pedro");
-    insertarProf(84728, "Gerardo");
-    insertarProf(40284, "Lucia");
+    insertarProf(11833, "Jose Ortega Granados");
+    insertarProf(12345, "Marta Sanchez Obviedo");
+    insertarProf(48503, "Pedro Peralta Aguirre");
+    insertarProf(84728, "Gerardo Gonzales Ferrero");
+    insertarProf(40284, "Lucia Mata Mata");
     cout<<"\tInsertando Estudiantes\n";
-    insertarEst(202006, "Brenda");
-    insertarEst(202105, "Earl");
-    insertarEst(201935, "Crystel");
-    insertarEst(201919, "Josefina");
-    insertarEst(201705, "Carmen");
+    insertarEst(202006, "Brenda Badilla Rodriguez");
+    insertarEst(202105, "Earl Areck Alvarado");
+    insertarEst(201935, "Crystel Zamora Guerrero");
+    insertarEst(201919, "Julia Segura Chacon");
+    insertarEst(201705, "Carmen Hernandez Mendez");
     cout<<"\tInsertanto Grupos\n";
     insertarGrupo("IC3101", buscarCurso("IC3101"), 50);
     insertarGrupo("IC3101", buscarCurso("IC3101"), 51);
@@ -2817,11 +2887,11 @@ int main(){
     relacionarGrupoProf(buscarProf(11833), encontrarGrupo("IC2040", 20));
     relacionarGrupoProf(buscarProf(11833), encontrarGrupo("IC2040", 35));
     cout<<"\tAsignado estudiantes a grupos\n";
-    relacionarGrupoEst(buscarEst(202006), encontrarGrupo("IC3101", 50));
-    relacionarGrupoEst(buscarEst(202105), encontrarGrupo("IC3101", 51));
-    relacionarGrupoEst(buscarEst(201935), encontrarGrupo("IC3101", 50));
-    relacionarGrupoEst(buscarEst(201919), encontrarGrupo("IC3101", 50));
-    relacionarGrupoEst(buscarEst(201705), encontrarGrupo("IC3101", 51));
+    relacionarGrupoEst(buscarEst(202006), encontrarGrupo("IC3101", 50));//Brenda grupo 50
+    relacionarGrupoEst(buscarEst(202105), encontrarGrupo("IC3101", 51));//Earl grupo 51
+    relacionarGrupoEst(buscarEst(201935), encontrarGrupo("IC3101", 50));//Crystel grupo 50
+    relacionarGrupoEst(buscarEst(201919), encontrarGrupo("IC3101", 50));//Josefina grupo 50
+    relacionarGrupoEst(buscarEst(201705), encontrarGrupo("IC3101", 51));//Carmen grupo 51
     cout<<"\tCreando actividades\n";
     insertarActProf(encontrarGrupo("IC3101", 50), "Tarea", "1", 20210927, 1400);//Solo la hizo Brenda, no la hizo Crystel
     insertarActProf(encontrarGrupo("IC3101", 51), "Proyecto", "1", 20210927, 1600);//Lo hizo solo Earl, no lo hizo Carmen
