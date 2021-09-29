@@ -217,21 +217,21 @@ struct semestre{ //Simple linked list
 
 int pedirAnnoSem(){
     int annoS;
-    cout<<"Ingrese el anno del semestre: "<<endl;
+    cout<<"Ingrese el anno del semestre: ";
     cin>>annoS;   
     return annoS; 
 }
 
 int pedirNumSem(){
     int semS;
-    cout<<"Ingrese el semestre del anno: "<<endl;
+    cout<<"Ingrese el semestre del anno: ";
     cin>>semS;
     return semS;
 }
 
 int pedirpresupuestoSem(){
     int presupuestoS;
-    cout<<"Ingrese el presupuesto del semestre: "<<endl;
+    cout<<"Ingrese el presupuesto del semestre: ";
     cin>>presupuestoS;
     return presupuestoS;    
 }
@@ -2078,7 +2078,7 @@ void reporte1(){
 
     int numSem = numSemana(dia, mes, anno);
     if(numSem < 0){//If today isn't sunday
-        dia = dia - numSem; //We need it to be sunday to start checking every day of the week  
+        dia = dia - (numSem+2); //We need it to be sunday to start checking every day of the week  
     }
     int tempDia = dia; //Safe the value so that we can iterate it 
     int contAct = 0; //We need to know how many activities we have for each day
@@ -2271,74 +2271,53 @@ void reporte3Aux(){
     }   
 }
 
+bool buscarCharlaEst(estudiante* tempEst, charla* tempCh){
+
+    enlaceCharla* buscarCh = tempEst->charla;
+
+    while(buscarCh != NULL){
+        if(buscarCh->enCharla == tempCh){
+            return true;
+        }
+        buscarCh = buscarCh->sig;
+    }
+    return false;
+}
+
+
 void reporte4(){
-        int cedula= pedirCedulaProf();
-
-        int nNumSem= 0;
-
-        int annoS = pedirAnnoSem();
-        int semS = pedirNumSem();
-        int codigoS = 10*annoS+semS;
-
-        int cantCharlas= 0;
-        semestre*tempS= listaSemestres;
-        while(tempS!=NULL){
-            if(tempS->abreviatura==codigoS){
-                charla*tempC= tempS->listaCharlas;
-                while(tempC!=NULL){
-                    cantCharlas+=1;
-                    tempC= tempC->sigCharla;
+    int annoS = pedirAnnoSem();
+    int semS = pedirNumSem();
+    int codigoS = 10*annoS+semS;
+    semestre* tempSem = buscarSem(codigoS);
+    if(tempSem == NULL){
+        cout<<"Semestre no encontrado"<<endl;
+    }else{
+        cout<<"\nEstudiantes que han participado en todas las charlas del semestre "<<semS<<" del "<<annoS<<"\n"<<endl;
+        charla* tempCh = tempSem->listaCharlas;
+        int cantCh = 0;
+        while(tempCh != NULL){
+            cantCh = cantCh + 1;
+            tempCh = tempCh->sigCharla;
+        }
+        estudiante* tempEst = listaEstudiantes;
+        
+        while(tempEst != NULL){
+            int cantChEst = 0;
+            enlaceCharla* tempEnCh = tempEst->charla;
+            while(tempEnCh != NULL){
+                if(buscarCharlaEst(tempEst, tempEnCh->enCharla)==true){
+                    cantChEst = cantChEst + 1; 
                 }
-
+                tempEnCh = tempEnCh->sig;
             }
-            tempS= tempS->sigSem;
+            if(cantChEst == cantCh){
+                cout<<"Estudiante: "<<tempEst->nombreEst<< "    Carnet: "<< tempEst->carnet<<endl;
+            }
+            tempEst = tempEst->sigEst;
         }
-        cout<<cantCharlas<<endl;
-        if(cantCharlas==0){
-            cout<<"No hubo charlas registradas el semestre indicado"<<endl;
-            return;
-        }
-        cout<<"Estudiantes que asistieron a todas las charlas el semestre indicado"<<endl;
-        estudiante*tempE= listaEstudiantes;
-        while(tempE!=NULL){
-            cout<< tempE->nombreEst<<endl;
-            int cantCharlasEst=0;
-            //hey hey hey, le hice cout a la cantCharlas y dice que 0. Hay charlas el 2do semestre 2021? vamos a ver el main, creo que si? lo  averiguaremos.
-            enlaceCharla*tempC= tempE->charla;
-            cout<< "d"<<endl;
-            if(tempC==NULL){
-                cout<<"Brenda la sabia"<<endl;
-            }
-            int fechaCharla= tempC->enCharla->fecha;
-            cout<< "e"<<endl;
-            int mesCharlaPreAux= fechaCharla/100; //202009XX  
-            cout<< "f"<<endl;
-            int mesCharlaAux= mesCharlaPreAux%100; //09 ve, la vara es que se supone que el mae ya corre por todo, pero no esta detectando las charlas
-            cout<< "g"<<endl;
-            int annoCharla= fechaCharla/10000; //2020
-            cout<< "h"<<endl;
-            int numSemTemp=0;
-            cout<< "a"<<endl;
-            if(mesCharlaAux<=7){
-                numSemTemp=1;
-            }else{
-                numSemTemp=2;
-            }
-
-            int codigoSemCharla= (annoCharla*10)+numSemTemp;
-            cout<< "b"<<endl;
-            while (tempC!=NULL){
-                if(codigoS==codigoSemCharla){   //CodS 20212, CodSemCh sem+mes
-                    cantCharlasEst+=1;
-                }
-                tempC = tempC->sig; //Revisar como se llama siguiente charla
-            }
-            if(cantCharlasEst== cantCharlas){
-                cout<<"Nombre: "<<tempE->nombreEst<<endl; //<< "\tCarnet: "<<tempE->carnet
-            }
-            tempE=tempE->sigEst; //Revisar como se llama siguiente estudiante 
-        }
-} 
+    }
+}
 
 void reporte5(profesor* tempP, curso* tempC){
 /*
@@ -2415,6 +2394,10 @@ void reporte5Aux(){
     }
 }
 
+void reporte6(){
+
+}
+
 void reporte7(){
 /*
 Inputs: 
@@ -2457,6 +2440,9 @@ Output:
     
 }
 
+void reporte8(){
+
+}
 
 //------------------Menus-----------------------------------------------------------------------------------------------------
 
