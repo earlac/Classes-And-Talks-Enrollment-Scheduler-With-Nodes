@@ -2428,7 +2428,48 @@ void reporte5Aux(){
         }
     }
 }
-        
+
+void reporte7(){
+/*
+Inputs: 
+        None
+Process:
+        We go through the list of students. 
+        For every student, we go through all of his/her groups.
+        For every group they're in, we go through all of the evaluations.
+        We check if the student has done its activities. While keeping a counter. 
+        If they haven't done any, then it prints the student and subject. 
+Output:
+        Students who haven't done any activities in a subject. 
+*/
+    if(listaEstudiantes == NULL){
+        cout<<"No existen estudiantes"<<endl;
+        return;
+    }else{
+        estudiante* tempEst = listaEstudiantes;
+        while(tempEst != NULL){
+            enlazarGrupo* tempEnG = tempEst->gruposEstAux;
+            while(tempEnG != NULL){
+                int actEst = 0;//Activities done by the student int actEst = 0;//Activities done by the student 
+                evaluacion* tempEv = tempEnG->enlaceGrupo->listaEvaluacion;
+                while(tempEv != NULL){
+
+                    if(buscarActEst(tempEst, tempEv) == true){
+                        actEst = actEst + 1;
+                    }
+
+                    tempEv = tempEv->sigEv;
+                }
+                if(actEst == 0){
+                    cout<<tempEst->nombreEst<<" (G"<<tempEnG->enlaceGrupo->numGrupo<<")"<<" no ha entregado nada en "<<tempEnG->enlaceGrupo->cursoActual->nombre<<endl;
+                }
+                tempEnG = tempEnG->sigEn;
+            }
+            tempEst = tempEst->sigEst;
+        }
+    }
+    
+}
 
 
 //------------------Menus-----------------------------------------------------------------------------------------------------
@@ -2594,6 +2635,35 @@ void menuProfesor(){
 }
 void menuAdmin();
 
+void menuAdminReportes(){
+    cout<<"\nEscoja e ingrese el reporte que desea generar:"<<endl;
+    
+    cout<<"a- Estudiantes que no han entregado ninguna actividad en algun curso\nb- 3 charlas con mas asistencia de un semestre\n\n1- Volver al menu de administrador\n2- Volver al menu principal\n\n\nOpcion: ";
+    string opcion;
+    cin>> opcion;
+
+    if(opcion == "a"){
+        reporte7();
+        menuAdminSemestre();
+    }
+    else if(opcion == "b"){
+        modificarSemestreAux();
+        menuAdminSemestre();
+    }
+    else if(opcion == "z"){
+        reporteCursosSem();
+        menuAdminSemestre();
+    }
+    else if(opcion == "1")
+        menuAdmin();
+    else if(opcion == "2")
+        menuPrincipal();
+    else{
+        cout<<"Opcion Invalida"<<endl;
+        menuAdminSemestre();
+    }    
+}
+
 void menuAdminSemestre(){
     cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
     
@@ -2744,7 +2814,7 @@ void menuAdminProf(){
 }
 void menuAdmin(){
     cout<<"\nEscoja e ingrese el caracter del objeto que desea modificar:"<<endl;
-    cout<<"a- Insertar Administrador\nb- Profesores\nc- Estudiantes\nd- Semestres\ne- Cursos\nf- Insertar grupo\n\n0- Volver al menu principal\nOpcion: ";
+    cout<<"a- Insertar Administrador\nb- Profesores\nc- Estudiantes\nd- Semestres\ne- Cursos\nf- Insertar grupo\ng- Reportes\n\n0- Volver al menu principal\nOpcion: ";
     
     string opcionMenuAdmin;
     
@@ -2772,6 +2842,9 @@ void menuAdmin(){
         insertarGrupoAux();
         menuAdmin();
         //reporteGrupo();
+    }
+    else if(opcionMenuAdmin == "g"){
+        menuAdminReportes();
     }
     else if(opcionMenuAdmin == "0"){
         menuPrincipal();
@@ -2890,7 +2963,7 @@ int main(){
     relacionarGrupoEst(buscarEst(202006), encontrarGrupo("IC3101", 50));//Brenda grupo 50
     relacionarGrupoEst(buscarEst(202105), encontrarGrupo("IC3101", 51));//Earl grupo 51
     relacionarGrupoEst(buscarEst(201935), encontrarGrupo("IC3101", 50));//Crystel grupo 50
-    relacionarGrupoEst(buscarEst(201919), encontrarGrupo("IC3101", 50));//Josefina grupo 50
+    relacionarGrupoEst(buscarEst(201919), encontrarGrupo("IC3101", 50));//Julia grupo 50
     relacionarGrupoEst(buscarEst(201705), encontrarGrupo("IC3101", 51));//Carmen grupo 51
     cout<<"\tCreando actividades\n";
     insertarActProf(encontrarGrupo("IC3101", 50), "Tarea", "1", 20210927, 1400);//Solo la hizo Brenda, no la hizo Crystel
