@@ -1601,6 +1601,14 @@ void insertarActProf(grupo* tempG, string tipoAct, string numAct, int fechaAct, 
         }
         else{
             while((tempEv->sigEv != NULL) && (tempEv->sigEv->fechaEntrega < nEv->fechaEntrega)){//Insert in the middle or the end
+                if(tempEv->sigEv->fechaEntrega == nEv->fechaEntrega){
+                    if(tempEv->sigEv->hora >= nEv->hora){
+                        nEv->sigEv = tempEv->sigEv;
+                        tempEv->sigEv = nEv;
+                        cout<<"Actividad creada con exito"<<endl;
+                        return;
+                    }
+                }
                 tempEv = tempEv->sigEv;
             }
             nEv->sigEv = tempEv->sigEv;
@@ -1794,10 +1802,17 @@ void insertarCharlaProf(semestre* tempSem, string nomCh, int fechaCh, int horaCh
         }else{//Either the middle or the end of the list
             
             //Find the element right before the one the conference is later, or the end of the list
-            while((tempCh->sigCharla != NULL)&&(tempCh->sigCharla->fecha < nCh->fecha)){
+            while((tempCh->sigCharla != NULL)&&(tempCh->sigCharla->fecha <= nCh->fecha)){
+                if(tempCh->sigCharla->fecha == nCh->fecha){
+                    if(tempCh->sigCharla->hora >= nCh->hora){
+                        nCh->sigCharla = tempCh->sigCharla;
+                        tempCh->sigCharla = nCh;
+                        cout<<"Actividad creada con exito"<<endl;
+                        return;
+                    }
+                }
                 tempCh = tempCh->sigCharla;
-            }
-            
+            }          
             nCh->sigCharla = tempCh->sigCharla;
             tempCh->sigCharla = nCh;
             cout<<"Actividad creada con exito"<<endl;
@@ -2418,6 +2433,21 @@ string grupoActEst(estudiante* tempEst, evaluacion* tempEv){
     return "";
 }
 
+charla* buscarSemFecha(int fechaSem){
+    semestre* tempSem = listaSemestres;
+    while(tempSem != NULL){
+        charla* tempCh = tempSem->listaCharlas;
+        while(tempCh != NULL){
+            if(tempCh->fecha == fechaSem){
+                return tempCh;
+            }
+            tempCh = tempCh->sigCharla;
+        }
+        tempSem = tempSem->sigSem;
+    }
+    return NULL;
+}
+
 void reporte6(){   
     int carnetEst = pedirCarnetEst();
     estudiante* tempEst = buscarEst(carnetEst);
@@ -2440,15 +2470,17 @@ void reporte6(){
         cout<<"Semana del "<<dia<<" al "<<dia+6<<" de "<<nomMes(mes)<<" del "<<anno<<endl;
         while(tempDia <= dia + 6){
             int contAct = 0;
+            int fechaChoque = 0;
+            int horaChoque = 0;
             cout<<nomSemana(numSemana(tempDia, mes, anno))<<" "<<tempDia<<endl;
             enlazarGrupo* tempG = tempEst->gruposEstAux;
             while(tempG != NULL){
-                
                 evaluacion* tempEv = tempG->enlaceGrupo->listaEvaluacion;
-                evaluacion* tempAnt;   
+                evaluacion* tempAnt;//We make this variable so that the user will see the schedule crash after it happens   
                 while(tempEv != NULL){
-                    
                     if(tempEv->fechaEntrega == (anno*10000 + mes*100 + tempDia)){
+                        fechaChoque = tempEv->fechaEntrega;
+                        horaChoque = tempEv->hora;
                         contAct = contAct + 1;            
                         cout<<"\t"<<tempEv->tipo<<" a las "<<tempEv->hora<<" en "<<tempG->enlaceGrupo->cursoActual->nombre<<endl; 
                         if(tempAnt->fechaEntrega == (anno*10000 + mes*100 + tempDia)){
@@ -2461,6 +2493,32 @@ void reporte6(){
                     tempEv = tempEv->sigEv;
                 }
                 tempG = tempG->sigEn;
+            }
+            semestre* tempSem = listaSemestres;
+            while(tempSem != NULL){
+                charla* tempCh = tempSem->listaCharlas;
+                charla* tempAntCh;
+                while(tempCh != NULL){
+                    if(tempCh->fecha == (anno*10000 + mes*100 + tempDia)){
+                        contAct = contAct + 1;
+                        cout<<"\t"<<tempCh->nombreCharla<<" a las "<<tempCh->hora<<endl;
+                        if(fechaChoque == (anno*10000 + mes*100 + tempDia)){
+                            if(((horaChoque <= tempCh->hora)&&(tempCh->hora <= (horaChoque + 200)))||((tempCh->hora <= horaChoque)&&(horaChoque <= (tempCh->hora + 200)))){
+                                cout<<"\tHay choque!"<<endl;
+                                fechaChoque = 0;
+                                horaChoque = 0;
+                            }
+                        }
+                        if(tempAntCh->fecha == (anno*10000 + mes*100 + tempDia)){
+                            if((tempAntCh->hora <= tempCh->hora)&&(tempCh->hora <= (tempAntCh->hora+200))){
+                                cout<<"\tHay choque!"<<endl;
+                            }
+                        }
+                    }
+                    tempAntCh = tempCh;
+                    tempCh = tempCh->sigCharla;
+                }
+                tempSem = tempSem->sigSem;
             }
             if(contAct == 0){
                 cout<<"\tNo hay entregas programadas"<<endl;
@@ -3076,11 +3134,11 @@ int main(){
     agregarActEst(buscarEst(201705), buscarAct(encontrarGrupo("IC3101", 51), "Proyecto", "1"));//Carmen 51 IC3101
     agregarActEst(buscarEst(201705), buscarAct(encontrarGrupo("IC3101", 51), "Examen", "2"));//Carmen 51 IC3101
     cout<<"\tCreando charlas\n";
-    insertarCharlaProf(buscarSem(20212), "Charla1", 20211030, 1300); //2021 octubre 30                         
-    insertarCharlaProf(buscarSem(20212), "Charla2", 20211103, 1600); //Noviembre 3
-    insertarCharlaProf(buscarSem(20212), "Charla3", 20210713, 1500); //Julio 13
-    insertarCharlaProf(buscarSem(20212), "Charla4", 20210910, 1700); //Setiembre 10
-    insertarCharlaProf(buscarSem(20212), "Charla5", 20211227, 1200); //Diciembre 27
+    insertarCharlaProf(buscarSem(20212), "Charla1", 20210923, 1300); //2021 octubre 30                         
+    insertarCharlaProf(buscarSem(20212), "Charla2", 20210927, 1600); //Noviembre 3
+    insertarCharlaProf(buscarSem(20212), "Charla3", 20210925, 1500); //Julio 13
+    insertarCharlaProf(buscarSem(20212), "Charla4", 20210926, 1700); //Setiembre 10
+    insertarCharlaProf(buscarSem(20212), "Charla5", 20210927, 1700); //Diciembre 27
     
     cout<<"\tInsertando estudiantes en charlas\t"<<endl;
     insertarCharlaEst(buscarEst(201935), buscarCharla(20212, "Charla1")); ///Ch1-4 Ch2-3 Ch3-2 Ch4-1 ch5-5
