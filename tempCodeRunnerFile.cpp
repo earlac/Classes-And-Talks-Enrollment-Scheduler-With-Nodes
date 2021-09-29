@@ -1,2 +1,1 @@
-
-        while(tempS!=NULL){
+1

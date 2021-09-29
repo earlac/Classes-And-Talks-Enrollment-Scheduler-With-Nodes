@@ -1464,11 +1464,11 @@ int pedirFechaAct(){
     int anno;
     int mes;
     int dia;
-    cout<<"Dia de entrega: ";
+    cout<<"Dia: ";
     cin>>dia;
     cout<<"-1 Enero\n-2 Febrero\n-3 Marzo\n-4 Abril\n-5 Mayo\n-6 Junio\n-7 Julio\n-8 Agosto\n-9 Setiembre\n-10 Octubre\n-11 Noviembre\n-12 Diciembre\nIngrese el numero del mes: ";
     cin>>mes;
-    cout<<"Anno de entrega: ";
+    cout<<"Anno: ";
     cin>>anno;
     
     int codigo;
@@ -2068,6 +2068,11 @@ string nomSemana(int numSem){
     string diasSem[7] = {"Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"};
     return diasSem[numSem];
 }
+
+string nomMes(int numMes){
+    string meses[12] = {"Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Setiembre", "Octubre", "Noviembre", "Diciembre"};
+    return meses[numMes-1];
+}
  
 void reporte1(){
     //DESPUES SUMARLE 7 A DIA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -2077,8 +2082,8 @@ void reporte1(){
     int anno = fecha/10000;
 
     int numSem = numSemana(dia, mes, anno);
-    if(numSem < 0){//If today isn't sunday
-        dia = dia - (numSem+2); //We need it to be sunday to start checking every day of the week  
+    if(numSem > 0){//If today isn't sunday
+        dia = dia - (numSem); //We need it to be sunday to start checking every day of the week  
     }
     int tempDia = dia; //Safe the value so that we can iterate it 
     int contAct = 0; //We need to know how many activities we have for each day
@@ -2394,8 +2399,75 @@ void reporte5Aux(){
     }
 }
 
-void reporte6(){
+string grupoActEst(estudiante* tempEst, evaluacion* tempEv){
 
+    enlazarGrupo* tempG = tempEst->gruposEstAux;
+
+    while(tempG != NULL){
+
+        evaluacion* tempEvG = tempG->enlaceGrupo->listaEvaluacion;
+        while(tempEvG != NULL){
+
+            if(tempEvG == tempEv){
+                return tempG->enlaceGrupo->cursoActual->nombre;
+            }
+            tempEvG = tempEvG->sigEv;
+        }
+        tempG = tempG->sigEn;
+    }
+    return "";
+}
+
+void reporte6(){   
+    int carnetEst = pedirCarnetEst();
+    estudiante* tempEst = buscarEst(carnetEst);
+
+    if(tempEst == NULL){
+        cout<<"El carnet ingresado no se encuentra registrado"<<endl;
+        return;
+    }else{
+        cout<<"Digite una fecha de la semana que desea verificar: \n";
+        int fecha = pedirFechaAct();
+        int dia = (fecha%100);
+        int mes = (fecha%10000)/100;//get month, day and year separated 
+        int anno = fecha/10000;
+
+        int numSem = numSemana(dia, mes, anno);
+        if(numSem > 0){//If today isn't sunday
+            dia = dia - numSem; //We need it to be sunday to start checking every day of the week  
+        }
+        int tempDia = dia; //Safe the value so that we can iterate it 
+        cout<<"Semana del "<<dia<<" al "<<dia+6<<" de "<<nomMes(mes)<<" del "<<anno<<endl;
+        while(tempDia <= dia + 6){
+            int contAct = 0;
+            cout<<nomSemana(numSemana(tempDia, mes, anno))<<" "<<tempDia<<endl;
+            enlazarGrupo* tempG = tempEst->gruposEstAux;
+            while(tempG != NULL){
+                
+                evaluacion* tempEv = tempG->enlaceGrupo->listaEvaluacion;
+                evaluacion* tempAnt;   
+                while(tempEv != NULL){
+                    
+                    if(tempEv->fechaEntrega == (anno*10000 + mes*100 + tempDia)){
+                        contAct = contAct + 1;            
+                        cout<<"\t"<<tempEv->tipo<<" a las "<<tempEv->hora<<" en "<<tempG->enlaceGrupo->cursoActual->nombre<<endl; 
+                        if(tempAnt->fechaEntrega == (anno*10000 + mes*100 + tempDia)){
+                            if((tempAnt->hora <= tempEv->hora)&&(tempEv->hora <= tempAnt->hora+200)){
+                                cout<<"\tHay choque!"<<endl;
+                            }
+                        }
+                    }
+                    tempAnt = tempEv;
+                    tempEv = tempEv->sigEv;
+                }
+                tempG = tempG->sigEn;
+            }
+            if(contAct == 0){
+                cout<<"\tNo hay entregas programadas"<<endl;
+            }    
+            tempDia = tempDia + 1;
+        }
+    }
 }
 
 void reporte7(){
@@ -2441,8 +2513,53 @@ Output:
 }
 
 void reporte8(){
+    int annoS = pedirAnnoSem();
+    int semS = pedirNumSem();
+    int codigoS = 10*annoS+semS;
+    
+
+    int a=0, b=0, c=0;
+    string na, nb, nc;
+    semestre*tempS= buscarSem(codigoS);
+    if(tempS==NULL){
+        cout<<"El semestre ingresado no existe."<<endl;
+        return;
+    }
+  
+    //for charla in semestre->listacharlas, for estudiante in lista estudiantes, if
+    //estudiante asistio a charla, sumar uno, compararlo con abc, hasta llegar al final.
+    charla*tempC= tempS->listaCharlas;
+    while(tempC!= NULL){
+        int contAsistentesCharla=0;
+        estudiante*tempE= listaEstudiantes;
+        while(tempE!=NULL){
+            if (buscarCharlaEst(tempE, tempC)==true){
+                contAsistentesCharla+=1;
+            }
+            tempE=tempE->sigEst;
+        }
+        if(contAsistentesCharla>a){
+            a= contAsistentesCharla;
+            na= tempC->nombreCharla;
+        }else if(contAsistentesCharla>b){
+            b= contAsistentesCharla;
+            nb= tempC->nombreCharla;
+        }else if(contAsistentesCharla>c){
+            c= contAsistentesCharla;
+            nc= tempC->nombreCharla;
+        }
+        
+        tempC=tempC->sigCharla;
+
+    }
+    cout<<"Las charlas más atendidas fueron: "<<endl;
+    cout<<"Charla#1: "<<na<<" con "<<a<<"estudiantes"<<endl;
+    cout<<"Charla#2: "<<nb<<" con "<<b<<"estudiantes"<<endl;
+    cout<<"Charla#3: "<<nc<<" con "<<c<<"estudiantes"<<endl;
+        
 
 }
+
 
 //------------------Menus-----------------------------------------------------------------------------------------------------
 
@@ -2450,7 +2567,7 @@ void menuPrincipal();
 
 void menuEstudiante(){
     cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
-    cout<<"a- Realizar Actividad\nb- Participar en Charla\n\n1- Volver al menu principal\n\n\nOpcion: ";
+    cout<<"a- Realizar Actividad\nb- Participar en Charla\nc- Reporte de actividades por semana\n\n1- Volver al menu principal\n\n\nOpcion: ";
     string opcion;
     cin>> opcion;    
 
@@ -2460,6 +2577,10 @@ void menuEstudiante(){
     }
     else if(opcion == "b"){
         insertarCharlaEstAux();
+        menuEstudiante();
+    }
+    else if(opcion == "c"){
+        reporte6();
         menuEstudiante();
     }
     else if(opcion == "1"){
@@ -2619,7 +2740,7 @@ void menuAdminReportes(){
         menuAdminSemestre();
     }
     else if(opcion == "b"){
-        modificarSemestreAux();
+        reporte8();
         menuAdminSemestre();
     }
     else if(opcion == "z"){
@@ -2939,6 +3060,7 @@ int main(){
     relacionarGrupoEst(buscarEst(201705), encontrarGrupo("IC3101", 51));//Carmen grupo 51
     cout<<"\tCreando actividades\n";
     insertarActProf(encontrarGrupo("IC3101", 50), "Tarea", "1", 20210927, 1400);//Solo la hizo Brenda, no la hizo Crystel
+    insertarActProf(encontrarGrupo("IC3101", 50), "Tarea", "2", 20210927, 1500);
     insertarActProf(encontrarGrupo("IC3101", 51), "Proyecto", "1", 20210927, 1600);//Lo hizo solo Earl, no lo hizo Carmen
     insertarActProf(encontrarGrupo("IC3101", 50), "Gira", "1", 20210926, 1600);//La hicieron Brenda y Crystel
     insertarActProf(encontrarGrupo("IC3101", 50), "Examen", "1", 20210925, 1600);//Solo lo hizo Crystel, no lo hizo Brenda
@@ -2946,6 +3068,7 @@ int main(){
     cout<<"\tAgregando las actividades realizadas por los estudiantes\n";
     agregarActEst(buscarEst(202006), buscarAct(encontrarGrupo("IC3101", 50), "Tarea", "1"));//Brenda 50 IC3101
     agregarActEst(buscarEst(202006), buscarAct(encontrarGrupo("IC3101", 50), "Gira", "1"));//Brenda 
+    agregarActEst(buscarEst(202006), buscarAct(encontrarGrupo("IC3101", 50), "Tarea", "2"));//Brenda 
     //agregarActEst(buscarEst(202006), buscarAct(encontrarGrupo("IC3101", 50), "Examen", "1"));//Brenda
     agregarActEst(buscarEst(201935), buscarAct(encontrarGrupo("IC3101", 50), "Gira", "1"));//Crystel 50 IC3101
     //agregarActEst(buscarEst(201935), buscarAct(encontrarGrupo("IC3101", 50), "Examen", "1"));//Crystel
@@ -2958,9 +3081,9 @@ int main(){
     insertarCharlaProf(buscarSem(20212), "Charla3", 20210713, 1500); //Julio 13
     insertarCharlaProf(buscarSem(20212), "Charla4", 20210910, 1700); //Setiembre 10
     insertarCharlaProf(buscarSem(20212), "Charla5", 20211227, 1200); //Diciembre 27
-    cout<<"\tInsertando estudiantes en charlas\t"<<endl;
     
-    insertarCharlaEst(buscarEst(201935), buscarCharla(20212, "Charla1"));
+    cout<<"\tInsertando estudiantes en charlas\t"<<endl;
+    insertarCharlaEst(buscarEst(201935), buscarCharla(20212, "Charla1")); ///Ch1-4 Ch2-3 Ch3-2 Ch4-1 ch5-5
     insertarCharlaEst(buscarEst(201935), buscarCharla(20212, "Charla2"));
     insertarCharlaEst(buscarEst(201935), buscarCharla(20212, "Charla3"));
     insertarCharlaEst(buscarEst(201935), buscarCharla(20212, "Charla4"));
@@ -2969,8 +3092,15 @@ int main(){
     insertarCharlaEst(buscarEst(202105), buscarCharla(20212, "Charla1"));
     insertarCharlaEst(buscarEst(202105), buscarCharla(20212, "Charla2"));
     insertarCharlaEst(buscarEst(202105), buscarCharla(20212, "Charla3"));
-    insertarCharlaEst(buscarEst(202105), buscarCharla(20212, "Charla4"));
-    insertarCharlaEst(buscarEst(202105), buscarCharla(20212, "Charla5"));
+
+    insertarCharlaEst(buscarEst(201705), buscarCharla(20212, "Charla5"));
+    insertarCharlaEst(buscarEst(201705), buscarCharla(20212, "Charla2"));
+
+    insertarCharlaEst(buscarEst(202006), buscarCharla(20212, "Charla1"));
+    insertarCharlaEst(buscarEst(202006), buscarCharla(20212, "Charla5"));
+
+    insertarCharlaEst(buscarEst(201919), buscarCharla(20212, "Charla1"));
+    insertarCharlaEst(buscarEst(201919), buscarCharla(20212, "Charla5"));
     //imprimirAdmins();
     //imprimirSemestres();
     menuPrincipal();
