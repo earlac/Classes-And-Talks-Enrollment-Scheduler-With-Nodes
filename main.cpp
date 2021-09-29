@@ -2003,27 +2003,24 @@ void agregarActEstAux(){
         }
     }
 }
-void insertarcharlaEstAux(int carnetEst, int codigoS, string idCh){
-    estudiante* tempEst = buscarEst(carnetEst);
-    if(tempEst == NULL){//Check if student exists
-        cout<<"Estudiante no encontrado"<<endl;
-        return;
-    }else{//Check if semester exists
-        semestre* tempSem = buscarSem(codigoS);
 
-        if(tempSem == NULL){
-            cout<<"Semestre no encontrado"<<endl;
-            return;
-        }else{
-            charla* tempCh = buscarCharla(codigoS, idCh);
-            if(tempCh == NULL){
-                cout<<"Charla no encontrada";
-                return;
-            }
-        }
-    }
+void insertarCharlaEst(estudiante* tempEst, charla* tempCh){
+    
+    enlaceCharla* nEnCh = new enlaceCharla(tempCh); 
+                
+    if(tempEst->charla == NULL){//Empty list
+        tempEst->charla = nEnCh;
+        cout<<"Charla asistida con exito"<<endl;
+        return;    
+    }else{//Insert at the beginning
+        nEnCh->sig = tempEst->charla->sig;
+        tempEst->charla->sig = nEnCh;
+        cout<<"Charla asistida con exito"<<endl;
+        return;
+    } 
 }
-void insertarCharlaEst(){
+
+void insertarCharlaEstAux(){
     int carnetEst = pedirCarnetEst();
     estudiante* tempEst = buscarEst(carnetEst);
     if(tempEst == NULL){//Check if student exists
@@ -2044,18 +2041,7 @@ void insertarCharlaEst(){
                 cout<<"Charla no encontrada";
                 return;
             }else{
-                enlaceCharla* nEnCh = new enlaceCharla(tempCh); 
-                
-                if(tempEst->charla == NULL){//Empty list
-                    tempEst->charla = nEnCh;
-                    cout<<"Charla asistida con exito"<<endl;
-                    return;    
-                }else{//Insert at the beginning
-                    nEnCh->sig = tempEst->charla->sig;
-                    tempEst->charla->sig = nEnCh;
-                    cout<<"Charla asistida con exito"<<endl;
-                    return;
-                }
+                insertarCharlaEst(tempEst, tempCh);
             }
         }
     }
@@ -2487,7 +2473,7 @@ void menuEstudiante(){
         menuEstudiante();
     }
     else if(opcion == "b"){
-        insertarCharlaEst();
+        insertarCharlaEstAux();
         menuEstudiante();
     }
     else if(opcion == "1"){
@@ -2978,7 +2964,7 @@ int main(){
     agregarActEst(buscarEst(201935), buscarAct(encontrarGrupo("IC3101", 50), "Gira", "1"));//Crystel 50 IC3101
     //agregarActEst(buscarEst(201935), buscarAct(encontrarGrupo("IC3101", 50), "Examen", "1"));//Crystel
     agregarActEst(buscarEst(202105), buscarAct(encontrarGrupo("IC3101", 51), "Proyecto", "1"));//Earl 51 IC3101
-    agregarActEst(buscarEst(201705), buscarAct(encontrarGrupo("IC3101", 51), "Proyecto", "1"));//Earl 51 IC3101
+    agregarActEst(buscarEst(201705), buscarAct(encontrarGrupo("IC3101", 51), "Proyecto", "1"));//Carmen 51 IC3101
     agregarActEst(buscarEst(201705), buscarAct(encontrarGrupo("IC3101", 51), "Examen", "2"));//Carmen 51 IC3101
     cout<<"\tCreando charlas\n";
     insertarCharlaProf(buscarSem(20212), "Charla1", 20211030, 1300); //2021 octubre 30                         
@@ -2987,18 +2973,18 @@ int main(){
     insertarCharlaProf(buscarSem(20212), "Charla4", 20210910, 1700); //Setiembre 10
     insertarCharlaProf(buscarSem(20212), "Charla5", 20211227, 1200); //Diciembre 27
     cout<<"\tInsertando estudiantes en charlas\t"<<endl;
-    insertarcharlaEstAux(201935, 20212, "Charla1");
-    insertarcharlaEstAux(201935, 20212, "Charla2");
-    insertarcharlaEstAux(201935, 20212, "Charla3");
-    insertarcharlaEstAux(201935, 20212, "Charla4");
-    insertarcharlaEstAux(201935, 20212, "Charla5");
+    
+    insertarCharlaEst(buscarEst(201935), buscarCharla(20212, "Charla1"));
+    insertarCharlaEst(buscarEst(201935), buscarCharla(20212, "Charla2"));
+    insertarCharlaEst(buscarEst(201935), buscarCharla(20212, "Charla3"));
+    insertarCharlaEst(buscarEst(201935), buscarCharla(20212, "Charla4"));
+    insertarCharlaEst(buscarEst(201935), buscarCharla(20212, "Charla5"));
 
-    insertarcharlaEstAux(202006, 20212, "Charla1");
-    insertarcharlaEstAux(202006, 20212, "Charla2");
-    insertarcharlaEstAux(202006, 20212, "Charla3");
-    insertarcharlaEstAux(202006, 20212, "Charla4");
-    insertarcharlaEstAux(202006, 20212, "Charla5");
-
+    insertarCharlaEst(buscarEst(202105), buscarCharla(20212, "Charla1"));
+    insertarCharlaEst(buscarEst(202105), buscarCharla(20212, "Charla2"));
+    insertarCharlaEst(buscarEst(202105), buscarCharla(20212, "Charla3"));
+    insertarCharlaEst(buscarEst(202105), buscarCharla(20212, "Charla4"));
+    insertarCharlaEst(buscarEst(202105), buscarCharla(20212, "Charla5"));
     //imprimirAdmins();
     //imprimirSemestres();
     menuPrincipal();
