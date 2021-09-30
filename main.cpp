@@ -3228,6 +3228,8 @@ Process:
 Outputs:
         Functionality chosen by the user.
 */
+    cout<<"\n--------------------------"<<endl;
+    cout<<"----Menu de Estudiante----"<<endl;
     cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
     cout<<"a- Realizar Actividad\nb- Participar en Charla\nc- Reporte de actividades por semana\n\n1- Volver al menu principal\n\n\nOpcion: ";
     string opcion;
@@ -3265,6 +3267,7 @@ Process:
 Outputs:
         Functionality chosen by the user.
 */
+    cout<<"\n--Actividades"<<endl;
     cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
     cout<<"a- Crear Actividad\nb- Modificar Actividad\nc- Borrar Actividad\n\n1- Volver al menu de profesor\n2- Volver al menu principal\n\n\nOpcion: ";
     string opcion;
@@ -3303,6 +3306,7 @@ Process:
 Outputs:
         Functionality chosen by the user.
 */
+    cout<<"\n--Charlas--"<<endl;
     cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
     cout<<"a- Crear Charla\nb- Modificar Charla\nc- Borrar Charla\n\n1- Volver al menu de profesor\n2- Volver al menu principal\n\n\nOpcion: ";
     string opcion;
@@ -3345,6 +3349,7 @@ Process:
 Outputs:
         Functionality chosen by the user.
 */
+    cout<<"\n--Reportes--"<<endl;
     cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
     cout<<"a- Actividades para la proxima semana\nb- Actividades para todo el semestre\nc- Actividades concluidas\nd- Estudiantes que participaron en todas las charlas \ne- Estudiantes que no han entregado asignaciones\n\n1- Volver al menu de profesor\n2- Volver al menu principal\n\n\nOpcion: ";
     string opcion;
@@ -3391,6 +3396,8 @@ Process:
 Outputs:
         Menu chosen by the user.
 */
+    cout<<"\n--------------------------"<<endl;
+    cout<<"-----Menu de Profesor-----"<<endl;
     cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
     cout<<"a- Actividades\nb- Charlas\nc- Reportes\n\n1- Volver al menu principal\n\n\nOpcion: ";
     string opcion;
@@ -3430,8 +3437,8 @@ Process:
 Outputs:
         Menu chosen by the user.
 */
+    cout<<"\n--Reportes--"<<endl;
     cout<<"\nEscoja e ingrese el reporte que desea generar:"<<endl;
-    
     cout<<"a- Estudiantes que no han entregado ninguna actividad en algun curso\nb- 3 charlas con mas asistencia de un semestre\n\n1- Volver al menu de administrador\n2- Volver al menu principal\n\n\nOpcion: ";
     string opcion;
     cin>> opcion;
@@ -3467,6 +3474,7 @@ Process:
 Outputs:
         Menu chosen by the user.
 */
+    cout<<"\n--Semestres--"<<endl;
     cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
     
     cout<<"a- Insertar Semestre\nb- Modificar Semestre\nc- Insertar Curso\n\n1- Volver al menu de administrador\n2- Volver al menu principal\n\n\nOpcion: ";
@@ -3508,6 +3516,7 @@ Process:
 Outputs:
         Menu chosen by the user.
 */
+    cout<<"\n--Cursos--"<<endl;
     cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
     
     cout<<"a- Insertar curso\nb- Modificar curso\nc- Borrar curso\n\n1- Volver al menu de administrador\n2- Volver al menu principal\n\n\nOpcion: ";
@@ -3549,8 +3558,8 @@ Process:
 Outputs:
         Menu chosen by the user.
 */
+    cout<<"\n--Estudiantes--"<<endl;
     cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
-    
     cout<<"a- Insertar estudiante\nb- Modificar estudiante\nc- Borrar estudiante\nd- Asignar a grupo\ne- Desvincular a grupo\n\n1- Volver al menu de administrador\n2- Volver al menu principal\n\n\nOpcion: ";
     string opcion;
     cin>> opcion;
@@ -3596,6 +3605,7 @@ Process:
 Outputs:
         Menu chosen by the user.
 */
+    cout<<"\n--Profesores--"<<endl;
     cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
     cout<<"a- Insertar profesor\nb- Modificar profesor\nc- Borrar profesor\nd- Asignar a grupo\n\n1-Volver al menu de administrador \n2-Volver al menu principal \nOpcion: ";
     string opcionMenuAdminProf;
@@ -3647,7 +3657,9 @@ Process:
 Outputs:
         Menu chosen by the user.
 */
-    cout<<"\nEscoja e ingrese el caracter del objeto que desea modificar:"<<endl;
+    cout<<"\n-------------------------"<<endl;
+    cout<<"--Menu de Administrador--"<<endl;
+    cout<<"\nEscoja e ingrese el caracter de la opcion seleccionada:"<<endl;
     cout<<"a- Insertar Administrador\nb- Profesores\nc- Estudiantes\nd- Semestres\ne- Cursos\nf- Insertar grupo\ng- Reportes\n\n0- Volver al menu principal\nOpcion: ";
     
     string opcionMenuAdmin;
@@ -3753,10 +3765,10 @@ Outputs:
 
 */
     cout<<"\n\n"<<endl;
-    cout<<"------------------------------------------------------------"<<endl;
-    cout<<"Bienvenido al sistema de Gestion de Actividades Curriculares"<<endl;
-    cout<<"------------------------------------------------------------"<<endl;
-    cout<<"Ingrese el numero de la seccion deseada: \n 1- Administrador\n 2- Usuario: Profesor\n 3- Usuario: Estudiante \n 4- Salir\nNumero: ";
+    cout<<"----------------------------------------------------------------"<<endl;
+    cout<<"--Bienvenido al sistema de Gestion de Actividades Curriculares--"<<endl;
+    cout<<"----------------------------------------------------------------\n"<<endl;
+    cout<<"Ingrese el numero de la seccion deseada: \n 1- Administrador\n 2- Usuario: Profesor\n 3- Usuario: Estudiante \n 4- Salir\n\nNumero: ";
     string opcion;
     cin>>opcion;
     if(opcion=="1"){
@@ -3767,8 +3779,9 @@ Outputs:
     }else if(opcion=="3"){
         menuEstudiante();
     }else if(opcion=="4"){
-        cout<<"\n\nSaliendo...";
-        return;
+        cout<<"\n\nSaliendo...\n\n";
+        cout<<"Gracias por usar nuestro sistema! (Profe porfa ponganos 100)"<<endl;
+        system("pause");
     }else{
         cout<<"Ingrese una opcion valida.";
         menuPrincipal();
@@ -3786,50 +3799,87 @@ Outputs:
 */
     cout<<"\n\n\t\tCargando Datos...\n\n";
     cout<<"\tInsertando Administradores\n";    
-    insertarAdmin("Maria", "123");
-    insertarAdmin("Juan", "4567");
-    insertarAdmin("Carlos", "930");
+    insertarAdmin("MarPereira", "201201");
+    insertarAdmin("JosRodriguez", "231023");
+    insertarAdmin("CarMonge", "903412");
+    insertarAdmin("JulFernandez", "492384");
+    insertarAdmin("DavOvando", "194829");
     cout<<"\tInsertando Semestres\n"; 
     insertarSemestre(2020, 2, 300);
     insertarSemestre(2020, 1, 250);
     insertarSemestre(2021, 1, 350);
     insertarSemestre(2021, 2, 100);
     insertarSemestre(2022, 1, 300);
+    insertarSemestre(2022, 2, 300);
     cout<<"\tInsertando Cursos\n"; 
     insertarCurso("Estructuras de Datos", "IC", 2040);
     insertarCurso("Arquitectura de Computadoras", "IC", 3101);
     insertarCurso("Matematica Discreta", "MA", 2089);
     insertarCurso("Probabilidad", "MA", 3098);
     insertarCurso("Programacion Orientada a Objetos", "IC", 5021);
+    insertarCurso("Analisis de Algoritmos", "IC", 3080);
     cout<<"\tInsertando Profesores\n";
     insertarProf(11833, "Jose Ortega Granados");
     insertarProf(12345, "Marta Sanchez Obviedo");
     insertarProf(48503, "Pedro Peralta Aguirre");
     insertarProf(84728, "Gerardo Gonzales Ferrero");
     insertarProf(40284, "Lucia Mata Mata");
+    insertarProf(56789, "Valeria Soto Obviedo");
     cout<<"\tInsertando Estudiantes\n";
     insertarEst(202006, "Brenda Badilla Rodriguez");
     insertarEst(202105, "Earl Areck Alvarado");
     insertarEst(201935, "Crystel Zamora Guerrero");
     insertarEst(201919, "Julia Segura Chacon");
     insertarEst(201705, "Carmen Hernandez Mendez");
+    insertarEst(201798, "Valery Gonzales Perez");
+    insertarEst(202106, "Alberto Vinneda Aguero");
+    insertarEst(202115, "Jeremy Fernandez Acosta");
+    insertarEst(201933, "Javier Figueres Fernandez");
+    insertarEst(201919, "Anthony Quiros Quiros");
+    insertarEst(201707, "Jose Calvo Salas");
+    insertarEst(201777, "Patricia Soto Soto");
     cout<<"\tInsertanto Grupos\n";
-    insertarGrupo("IC3101", buscarCurso("IC3101"), 50);
-    insertarGrupo("IC3101", buscarCurso("IC3101"), 51);
-    insertarGrupo("IC2040", buscarCurso("IC2040"), 20);
-    insertarGrupo("IC2040", buscarCurso("IC2040"), 35);
-    insertarGrupo("MA2089", buscarCurso("MA2089"), 43);
+    insertarGrupo("IC3101", buscarCurso("IC3101"), 50);//Arquitectura de Computadoras, grupo 50
+    insertarGrupo("IC3101", buscarCurso("IC3101"), 51);//Arquitectura de Computadoras, grupo 51
+    insertarGrupo("IC2040", buscarCurso("IC2040"), 20);//Estructuras de Datos, grupo 20
+    insertarGrupo("IC2040", buscarCurso("IC2040"), 35);//Estructuras de Datos, grupo 35
+    insertarGrupo("IC2040", buscarCurso("IC2040"), 36);//Estructuras de Datos, grupo 36
+    insertarGrupo("MA2089", buscarCurso("MA2089"), 43);//Matematica Discreta, grupo 43
+    insertarGrupo("MA2089", buscarCurso("MA2089"), 41);//Matematica Discreta, grupo 41
+    insertarGrupo("MA2089", buscarCurso("MA2089"), 33);//Matematica Discreta, grupo 33
+    insertarGrupo("MA3098", buscarCurso("MA3098"), 21);//Probabilidad, grupo 21
+    insertarGrupo("MA3098", buscarCurso("MA3098"), 20);//Probabilidad, grupo 20
     cout<<"\tAsignado profesores a grupos\n";
-    relacionarGrupoProf(buscarProf(11833), encontrarGrupo("IC3101", 51));
-    relacionarGrupoProf(buscarProf(11833), encontrarGrupo("IC3101", 50));
-    relacionarGrupoProf(buscarProf(11833), encontrarGrupo("IC2040", 20));
-    relacionarGrupoProf(buscarProf(11833), encontrarGrupo("IC2040", 35));
+    relacionarGrupoProf(buscarProf(11833), encontrarGrupo("IC3101", 51));//Jose Ortega Granados, Arqui, grupo 50
+    relacionarGrupoProf(buscarProf(11833), encontrarGrupo("IC3101", 50));//Jose Ortega Granados, Arqui, grupo 51
+    relacionarGrupoProf(buscarProf(11833), encontrarGrupo("IC2040", 20));//Jose Ortega Granados, Estructuras, grupo 20
+    relacionarGrupoProf(buscarProf(11833), encontrarGrupo("IC2040", 35));//Jose Ortega Granados, Estructuras, grupo 35
+    relacionarGrupoProf(buscarProf(11833), encontrarGrupo("IC2040", 36));//Jose Ortega Granados, Estructuras, grupo 36
+    relacionarGrupoProf(buscarProf(12345), encontrarGrupo("MA2089", 43));//Marta Sanchez Obviedo, Discreta, grupo 43
+    relacionarGrupoProf(buscarProf(12345), encontrarGrupo("MA2089", 41));//Marta Sanchez Obviedo, Discreta, grupo 41
+    relacionarGrupoProf(buscarProf(48503), encontrarGrupo("MA2089", 33));//Pedro Peralta Aguirre, Discreta, grupo 41
+    relacionarGrupoProf(buscarProf(48503), encontrarGrupo("MA3098", 21));//Pedro Peralta Aguirre, Probabilidad, grupo 21
+    relacionarGrupoProf(buscarProf(48503), encontrarGrupo("MA3098", 20));//Pedro Peralta Aguirre, Probabilidad, grupo 20
     cout<<"\tAsignado estudiantes a grupos\n";
+    //Arqui, grupo 50
     relacionarGrupoEst(buscarEst(202006), encontrarGrupo("IC3101", 50));//Brenda grupo 50
-    relacionarGrupoEst(buscarEst(202105), encontrarGrupo("IC3101", 51));//Earl grupo 51
     relacionarGrupoEst(buscarEst(201935), encontrarGrupo("IC3101", 50));//Crystel grupo 50
     relacionarGrupoEst(buscarEst(201919), encontrarGrupo("IC3101", 50));//Julia grupo 50
+    relacionarGrupoEst(buscarEst(201798), encontrarGrupo("IC3101", 50));//Valery grupo 50
+    relacionarGrupoEst(buscarEst(202106), encontrarGrupo("IC3101", 50));//Alberto grupo 50
+    //Arqui, grupo 51
+    relacionarGrupoEst(buscarEst(202105), encontrarGrupo("IC3101", 51));//Earl grupo 51
     relacionarGrupoEst(buscarEst(201705), encontrarGrupo("IC3101", 51));//Carmen grupo 51
+    relacionarGrupoEst(buscarEst(201798), encontrarGrupo("IC3101", 51));//Valery grupo 51
+    relacionarGrupoEst(buscarEst(202115), encontrarGrupo("IC3101", 51));//Jeremy grupo 51
+    relacionarGrupoEst(buscarEst(201933), encontrarGrupo("IC3101", 51));//Javier grupo 51
+    //Estructuras, grupo 20
+    relacionarGrupoEst(buscarEst(202006), encontrarGrupo("IC3101", 50));//Brenda grupo 50 
+    relacionarGrupoEst(buscarEst(201705), encontrarGrupo("IC3101", 51));//Carmen grupo 51
+    relacionarGrupoEst(buscarEst(201919), encontrarGrupo("IC3101", 51));//Anthony grupo 51
+    relacionarGrupoEst(buscarEst(201707), encontrarGrupo("IC3101", 51));//Jose grupo 51
+    relacionarGrupoEst(buscarEst(201777), encontrarGrupo("IC3101", 51));//Patricia grupo 51    
+
     cout<<"\tCreando actividades\n";
     insertarActProf(encontrarGrupo("IC3101", 50), "Tarea", "1", 20210927, 1400);//Solo la hizo Brenda, no la hizo Crystel
     insertarActProf(encontrarGrupo("IC3101", 50), "Tarea", "2", 20210927, 1500);
