@@ -333,7 +333,7 @@ Outputs:
     if(listaSemestres == NULL){
         
         listaSemestres=nS;
-        cout<<"Semestre ingresado exitosamente."<<endl;
+        cout<<"Semestre ingresado exitosamente"<<endl;
         return;
     }
     //Item goes first
@@ -989,7 +989,7 @@ Outputs:
 
 */
     if(buscarGrupoEst(tempE->carnet, tempG->idCurso) != NULL){
-        cout<<"El estudiante ya se encuentra registrado a este grupo";
+        cout<<"El estudiante ya se encuentra registrado a este grupo"<<endl;
         return;
     }else{
         enlazarGrupo* nE = new enlazarGrupo(tempG);
@@ -1269,7 +1269,7 @@ void insertarProf(int cedulaP, string nombreP){
         listaProfesores->antProf = nP;
     
     listaProfesores = nP;
-    cout<<"\nProfesor insertado exitosamente"<<endl;
+    cout<<"Profesor insertado exitosamente"<<endl;
 }
 
 void insertarProfAux(){
@@ -1453,7 +1453,7 @@ Outputs:
     enlazarGrupo* nE = new enlazarGrupo(tempG);
     nE->sigEn = tempP->gruposProfAux;
     tempP->gruposProfAux = nE;
-    cout<<"\nProfesor asignado a grupo satisfactoriamente"<<endl;
+    cout<<"Profesor asignado a grupo satisfactoriamente"<<endl;
 }
 
 void relacionarGrupoProfAux(){
@@ -3208,10 +3208,69 @@ Outputs:
         tempC=tempC->sigCharla;
 
     }
-    cout<<"Para el semestre "<<codigoS%10<<" del "<<codigoS/10<<" las 3 charlas con más asistencia fueron: "<<endl;
+    cout<<"Para el semestre "<<codigoS%10<<" del "<<codigoS/10<<" las 3 charlas con mas asistencia fueron: "<<endl;
     cout<<"Charla#1: "<<na<<" con "<<a<<" estudiantes"<<endl;
     cout<<"Charla#2: "<<nb<<" con "<<b<<" estudiantes"<<endl;
     cout<<"Charla#3: "<<nc<<" con "<<c<<" estudiantes"<<endl;
+}
+
+void reporte8Aux(){
+    int codigoS = pedirCodigoSem();
+    int a=0, b=0, c=0;
+    string na, nb, nc;
+    semestre*tempS= buscarSem(codigoS);
+    if(tempS==NULL){
+        cout<<"El semestre ingresado no existe."<<endl;
+        return;
+    }else{
+        charla* tempCh = tempS->listaCharlas;
+        while(tempCh != NULL){
+            int cantEst = 0;
+            estudiante* tempEst = listaEstudiantes;
+            while(tempEst != NULL){
+                if(buscarCharlaEst(tempEst, tempCh)){
+                    cantEst = cantEst + 1;
+                }
+                tempEst = tempEst->sigEst;
+            }
+            cout<<"\nCharla: "<<tempCh->nombreCharla<<" CantEst: "<<cantEst<<"\n\n"<<endl;
+            if(cantEst >= c){
+                if(cantEst >= b){
+                    if(cantEst >= a){
+                        c = b;
+                        nc = nb;
+                        b = a;
+                        nb = na;
+                        a = cantEst;
+                        na = tempCh->nombreCharla;
+                        cout<<"A "<<na<<" Cant " <<a<<endl;
+                        cout<<"B "<<nb<<" Cant " <<b<<endl;
+                        cout<<"C "<<nc<<" Cant " <<c<<endl;
+                        
+                    }else{
+                        c = b;
+                        nc = nb;
+                        b = cantEst;
+                        nb = tempCh->nombreCharla;
+                        cout<<"A "<<na<<" Cant " <<a<<endl;
+                        cout<<"B "<<nb<<" Cant " <<b<<endl;
+                        cout<<"C "<<nc<<" Cant " <<c<<endl;
+                    }
+                }else{
+                    c = cantEst;
+                    nc = tempCh->nombreCharla;
+                    cout<<"A "<<na<<" Cant " <<a<<endl;
+                    cout<<"B "<<nb<<" Cant " <<b<<endl;
+                    cout<<"C "<<nc<<" Cant " <<c<<endl;
+                }
+            }
+            tempCh = tempCh->sigCharla;
+        }
+        cout<<"Para el semestre "<<codigoS%10<<" del "<<codigoS/10<<" las 3 charlas con mas asistencia fueron: "<<endl;
+        cout<<"Charla#1: "<<na<<" con "<<a<<" estudiantes"<<endl;
+        cout<<"Charla#2: "<<nb<<" con "<<b<<" estudiantes"<<endl;
+        cout<<"Charla#3: "<<nc<<" con "<<c<<" estudiantes"<<endl;
+    }
 }
 
 
@@ -3445,15 +3504,15 @@ Outputs:
 
     if(opcion == "a"){
         reporte7();
-        menuAdminSemestre();
+        menuAdminReportes();
     }
     else if(opcion == "b"){
-        reporte8();
-        menuAdminSemestre();
+        reporte8Aux();
+        menuAdminReportes();
     }
     else if(opcion == "z"){
         reporteCursosSem();
-        menuAdminSemestre();
+        menuAdminReportes();
     }
     else if(opcion == "1")
         menuAdmin();
@@ -3461,7 +3520,7 @@ Outputs:
         menuPrincipal();
     else{
         cout<<"Opcion Invalida"<<endl;
-        menuAdminSemestre();
+        menuAdminReportes();
     }    
 }
 
@@ -3852,6 +3911,9 @@ Outputs:
     cout<<"\tAsignado profesores a grupos\n";
     relacionarGrupoProf(buscarProf(11833), encontrarGrupo("IC3101", 51));//Jose Ortega Granados, Arqui, grupo 50
     relacionarGrupoProf(buscarProf(11833), encontrarGrupo("IC3101", 50));//Jose Ortega Granados, Arqui, grupo 51
+    relacionarGrupoProf(buscarProf(84728), encontrarGrupo("IC3101", 53));//Gerardo Gonzales Ferrero, Arqui, grupo 53   
+    relacionarGrupoProf(buscarProf(84728), encontrarGrupo("IC3101", 52));//Gerardo Gonzales Ferrero, Arqui, grupo 52  
+    relacionarGrupoProf(buscarProf(84728), encontrarGrupo("IC3101", 54));//Gerardo Gonzales Ferrero, Arqui, grupo 54  
     relacionarGrupoProf(buscarProf(11833), encontrarGrupo("IC2040", 20));//Jose Ortega Granados, Estructuras, grupo 20
     relacionarGrupoProf(buscarProf(11833), encontrarGrupo("IC2040", 35));//Jose Ortega Granados, Estructuras, grupo 35
     relacionarGrupoProf(buscarProf(11833), encontrarGrupo("IC2040", 36));//Jose Ortega Granados, Estructuras, grupo 36
@@ -3874,50 +3936,63 @@ Outputs:
     relacionarGrupoEst(buscarEst(202115), encontrarGrupo("IC3101", 51));//Jeremy grupo 51
     relacionarGrupoEst(buscarEst(201933), encontrarGrupo("IC3101", 51));//Javier grupo 51
     //Estructuras, grupo 20
-    relacionarGrupoEst(buscarEst(202006), encontrarGrupo("IC3101", 50));//Brenda grupo 50 
-    relacionarGrupoEst(buscarEst(201705), encontrarGrupo("IC3101", 51));//Carmen grupo 51
-    relacionarGrupoEst(buscarEst(201919), encontrarGrupo("IC3101", 51));//Anthony grupo 51
-    relacionarGrupoEst(buscarEst(201707), encontrarGrupo("IC3101", 51));//Jose grupo 51
-    relacionarGrupoEst(buscarEst(201777), encontrarGrupo("IC3101", 51));//Patricia grupo 51    
-
+    relacionarGrupoEst(buscarEst(202006), encontrarGrupo("IC2040", 20));//Brenda grupo 50 
+    relacionarGrupoEst(buscarEst(201705), encontrarGrupo("IC2040", 20));//Carmen grupo 51
+    relacionarGrupoEst(buscarEst(201919), encontrarGrupo("IC2040", 20));//Anthony grupo 51
+    relacionarGrupoEst(buscarEst(201707), encontrarGrupo("IC2040", 20));//Jose grupo 51
+    relacionarGrupoEst(buscarEst(201777), encontrarGrupo("IC2040", 20));//Patricia grupo 51    
     cout<<"\tCreando actividades\n";
-    insertarActProf(encontrarGrupo("IC3101", 50), "Tarea", "1", 20210927, 1400);//Solo la hizo Brenda, no la hizo Crystel
-    insertarActProf(encontrarGrupo("IC3101", 50), "Tarea", "2", 20210927, 1500);
-    insertarActProf(encontrarGrupo("IC3101", 51), "Proyecto", "1", 20210927, 1600);//Lo hizo solo Earl, no lo hizo Carmen
-    insertarActProf(encontrarGrupo("IC3101", 50), "Gira", "1", 20210926, 1600);//La hicieron Brenda y Crystel
-    insertarActProf(encontrarGrupo("IC3101", 50), "Examen", "1", 20210925, 1600);//Solo lo hizo Crystel, no lo hizo Brenda
-    insertarActProf(encontrarGrupo("IC3101", 51), "Examen", "2", 20210924, 1600);//Solo lo hizo Carmen, no lo hizo Earl
+    insertarActProf(encontrarGrupo("IC3101", 50), "Tarea", "1", 20211003, 1400);//Solo la hizo Brenda, no la hizo Crystel
+    insertarActProf(encontrarGrupo("IC3101", 50), "Tarea", "2", 20211009, 1500);
+    insertarActProf(encontrarGrupo("IC3101", 51), "Proyecto", "1", 20211006, 1600);//Lo hizo solo Earl, no lo hizo Carmen
+    insertarActProf(encontrarGrupo("IC3101", 50), "Gira", "1", 20211010, 1600);//La hicieron Brenda y Crystel
+    insertarActProf(encontrarGrupo("IC3101", 50), "Examen", "1", 20211015, 1600);//Solo lo hizo Crystel, no lo hizo Brenda
+    insertarActProf(encontrarGrupo("IC3101", 51), "Examen", "2", 20211015, 1600);//Solo lo hizo Carmen, no lo hizo Earl
+    insertarActProf(encontrarGrupo("IC3101", 50), "Tarea", "3", 20211016, 1600);
+    insertarActProf(encontrarGrupo("IC3101", 50), "Tarea", "4", 20211011, 1600);
+    
+    insertarActProf(encontrarGrupo("IC2040", 20), "Examen", "1", 20211007, 1600);
+    insertarActProf(encontrarGrupo("IC2040", 20), "Tarea", "1", 20211007, 1600);
+    insertarActProf(encontrarGrupo("IC2040", 20), "Tarea", "2", 20211006, 1600);
+
     cout<<"\tAgregando las actividades realizadas por los estudiantes\n";
     agregarActEst(buscarEst(202006), buscarAct(encontrarGrupo("IC3101", 50), "Tarea", "1"));//Brenda 50 IC3101
     agregarActEst(buscarEst(202006), buscarAct(encontrarGrupo("IC3101", 50), "Gira", "1"));//Brenda 
     agregarActEst(buscarEst(202006), buscarAct(encontrarGrupo("IC3101", 50), "Tarea", "2"));//Brenda 
-    //agregarActEst(buscarEst(202006), buscarAct(encontrarGrupo("IC3101", 50), "Examen", "1"));//Brenda
+    agregarActEst(buscarEst(202006), buscarAct(encontrarGrupo("IC3101", 50), "Tarea", "3"));//Brenda 
+    agregarActEst(buscarEst(202006), buscarAct(encontrarGrupo("IC3101", 50), "Tarea", "4"));//Brenda 
+    agregarActEst(buscarEst(202006), buscarAct(encontrarGrupo("IC3101", 50), "Examen", "1"));//Brenda
     agregarActEst(buscarEst(201935), buscarAct(encontrarGrupo("IC3101", 50), "Gira", "1"));//Crystel 50 IC3101
-    //agregarActEst(buscarEst(201935), buscarAct(encontrarGrupo("IC3101", 50), "Examen", "1"));//Crystel
+    agregarActEst(buscarEst(201935), buscarAct(encontrarGrupo("IC3101", 50), "Examen", "1"));//Crystel
     agregarActEst(buscarEst(202105), buscarAct(encontrarGrupo("IC3101", 51), "Proyecto", "1"));//Earl 51 IC3101
     agregarActEst(buscarEst(201705), buscarAct(encontrarGrupo("IC3101", 51), "Proyecto", "1"));//Carmen 51 IC3101
     agregarActEst(buscarEst(201705), buscarAct(encontrarGrupo("IC3101", 51), "Examen", "2"));//Carmen 51 IC3101
+    
     cout<<"\tCreando charlas\n";
-    insertarCharlaProf(buscarSem(20212), "IEEE Introduction", 20210923, 1300); //2021 octubre 30                         
-    insertarCharlaProf(buscarSem(20212), "IA en videojuegos", 20210927, 1600); //Noviembre 3
-    insertarCharlaProf(buscarSem(20212), "Habilidades Blandas en Ing. en Computacion", 20210925, 1500); //Julio 13
-    insertarCharlaProf(buscarSem(20212), "La industria de videojuegos en Costa Rica", 20210926, 1700); //Setiembre 10
-    insertarCharlaProf(buscarSem(20212), "Intercambio estudiantil a Alemania", 20210927, 1700); //Diciembre 27
+    insertarCharlaProf(buscarSem(20212), "IEEE Introduction", 20211008, 1300); //2021 octubre 30                         
+    insertarCharlaProf(buscarSem(20212), "IA en videojuegos", 20211027, 1600); //Noviembre 3
+    insertarCharlaProf(buscarSem(20212), "Habilidades Blandas en Ing. en Computacion", 20211025, 1500); //Julio 13
+    insertarCharlaProf(buscarSem(20212), "La industria de videojuegos en Costa Rica", 20211026, 1700); //Setiembre 10
+    insertarCharlaProf(buscarSem(20212), "Intercambio estudiantil a Alemania", 20211027, 1700); //Diciembre 27
     
     cout<<"\tInsertando estudiantes en charlas\t"<<endl;
-    insertarCharlaEst(buscarEst(201935), buscarCharla(20212, "20212IEEE Introduction")); ///Ch1-4 Ch2-3 Ch3-2 Ch4-2 ch5-5
+    //IEEE Introduction 4
+    //IA en videojuegos 3
+    //Habilidades Blandas en Ing. en Computacion 2
+    //La industria de videojuegos en Costa Rica 1
+    //Intercambio estudiantil a Alemania 5
+    insertarCharlaEst(buscarEst(201935), buscarCharla(20212, "20212IEEE Introduction")); 
     insertarCharlaEst(buscarEst(201935), buscarCharla(20212, "20212IA en videojuegos"));
     insertarCharlaEst(buscarEst(201935), buscarCharla(20212, "20212Habilidades Blandas en Ing. en Computacion"));
     insertarCharlaEst(buscarEst(201935), buscarCharla(20212, "20212La industria de videojuegos en Costa Rica"));
     insertarCharlaEst(buscarEst(201935), buscarCharla(20212, "20212Intercambio estudiantil a Alemania"));
 
-    insertarCharlaEst(buscarEst(202105), buscarCharla(20212, "20212IEEE Introduction"));
     insertarCharlaEst(buscarEst(202105), buscarCharla(20212, "20212IA en videojuegos"));
     insertarCharlaEst(buscarEst(202105), buscarCharla(20212, "20212Habilidades Blandas en Ing. en Computacion"));
-    insertarCharlaEst(buscarEst(202105), buscarCharla(20212, "20212La industria de videojuegos en Costa Rica"));
     insertarCharlaEst(buscarEst(202105), buscarCharla(20212, "20212Intercambio estudiantil a Alemania"));
 
     insertarCharlaEst(buscarEst(201705), buscarCharla(20212, "20212Intercambio estudiantil a Alemania"));
+    insertarCharlaEst(buscarEst(201705), buscarCharla(20212, "20212IEEE Introduction"));
     insertarCharlaEst(buscarEst(201705), buscarCharla(20212, "20212IA en videojuegos"));
 
     insertarCharlaEst(buscarEst(202006), buscarCharla(20212, "20212IEEE Introduction"));
@@ -3926,6 +4001,7 @@ Outputs:
     insertarCharlaEst(buscarEst(201919), buscarCharla(20212, "20212IEEE Introduction"));
     insertarCharlaEst(buscarEst(201919), buscarCharla(20212, "20212Intercambio estudiantil a Alemania"));
     
+    imprimirAdmins();
     menuPrincipal();
 
     return 0;
