@@ -46,28 +46,6 @@ struct profesor{ //Double linked list
 
 } *listaProfesores;
 
-struct estudiante{//Simple linked list
-    string nombreEst;
-    int carnet;
-
-    estudiante *sigEst;
-    struct enlazarGrupo *gruposEstAux;//Links to list of groups the student is in. Uses the same struct as Profesor
-
-    struct enlaceCharla *charla;
-    struct evaluacionesEntregadas *evaluacionEst; 
-
-    estudiante(string nNombreEst, int nCarnet){
-        nombreEst = nNombreEst;
-        carnet = nCarnet;
-
-        sigEst = NULL;
-        gruposEstAux = NULL;
-
-        charla= NULL;
-        evaluacionEst=NULL;
-    }
-} *listaEstudiantes;
-
 struct grupo{//Simple linked list
     grupo *sigGrupo;
     // Al usuario se le pide el curso(abv+codigoNum) y el grupo(numGrupo)
@@ -104,8 +82,6 @@ struct enlazarGrupo{//Simple linked list
         enlaceGrupo= nEnlaceGrupo;
     }
 };
-
-
 
 struct enlaceCurso{//Simple linked list
     struct curso *sigCurso; //Links to the course itself
@@ -171,26 +147,47 @@ struct charla{//Simple linked list
     string idCharla;
     int fecha; //Format: yyyy/mm/dd
     int hora;  //Militar: 1630 = 4p.m
-    //Duracion puede ser fija, evaluaciones tambien
-    charla* sigCharla = NULL;
+    charla* sigCharla;
     charla(string nNombreCharla, int nFecha, int nHora, int semestre){
-        nombreCharla= nNombreCharla;
-        fecha= nFecha;
+        nombreCharla = nNombreCharla;
+        fecha = nFecha;
         hora = nHora;
-        idCharla = (to_string(semestre)).append(nombreCharla);
+        idCharla = (to_string(semestre)).append(nombreCharla);//2021Charla1
+        sigCharla = NULL;
     }
-
 };
 
 struct enlaceCharla{
     charla *enCharla; //Links to the course itself
     enlaceCharla *sig; //Orders the courses
 
-    enlaceCharla(struct charla *nEnCharla){
-        enCharla= nEnCharla;
+    enlaceCharla(charla* nEnCharla){
+        enCharla = nEnCharla;
         sig = NULL;
     }
 };
+
+struct estudiante{//Simple linked list
+    string nombreEst;
+    int carnet;
+
+    estudiante *sigEst;
+    enlazarGrupo *gruposEstAux;//Links to list of groups the student is in. Uses the same struct as Profesor
+
+    enlaceCharla *charla;
+    evaluacionesEntregadas *evaluacionEst; 
+
+    estudiante(string nNombreEst, int nCarnet){
+        nombreEst = nNombreEst;
+        carnet = nCarnet;
+
+        sigEst = NULL;
+        gruposEstAux = NULL;
+
+        charla= NULL;
+        evaluacionEst=NULL;
+    }
+} *listaEstudiantes;
 
 struct semestre{ //Simple linked list 
     //struct curso *listaCursos; //Links to the list of courses given in that said semester
@@ -213,32 +210,97 @@ struct semestre{ //Simple linked list
     }
 } *listaSemestres;
 
-//-----------------------------------------------------------------------------------Methods
+//------------------------------------------------------------------------------------Methods-------------------------------------------------
 
-int pedirAnnoSem(){
-    int annoS;
-    cout<<"Ingrese el anno del semestre: ";
-    cin>>annoS;   
-    return annoS; 
-}
-
-int pedirNumSem(){
-    int semS;
-    cout<<"Ingrese el semestre del anno: ";
-    cin>>semS;
-    return semS;
-}
-
-int pedirpresupuestoSem(){
-    int presupuestoS;
-    cout<<"Ingrese el presupuesto del semestre: ";
-    cin>>presupuestoS;
-    return presupuestoS;    
-}
 //------------------Periods' Methods---------------------------------
 void menuAdminSemestre();
 
+int pedirAnnoSem(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    int annoS;
+    cout<<"Ingrese el anno del semestre: ";
+    while(!(cin>>annoS)){
+        cin.clear();
+        while(cin.get() != '\n')
+            continue;   
+        cout<<"Favor digitar solo numeros"<<endl;
+        return pedirAnnoSem(); 
+    }
+    return annoS;
+}
+
+int pedirNumSem(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    int semS;
+    cout<<"Ingrese el semestre del anno (1 o 2): ";
+    while((!(cin>>semS))||((semS != 1)&&(semS != 2))){
+        cin.clear();
+        while(cin.get() != '\n')
+            continue;
+        cout<<"Favor digitar solo 1 o 2"<<endl;
+        return pedirNumSem();
+    }
+    return semS;
+}
+
+int pedirPresupuestoSem(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    int presupuestoS;
+    cout<<"Ingrese el presupuesto del semestre: ";
+    while(!(cin>>presupuestoS)){
+        cin.clear();
+        while(cin.get() != '\n')
+            continue;   
+        cout<<"Favor digitar solo numeros"<<endl;
+        return pedirPresupuestoSem(); 
+    }
+    return presupuestoS;   
+}
+
+int pedirCodigoSem(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    int anno = pedirAnnoSem();
+    int num = pedirNumSem();
+    return (anno*10)+num;
+}
+
 semestre* buscarSem(int nCodigo){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     semestre *temp = listaSemestres;
     while(temp != NULL){
         if(temp->abreviatura==nCodigo){
@@ -250,6 +312,14 @@ semestre* buscarSem(int nCodigo){
 }
 
 void insertarSemestre(int annoS, int semS, int presupuestoS){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     int codigoS;
     codigoS= 10*annoS+semS;
 
@@ -261,17 +331,14 @@ void insertarSemestre(int annoS, int semS, int presupuestoS){
 
     //if list is empty
     if(listaSemestres == NULL){
-        //cout<<"Lista vacia"<<endl;
+        
         listaSemestres=nS;
-        nS->sigSem=NULL;
-        nS->antSem=NULL;
         cout<<"Semestre ingresado exitosamente."<<endl;
         return;
     }
     //Item goes first
     semestre *tempA= listaSemestres;
-    if(tempA-> abreviatura> codigoS){
-        //cout<<"Primero"<< endl;
+    if(tempA->abreviatura > codigoS){
         nS->antSem= NULL;
         nS->sigSem= tempA;
         tempA-> antSem= nS;
@@ -285,7 +352,6 @@ void insertarSemestre(int annoS, int semS, int presupuestoS){
         tempB= tempB-> sigSem;
     }
     if(tempB->abreviatura<codigoS){
-        //cout<<"Ultimo"<< endl;
         tempB->sigSem= nS;
         nS->antSem= tempB;
         nS-> sigSem= NULL;
@@ -296,7 +362,6 @@ void insertarSemestre(int annoS, int semS, int presupuestoS){
     semestre *tempC= listaSemestres;
     while(tempC->sigSem!= NULL){
         if(tempC->abreviatura>codigoS){
-            //cout<<"Centro"<< endl;
             (tempC->antSem)->sigSem=nS;
 
             nS-> antSem= tempC-> antSem;
@@ -312,99 +377,34 @@ void insertarSemestre(int annoS, int semS, int presupuestoS){
     return;
 }    
 
-/*
-void insertarSem(int annoS, int semS, int presupuestoS){
-    int codigo = 10*annoS + semS;
-
-    semestre* buscar = buscarSem(codigo);
-    if(buscar != NULL){
-        cout<<"Semestre ya se encuentra registrado"<<endl;
-        return;
-    }else{  
-        semestre* nS = new semestre(semS, annoS, codigo, presupuestoS);
-        if(listaSemestres==NULL){//Empty list
-            listaSemestres = nS;
-            nS->sigSem = NULL;
-            cout<<"Semestre insertado exitosamente!"<<endl;
-            return;
-        }else{//Beginning of the list
-            semestre* tempSem = listaSemestres;
-            if(codigo < tempSem->abreviatura){
-                nS->sigSem = listaSemestres;
-                listaSemestres = nS;
-                cout<<"Semestre insertado satisfactoriamente!"<<endl;
-            }
-
-        }
-    }
-
-    
-
-}
-*/
-
-/*
-
-        
-        //Inicio de la lista
-        //cout<<"Valorando primer elemento"<<endl;
-        estudiante*primero=listaEstudiantes;
-        //cout<<"b"<<endl;
-        if(carnetEst< primero->carnet){
-            //cout<<"e"<<endl;
-            nEst->sigEst=listaEstudiantes;
-            listaEstudiantes= nEst;
-            //cout<<"Primer elemento insertado"<<endl;
-            menuAdminEst();
-        }
-
-        //Final de la lista
-        //cout<<"Valorando ultimo elemento"<<endl;
-        estudiante*tempF= listaEstudiantes;
-        //cout<<"c"<<endl;
-        while(tempF->sigEst !=NULL){
-            //cout<<"w"<<endl;
-            tempF= tempF->sigEst;
-        }
-        //cout<<"a"<<endl;
-        if(carnetEst> tempF->carnet){
-            //cout<<"d"<<endl;
-            tempF->sigEst= nEst;
-            nEst->sigEst= NULL;
-            //cout<<"ultimo elemento"<<endl;
-        }
-        
-        //Media lista
-        //cout<<"Valorando in elemento"<<endl;
-        estudiante*temp= listaEstudiantes;
-        while(temp->sigEst!=NULL){
-            //cout<<"y"<<endl;
-            if((temp->sigEst)->carnet > carnetEst){
-                //cout<<"z"<<endl;
-                nEst->sigEst= temp->sigEst;
-                temp->sigEst= nEst;
-                
-                //cout<<"Elemento in lista"<<endl;
-                menuAdminEst();
-            }
-            temp= temp->sigEst;
-        }
-        cout<<"Estudiante agregado exitosamente"<<endl;
-}
-*/
-
 void insertarSemestreAux(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     int annoS = pedirAnnoSem();
     int semS = pedirNumSem();
-    int presupuestoS = pedirpresupuestoSem();
+    int presupuestoS = pedirPresupuestoSem();
     insertarSemestre(annoS, semS, presupuestoS);
 }
 
 void modificarSemestre(int codigoS){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     semestre*nSem= buscarSem(codigoS);
     
     int nPresupuestoS;
-    cout<<"Ingrese el nuevo presupuesto del semestre: "<<endl;
+    cout<<"Ingrese el nuevo presupuesto del semestre (El programa agrega los millones): "<<endl;
     cin>>nPresupuestoS;
 
     nSem->presupuesto= nPresupuestoS;
@@ -412,129 +412,58 @@ void modificarSemestre(int codigoS){
 }
 
 void modificarSemestreAux(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     int annoS = pedirAnnoSem();
     int semS = pedirNumSem();
     int codigoS = 10*annoS+semS;
     modificarSemestre(codigoS);  
 }
 
-curso* buscarCurso(string codigo);
-
-void relacionarCurso(int codSem){   
-    semestre* tempS = buscarSem(codSem);         //Revisamos si semestre existe
-    if(tempS == NULL){
-        cout<<"Semestre no encontrado"<<endl;
-        return;
-    }
-    else{                                       //Revisamos si curso existe
-        string codigo;
-        cout<<"Ingrese el codigo del curso (Ej. IC3101): ";
-        cin>>codigo;
-
-        curso* tempC = buscarCurso(codigo);
-        if(tempC == NULL){
-            cout<<"Curso no encontrado"<<endl;
-            return;
-        }
-        else{                               //Semestre y curso existen, enlace
-            enlaceCurso* nE = new enlaceCurso(tempC); //Creo el nuevo enlace
-            nE->sig = tempS->listaCursos;           //Que apunte al primer elemento de la lista de cursos de semestre
-            tempS->listaCursos = nE;                //Insercion al inicio de lista simple
-            cout<<"\nCurso asignado satisfactoriamente"<<endl;
-        }
-    }
-}
-
-void relacionarCursoAux(){
-    int annoS = pedirAnnoSem();
-    int semS = pedirNumSem();
-    int codigoS = 10*annoS+semS;
-    relacionarCurso(codigoS);
-}
-
-int pedirCodigoSem(){
-    int codigoS;
-    cout<<"Inserte el codigo del semestre (Ej. 20201): ";
-    cin>>codigoS;
-    return codigoS;
-}
-
-void reporteCursosSem(){
-    int codigoS = pedirCodigoSem();
-    semestre* tempSem = buscarSem(codigoS);
-    if(tempSem == NULL){
-        cout<<"Semestre no encontrado"<<endl;
-        return;
-    }
-    else{
-        cout<<"Anno: "<<tempSem->anno<<" Semestre: "<<tempSem->numSemestre<<endl;
-        cout<<"Cursos: "<<endl;
-        enlaceCurso* tempCurso = tempSem->listaCursos;
-        while(tempCurso != NULL){
-            cout<<"Nombre: "<<tempCurso->sigCurso->nombre<<endl;
-            cout<<"Codigo: "<<tempCurso->sigCurso->abreviatura<<tempCurso->sigCurso->codigoNum<<endl;
-            tempCurso = tempCurso->sig;
-        }
-        cout<<"\nFinal de reporte"<<endl;
-    }
-
-}
-
-/*
-    if(tempEst == NULL){
-        cout<<"Estudiante no encontrado"<<endl;
-        return;
-    }else{
-        cout<<"Grupos asignados: "<<endl;
-        cout<<"Estudiante: "<<tempEst->nombreEst<<" Carnet: "<<tempEst->carnet<<endl;
-        enlazarGrupo* tempG = tempEst->gruposEstAux;
-        while(tempG != NULL){
-            cout<<"G"<<tempG->enlaceGrupo->numGrupo<<endl;
-            cout<<"Curso: "<<tempG->enlaceGrupo->cursoActual->nombre<<endl;
-            cout<<"ID de grupo: "<<tempG->enlaceGrupo->idCurso<<endl;
-            tempG = tempG->sigEn;
-        }
-        cout<<"\nFinal de reporte"<<endl;
-    }    
-*/
-
-//------------------Courses' Methods---------------------------------
-
-string pedirNomCurso(){
-    string nombreC;
-    cout<<"Ingrese el nombre del curso: ";
-    cin>>nombreC;
-    return nombreC;
-}
-
-string pedirAbvCurso(){
-    string abvC;
-    cout<<"Ingrese la escuela del curso (Ej. IC, MA..): ";
-    cin>>abvC;
-    return abvC;
-}
-
-int pedirCodCurso(){
-    int codigoC;
-    cout<<"Ingrese el codigo del curso (Ej. 3101): ";
-    cin>>codigoC;
-    if(cin.fail()){
-        cout<<"Solo ingresar un numero de cuatro digitos: ";
-        pedirCodCurso();
-        return 0;
-    }else{
-        return codigoC;
-    }
-}
+//------------------Semester and subject's linking Methods---------------------------------
 
 string pedirCodigoCurso(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     string codigo;
     cout<<"Ingrese el codigo del curso (Ej. IC3101): ";
-    cin>>codigo;
+    cin.sync();
+    getline(cin, codigo);
     return codigo;
 }
 
+bool buscarCursoSem(semestre* tempSem, curso* tempC){
+    enlaceCurso* tempEnC = tempSem->listaCursos;
+    while(tempEnC != NULL){
+        if(tempEnC->sigCurso == tempC){
+            return true;
+        }
+        tempEnC = tempEnC->sig;
+    }
+    return false;
+}
+
 curso* buscarCurso(string codigo){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     string abv = codigo.substr(0,2);
     int numCurso = stoi(codigo.substr(2,4));
     if(listaCursos == NULL){
@@ -544,7 +473,6 @@ curso* buscarCurso(string codigo){
         curso *temp = listaCursos;
         do{
             if((temp->codigoNum == numCurso) && (temp->abreviatura == abv)){
-                //cout<<"Encontrado: "<<temp->nombre<<endl;
                 return temp;
             }
             temp = temp->sigCurso;
@@ -553,7 +481,118 @@ curso* buscarCurso(string codigo){
     } 
 }
 
+void relacionarCurso(int codSem){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/   
+    semestre* tempS = buscarSem(codSem);         //Check if semester exists
+    if(tempS == NULL){
+        cout<<"Semestre no encontrado"<<endl;
+        return;
+    }else{                                       //Check if subject exists
+        string codigo = pedirCodigoCurso();
+        curso* tempC = buscarCurso(codigo);
+        if(tempC == NULL){
+            cout<<"Curso no encontrado"<<endl;
+            return;
+        }
+        else{                               //Semester and subject exist
+            if(buscarCursoSem(tempS, tempC)){
+                cout<<"El curso ya se encuentra registrado en este semestre"<<endl;
+                return;
+            }else{
+                enlaceCurso* nE = new enlaceCurso(tempC); //Create new link 
+                nE->sig = tempS->listaCursos;           //Point it to the beginning of the list
+                tempS->listaCursos = nE;                //Insertion at the beginning of the list
+                cout<<"\nCurso asignado satisfactoriamente"<<endl;
+            }
+            
+        }
+    }
+}
+
+void relacionarCursoAux(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    int codigoS = pedirCodigoSem();
+    relacionarCurso(codigoS);
+}
+
+//------------------Courses' Methods---------------------------------
+
+string pedirNomCurso(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    string nombreC;
+    cout<<"Ingrese el nombre del curso: ";
+    cin.sync();
+    getline(cin,nombreC);
+    return nombreC;
+}
+
+string pedirAbvCurso(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    string abvC;
+    cout<<"Ingrese la escuela del curso (Ej. IC, MA..): ";
+    cin.sync();
+    getline(cin,abvC);
+    return abvC;
+}
+
+int pedirCodCurso(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    int codigoC;
+    cout<<"Ingrese el codigo del curso (3101): ";
+    while(!(cin>>codigoC)){
+        cin.clear();
+        while(cin.get() != '\n')
+            continue;   
+        cout<<"Favor digitar solo numeros"<<endl;
+        return pedirCodCurso(); 
+    }
+    return codigoC;   
+}
+
 void insertarCurso(string nombreC, string abv, int codigoNumC){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     curso *nC = new curso(nombreC, abv, codigoNumC);
     if(listaCursos == NULL){
         listaCursos=nC;
@@ -573,35 +612,61 @@ void insertarCurso(string nombreC, string abv, int codigoNumC){
 }
 
 void insertarCursoAux(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     string nombreC = pedirNomCurso();
     string abvC = pedirAbvCurso();
     int codigo = pedirCodCurso();
-
-    insertarCurso(nombreC, abvC, codigo);
+    curso* buscarC = buscarCurso(abvC + to_string(codigo));
+    if(buscarC != NULL){
+        cout<<"Curso ya se encuentra registrado"<<endl;
+    }else{
+        insertarCurso(nombreC, abvC, codigo);   
+    }
 }
 
 void modificarCurso(){
-    string codigo;
-    cout<<"Ingrese el codigo del curso (Ej. IC3101): ";
-    cin>>codigo;
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
 
+*/
+    string codigo = pedirCodigoCurso();
     curso* buscado = buscarCurso(codigo);
     
     if(buscado == NULL){
-        cout<<"Elemento no encontrado"<<endl;
+        cout<<"Curso no encontrado"<<endl;
     }
     else{
         string nuevoNom;
         cout<<"Escriba el nuevo nombre: ";
-        cin>>nuevoNom;
+        cin.sync();
+        getline(cin, nuevoNom);
         buscado->nombre = nuevoNom;
         cout<<"Nombre del curso cambiado con exito"<<endl;
     } 
 }
 
 void eliminarCurso(int codigoC, string abvC){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     if(listaCursos == NULL){
-        cout<<"Lista vacia!"<<endl;
+        cout<<"No existen cursos registrados"<<endl;
     }
     else{
         curso *temp = listaCursos;
@@ -618,37 +683,73 @@ void eliminarCurso(int codigoC, string abvC){
 }
 
 void eliminarCursoAux(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     string abv = pedirAbvCurso();
     int codigo = pedirCodCurso();
 
     eliminarCurso(codigo, abv); 
 }
 
-
-void mostrarCurso(){
-    cout<<"Lista de cursos"<<endl;
-    if(listaCursos == NULL){
-        cout<<"Lista vacia!"<<endl;
-    }
-    else{
-        curso *temp = listaCursos;
-        do{
-            cout<<temp->nombre<<endl;
-            temp = temp->sigCurso;
-        }while(temp != listaCursos);
-    }
-}
-
-
 //------------------Students' Methods---------------------------------
 int pedirCarnetEst(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     int carnetEst;
-    cout<<"Ingrese el carnet del estudiante: ";
-    cin>>carnetEst;
+    cout<<"Ingrese el carnet: ";
+    while (!(cin >> carnetEst))
+    {
+        cin.clear();
+        while (cin.get() != '\n') 
+            continue;
+        cout << "Por favor digite solo numeros"<<endl;
+        return pedirCarnetEst();
+    }
     return carnetEst;
 }
 
+int pedirNumGrupo(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    int numG;
+    cout<<"Ingrese el numero del grupo (Ej 50): ";
+    while(!(cin>>numG)){
+        cin.clear();
+        while(cin.get()!='\n')
+            continue;   
+        cout<<"Favor digitar solo numeros"<<endl;
+        return pedirNumGrupo(); 
+    }
+    return numG;
+}
+
 estudiante* buscarEst(int carnetEst){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     //cout<<"t"<<endl;
     estudiante *temp = listaEstudiantes;
     while(temp != NULL){
@@ -663,60 +764,15 @@ estudiante* buscarEst(int carnetEst){
     return NULL;
 }
 
-void menuAdminEst();
-
-/*
-void insertarEst(){
-    int carnetEst;
-    cout<< "Ingrese el carnet del estudiante por agregar:"<<endl;
-    cin>> carnetEst;
-
-    if((buscarEst(carnetEst)) != NULL){
-        cout<<"El carnet ya se encuentra registrado bajo otro estudiante"<<endl;
-        return;
-    }
-    else
-    {
-        string nombreEst;
-        cout<< "Ingrese el nombre del estudiante por agregar: ";
-        cin>> nombreEst;   
-
-        estudiante*nEst = new estudiante(nombreEst, carnetEst);
-
-        if(listaEstudiantes == NULL){//Lista vacia
-            listaEstudiantes = nEst;
-            cout<<"Lista vacia";
-        }
-
-        else if(carnetEst < (listaEstudiantes->carnet)){//Inicio de lista
-            nEst->sigEst = listaEstudiantes;
-            cout<<"Inicio de lista";
-        }
-        else{
-            estudiante*temp = listaEstudiantes;
-
-            while(temp != NULL){
-                //En medio
-                if((((temp->carnet) < carnetEst) && (((temp->sigEst)->carnet) > carnetEst))){
-                    nEst->sigEst = temp->sigEst;
-                    temp->sigEst = nEst;
-                    cout<<"Medio";
-                }
-                //Final de la lista
-                else if((temp->sigEst) == NULL){
-                    temp->sigEst = nEst;
-                    nEst->sigEst = NULL;
-                    cout<<"Final";
-                }
-                temp = temp->sigEst;
-            }
-        }            
-        cout<<"Estudiante ingresado exitosamente"<<endl;
-    }
-} 
-*/
-
 void insertarEst(int carnetEst, string nombreEst){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
 
     estudiante*nEst= new estudiante(nombreEst, carnetEst);
     //Lista vacia
@@ -779,6 +835,14 @@ void insertarEst(int carnetEst, string nombreEst){
 
 
 void insertarEstAux(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     int carnetEst = pedirCarnetEst();
 
     estudiante*existe= buscarEst(carnetEst);
@@ -789,13 +853,21 @@ void insertarEstAux(){
     }else{
         string nombreEst;
         cout<< "Ingrese el nombre del estudiante por agregar: ";
-        cin>> nombreEst;   
-
+        cin.sync();
+        getline(cin, nombreEst);  
         insertarEst(carnetEst, nombreEst);
     }
 }
 
 void modificarEst(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     
     int carnet = pedirCarnetEst();
     estudiante*buscado = buscarEst(carnet);
@@ -806,7 +878,8 @@ void modificarEst(){
     else{
         string nuevoNom;
         cout<<"\nIngrese el nuevo nombre del estudiante: ";
-        cin>>nuevoNom;
+        cin.sync();
+        getline(cin, nuevoNom);
 
         buscado->nombreEst = nuevoNom;
         cout<<"\nNombre de estudiante modificado con exito"<<endl;
@@ -815,6 +888,14 @@ void modificarEst(){
 }
 
 void eliminarEst(){//Delete on simple linked list
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
 
     int carnetEst = pedirCarnetEst();
     if(listaEstudiantes == NULL){
@@ -848,21 +929,87 @@ void eliminarEst(){//Delete on simple linked list
     }
 }
 
-grupo* encontrarGrupo(string codigo, int numGrupo);
+grupo* buscarGrupoEst(int carnetEst, int codG){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
 
-void relacionarGrupoEst(estudiante* tempE, grupo* tempG){
-    enlazarGrupo* nE = new enlazarGrupo(tempG);
-    nE->sigEn = tempE->gruposEstAux;
-    tempE->gruposEstAux = nE;
-    cout<<"Estudiante asignado a grupo satisfactoriamente"<<endl;
-    return;
+*/
+    estudiante* tempEst = buscarEst(carnetEst);
+    if(tempEst == NULL){
+        return NULL;
+    }else{
+        if(tempEst->gruposEstAux == NULL){
+            return NULL;
+        }else{
+            enlazarGrupo* tempG = tempEst->gruposEstAux;
+            while(tempG != NULL){
+                if(tempG->enlaceGrupo->idCurso == codG){
+                    return tempG->enlaceGrupo;
+                }
+                tempG = tempG->sigEn;
+            }
+            return NULL;
+        }
+    }    
 }
 
-int pedirNumGrupo();
+grupo* encontrarGrupo(string codigo, int numGrupo){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+
+    curso* tempCurso = buscarCurso(codigo);
+
+    grupo *tempGrupo = tempCurso->grupoCursando;
+
+    while(tempGrupo != NULL){
+        if(tempGrupo->numGrupo == numGrupo)
+            return tempGrupo;
+        tempGrupo = tempGrupo->sigGrupo;
+    }
+    return NULL;
+}
+
+void relacionarGrupoEst(estudiante* tempE, grupo* tempG){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    if(buscarGrupoEst(tempE->carnet, tempG->idCurso) != NULL){
+        cout<<"El estudiante ya se encuentra registrado a este grupo";
+        return;
+    }else{
+        enlazarGrupo* nE = new enlazarGrupo(tempG);
+        nE->sigEn = tempE->gruposEstAux;
+        tempE->gruposEstAux = nE;
+        cout<<"Estudiante asignado a grupo satisfactoriamente"<<endl;
+        return;
+    }
+}
 
 void relacionarGrupoEstAux(){
-    int carnetEst = pedirCarnetEst();
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
 
+*/
+    int carnetEst = pedirCarnetEst();
     estudiante* tempE = buscarEst(carnetEst);
 
     if(tempE == NULL){
@@ -882,7 +1029,39 @@ void relacionarGrupoEstAux(){
     }
 }
 
-void borrarGrupoEst(){
+void borrarGrupoEst(estudiante* tempEst, int idG){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    if(tempEst->gruposEstAux->enlaceGrupo->idCurso == idG){//Delet the beginning of the list
+        
+        tempEst->gruposEstAux = tempEst->gruposEstAux->sigEn; 
+        cout<<"Curso desvinculado del estudiante exitosamente"<<endl;
+        return;
+    
+    }else{                                                  //Delete middle or end of list
+        enlazarGrupo* tempEn = tempEst->gruposEstAux;
+        
+        while(tempEn->sigEn != NULL){
+            
+            if(tempEn->sigEn->enlaceGrupo->idCurso == idG){
+                
+                tempEn->sigEn = tempEn->sigEn->sigEn;
+                cout<<"Curso desvinculado del estudiante exitosamente"<<endl;
+                return;
+            }
+            tempEn = tempEn->sigEn;
+        }
+        cout<<"Ha occurrido un error al desvincular el grupo"<<endl;
+    }
+}
+
+void borrarGrupoEstAux(){
     if(listaEstudiantes == NULL){
         cout<<"No hay estudiantes registrados"<<endl;
         return;
@@ -893,14 +1072,8 @@ void borrarGrupoEst(){
         cout<<"Estudiante no encontrado"<<endl;
         return;
         }else{
-            string codigo;
-            int numG;
-
-            cout<<"Ingrese el codigo del curso (Ej. IC3101): ";
-            cin>>codigo;
-
-            cout<<"Ingrese el numero de grupo: ";
-            cin>>numG;
+            string codigo = pedirCodigoCurso();
+            int numG = pedirNumGrupo();
 
             grupo* tempG = encontrarGrupo(codigo, numG);
             if(tempG == NULL){
@@ -908,35 +1081,531 @@ void borrarGrupoEst(){
                 return;
             }else{//Group and student exist
                 int idG = 100*(stoi(codigo.substr(2,4))) + numG;
-                if(tempEst->gruposEstAux->enlaceGrupo->idCurso == idG){//Delet the beginning of the list
-                    tempEst->gruposEstAux = tempEst->gruposEstAux->sigEn; 
-                    cout<<"Curso desvinculado del estudiante exitosamente"<<endl;
-                    return;
-                }else{                                                  //Delete middle or end of list
-                    enlazarGrupo* tempEn = tempEst->gruposEstAux;
-                    while(tempEn->sigEn != NULL){
-                        if(tempEn->sigEn->enlaceGrupo->idCurso == idG){
-                            tempEn->sigEn = tempEn->sigEn->sigEn;
-                            cout<<"Curso desvinculado del estudiante exitosamente"<<endl;
-                            return;
-                        }
-                        tempEn = tempEn->sigEn;
-                    }
-                    cout<<"Ha occurrido un error al desvincular el grupo"<<endl;
-                }
-            
+                borrarGrupoEst(tempEst, idG);
             }
+        }
+    }
+}
 
-        }   
+//------------------Group's Methods----------------------------------
 
+
+void insertarGrupo(string codigo, curso* cursoG, int numGrupo){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    if(encontrarGrupo(codigo, numGrupo) != NULL){
+        cout<<"El grupo ya existe en este curso"<<endl;
+        return;
+    }else{
+        string abv = codigo.substr(0,2);
+        int numCurso = stoi(codigo.substr(2,4));
+
+        struct grupo *nG = new grupo(numGrupo, abv, numCurso);
+
+        nG->cursoActual = cursoG; //Links to the course it's part of
+        nG->sigGrupo = cursoG->grupoCursando; //Then it's pointed to the begginning of the list of groups in the course
+        cursoG->grupoCursando = nG;//Then it becomes the beginning of said list
+
+        cout<<"Grupo insertado con exito"<<endl;
+    }
+}
+
+void insertarGrupoAux(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    string codigo = pedirCodigoCurso();
+
+    curso* cursoG = buscarCurso(codigo);
+    if(cursoG == NULL){
+        cout<<"No se ha encontrado el curso"<<endl;
+    }else{
+        int numGrupo = pedirNumGrupo();
+
+        insertarGrupo(codigo, cursoG, numGrupo);
+    }
+}
+
+//------------------Admin Methods---------------------------------
+
+administrador* buscarAdmin(string nombreA){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    administrador* temp = listaAdministradores;
+    while(temp!= NULL){
+        if (temp->usuario == nombreA)
+            return temp;
+        temp = temp->sigAdmin;
+    }
+    return NULL;
+}
+
+void insertarAdmin(string nombreA, string contrasennaA){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    
+    administrador *nA = new administrador(nombreA, contrasennaA);
+    nA->sigAdmin = listaAdministradores;
+    listaAdministradores = nA;     
+    cout<<"Administrador insertado existosamente"<<endl;
+}
+
+void insertarAdminAux(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    string nombreA;
+    cout<<"Ingrese el nombre de usuario del nuevo administrador: ";
+    cin.sync();
+    getline(cin,nombreA);
+    
+    if((buscarAdmin(nombreA)) != NULL)
+    {
+        cout<<"El usuario ya se encuentra registrado"<<endl;
+    }
+    else
+    {
+    string contrasennaA;
+    cout<<"Ingrese la contrasena del nuevo administrador: ";
+    cin.sync();
+    getline(cin,contrasennaA);
+
+    insertarAdmin(nombreA, contrasennaA);
+    }
+}
+
+//------------------Teachers' Methods---------------------------------
+
+int pedirCedulaProf(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    int cedulaP;
+    cout<<"Ingrese la cedula: ";
+    while(!(cin>>cedulaP)){
+        cin.clear();
+        while (cin.get() != '\n') 
+            continue;
+        cout<<"Por favor digite solo numeros"<<endl;
+        return pedirCedulaProf();
+    }
+    return cedulaP;
+}
+
+profesor* buscarProf(int cedulaP){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    profesor *temp = listaProfesores;
+    while(temp != NULL){
+        if (temp->cedulaProf == cedulaP)
+            return temp;
+        temp = temp->sigProf;
+    }
+    return NULL;
+}
+
+string pedirNombreProf(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    string nombreProf;
+    cout<<"Ingrese el nombre del profesor: ";
+    cin.sync();
+    getline(cin,nombreProf);
+    return nombreProf;
+}
+
+void insertarProf(int cedulaP, string nombreP){
+
+    profesor*nP = new profesor(nombreP, cedulaP);
+    
+    nP->sigProf = listaProfesores;
+    
+    if(listaProfesores != NULL)
+        listaProfesores->antProf = nP;
+    
+    listaProfesores = nP;
+    cout<<"\nProfesor insertado exitosamente"<<endl;
+}
+
+void insertarProfAux(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    int cedulaP = pedirCedulaProf();
+
+    if((buscarProf(cedulaP)) != NULL){
+        cout<<"El profesor ya se encuentra registrado"<<endl;
+        return;
+    }
+    else
+    {
+        string nombre = pedirNombreProf();
+        insertarProf(cedulaP, nombre);
+    }
+}
+
+void modificarProf(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    int cedulaP = pedirCedulaProf();
+    profesor *temp = buscarProf(cedulaP);
+    
+    if(temp == NULL){
+        cout<<"\nEl profesor no existe, no se puede modificar"<<endl;
+    }
+    else{
+        string nomProf;
+        cout<<"Ingrese el nuevo nombre del profesor: ";
+        cin.sync();
+        getline(cin, nomProf);
+        temp->nombreProf = nomProf;
+        cout<<"Nombre del profesor modificado existosamente"<<endl;
+    }
+}
+
+void eliminarProf(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    int cedProf = pedirCedulaProf();
+    profesor *temp = buscarProf(cedProf);
+
+    if(temp == NULL){
+        cout<<"El profesor no existe, no se puede borrar"<<endl;
+    }
+    else{ //Delete at the beginning of the list
+        if(temp == listaProfesores){
+            if(temp->sigProf == NULL)
+                listaProfesores = NULL;
+            else{
+                listaProfesores = listaProfesores->sigProf;
+                listaProfesores->antProf = NULL;
+            }
+        }
+        else{//Middle or end of list
+            if(temp->sigProf == NULL)//Last
+                temp->antProf->sigProf = NULL;
+            else{//Middle
+                temp->antProf->sigProf = temp->sigProf;
+                temp->sigProf->antProf = temp->antProf;
+            }
+        }
+        cout<<"Profesor eliminado exitosamente"<<endl;
+    }
+}
+
+grupo* buscarGrupoProfe(int cedulaP, string codCurso){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    profesor* tempP = buscarProf(cedulaP);
+
+    if(tempP == NULL){
+        return NULL;
+    }else{
+        enlazarGrupo* tempG = tempP->gruposProfAux;
+        if(buscarCurso(codCurso) == NULL){
+            return NULL;
+        }
+        else{
+            int numG = pedirNumGrupo();
+            int idG = 100*(stoi(codCurso.substr(2,4))) + numG;
+            while(tempG != NULL){
+                if(tempG->enlaceGrupo->idCurso == idG){
+                    return tempG->enlaceGrupo;
+                }
+                tempG = tempG->sigEn;
+            }
+            return NULL;
+        } 
+    }    
+}
+
+void borrarGrupoProf(profesor* tempProf, int idG){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    if(tempProf->gruposProfAux->enlaceGrupo->idCurso == idG){//Delet the beginning of the list
+        tempProf->gruposProfAux = tempProf->gruposProfAux->sigEn; 
+        cout<<"Curso desvinculado del profesor exitosamente"<<endl;
+        return;
+    }else{                                                  //Delete middle or end of list
+        enlazarGrupo* tempEn = tempProf->gruposProfAux;
+        while(tempEn->sigEn != NULL){
+            if(tempEn->sigEn->enlaceGrupo->idCurso == idG){
+                tempEn->sigEn = tempEn->sigEn->sigEn;
+                cout<<"Curso desvinculado del profesor exitosamente"<<endl;
+                return;
+            }
+            tempEn = tempEn->sigEn;
+        }
+        cout<<"Ha occurrido un error al desvincular el grupo"<<endl;
+    }
+}
+
+void borrarGrupoProfAux(){
+    if(listaProfesores == NULL){
+        cout<<"No hay profesores registrados"<<endl;
+        return;
+    }else{
+        int cedulaP = pedirCedulaProf();
+        profesor* tempProf = buscarProf(cedulaP);
+
+        if(tempProf == NULL){
+        cout<<"Profesor no encontrado"<<endl;
+        return;
+        }else{
+            string codigo = pedirCodigoCurso();
+            int numG = pedirNumGrupo();
+
+            grupo* tempG = encontrarGrupo(codigo, numG);
+            if(tempG == NULL){
+                cout<<"Grupo no encontrado"<<endl;
+                return;
+            }else{//Group and student exist
+                int idG = 100*(stoi(codigo.substr(2,4))) + numG;
+                borrarGrupoProf(tempProf, idG);
+            }
+        }
+    }
+}
+
+void relacionarGrupoProf(profesor* tempP, grupo* tempG){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    enlazarGrupo* nE = new enlazarGrupo(tempG);
+    nE->sigEn = tempP->gruposProfAux;
+    tempP->gruposProfAux = nE;
+    cout<<"\nProfesor asignado a grupo satisfactoriamente"<<endl;
+}
+
+void relacionarGrupoProfAux(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    int cedulaP = pedirCedulaProf();
+
+    profesor* tempP = buscarProf(cedulaP);
+
+    if(tempP == NULL){
+        cout<<"Profesor no encontrado"<<endl;
+        return;
+    }
+    
+    string codigo = pedirCodigoCurso();
+    int numG = pedirNumGrupo();
+
+    grupo* tempG = encontrarGrupo(codigo, numG);
+    if(tempG == NULL){
+        cout<<"Grupo no encontrado"<<endl;
+        return;
+    }else{
+        grupo* buscar = buscarGrupoProfe(cedulaP, codigo);
+        if(buscar != NULL){
+            cout<<"El profesor ya se encuentra asignado a este grupo"<<endl;
+        }else{
+            relacionarGrupoProf(tempP, tempG);
+        }
+    }
+}
+
+//------------------Printing Methods---------------------------------
+
+void imprimirProfesores(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    if(listaProfesores == NULL)
+        cout<<"\nNo hay profesores en la lista"<<endl;
+    else{
+        profesor *temp = listaProfesores;
+        cout<<"Lista de profesores: "<<endl;
+        while(temp->sigProf != NULL){
+            cout<<"Profesor: "<<temp->nombreProf<<", Cedula: " <<temp->cedulaProf<<endl;
+            temp = temp->sigProf;
+        }
+        cout<<"Profesor: "<<temp->nombreProf<<", Cedula: " <<temp->cedulaProf<<endl;    
+    }
+}
+
+void imprimirAdmins(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    if(listaAdministradores == NULL)
+        cout<<"\nNo hay administradores en la lista"<<endl;
+    else{
+        administrador *temp = listaAdministradores;
+        cout<<"Lista de administradores: ";
+        while(temp != NULL){
+            cout<<temp->usuario<<", ";
+            temp = temp->sigAdmin;
+        }
+        cout<<endl;
+    }
+}
+
+void imprimirEstudiantes(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    estudiante *temp = listaEstudiantes;
+    cout<<"Lista de estudiantes: "<<endl;
+    while(temp != NULL){
+        cout<<"pasando al siguiente"<<endl;
+        cout<<"Estudiante: "<<temp->nombreEst<<", Carnet: "<<temp->carnet<<endl;
+        temp = temp->sigEst;
+    }
+
+}
+void imprimirSemestres(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    semestre *temp = listaSemestres;
+    cout<<"Lista de semesetres: "<<endl;
+    while(temp != NULL){
+        //cout<<"pasando al siguiente"<<endl;
+        cout<<"Periodo: "<<temp->numSemestre<<", Anno: "<<temp->anno<<", Presupuesto: "<<temp->presupuesto<<" millones de colones"<<endl;
+        temp = temp->sigSem;
     }
 
 }
 
+void mostrarCurso(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    cout<<"Lista de cursos"<<endl;
+    if(listaCursos == NULL){
+        cout<<"Lista vacia!"<<endl;
+    }
+    else{
+        curso *temp = listaCursos;
+        do{
+            cout<<temp->nombre<<endl;
+            temp = temp->sigCurso;
+        }while(temp != listaCursos);
+    }
+}
+
 void reporteGruposEst(){
-    int carnetEst;
-    cout<<"Escriba el carnet del estudiante: "<<endl;
-    cin>>carnetEst;
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    int carnetEst = pedirCarnetEst();
 
     estudiante* tempEst = buscarEst(carnetEst);
 
@@ -957,39 +1626,15 @@ void reporteGruposEst(){
     }    
 }
 
-//------------------Group's Methods----------------------------------
-
-void insertarGrupo(string codigo, curso* cursoG, int numGrupo){
-
-    string abv = codigo.substr(0,2);
-    int numCurso = stoi(codigo.substr(2,4));
-    
-    struct grupo *nG = new grupo(numGrupo, abv, numCurso);
-    
-    nG->cursoActual = cursoG; //Lo linkeo al curso que pertenece
-    nG->sigGrupo = cursoG->grupoCursando;
-    cursoG->grupoCursando = nG;
-    
-    cout<<"Grupo insertado con exito"<<endl;
-
-}
-
-void insertarGrupoAux(){
-    string codigo = pedirCodigoCurso();
-
-    curso* cursoG = buscarCurso(codigo);
-    if(cursoG == NULL){
-        cout<<"No se ha encontrado el curso"<<endl;
-    }else{
-        int numGrupo;
-        cout<<"Ingrese el numero de grupo: ";
-        cin>>numGrupo;
-
-        insertarGrupo(codigo, cursoG, numGrupo);
-    }
-}
-
 void reporteGrupo(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     string codigo = pedirCodigoCurso();
 
     curso* tempCurso = buscarCurso(codigo);
@@ -1007,263 +1652,15 @@ void reporteGrupo(){
 
 }
 
-grupo* encontrarGrupo(string codigo, int numGrupo){
-
-    curso* tempCurso = buscarCurso(codigo);
-
-    grupo *tempGrupo = tempCurso->grupoCursando;
-
-    while(tempGrupo != NULL){
-        if(tempGrupo->numGrupo == numGrupo)
-            return tempGrupo;
-        tempGrupo = tempGrupo->sigGrupo;
-    }
-    return NULL;
-}
-
-grupo* buscarGrupoEst(int carnetEst, int codG){
-    estudiante* tempEst = buscarEst(carnetEst);
-    if(tempEst == NULL){
-        return NULL;
-    }else{
-        if(tempEst->gruposEstAux == NULL){
-            return NULL;
-        }else{
-            enlazarGrupo* tempG = tempEst->gruposEstAux;
-            while(tempG != NULL){
-                if(tempG->enlaceGrupo->idCurso == codG){
-                    return tempG->enlaceGrupo;
-                }
-                tempG = tempG->sigEn;
-            }
-            return NULL;
-        }
-    }    
-}
-
-//------------------Admin Methods---------------------------------
-
-administrador* buscarAdmin(string nombreA){
-    administrador* temp = listaAdministradores;
-    while(temp!= NULL){
-        if (temp->usuario == nombreA)
-            return temp;
-        temp = temp->sigAdmin;
-    }
-    return NULL;
-}
-
-void insertarAdmin(string nombreA, string contrasennaA){
-    
-    administrador *nA = new administrador(nombreA, contrasennaA);
-    nA->sigAdmin = listaAdministradores;
-    listaAdministradores = nA;     
-    cout<<"Administrador insertado existosamente"<<endl;
-}
-
-void insertarAdminAux(){
-    string nombreA;
-    cout<<"Ingrese el nombre de usuario del nuevo administrador: ";
-    cin>>nombreA;
-    
-    if((buscarAdmin(nombreA)) != NULL)
-    {
-        cout<<"El usuario ya se encuentra registrado"<<endl;
-    }
-    else
-    {
-    string contrasennaA;
-    cout<<"Ingrese la contrasena del nuevo administrador: ";
-    cin>>contrasennaA;
-
-    insertarAdmin(nombreA, contrasennaA);
-    }
-}
-
-//------------------Teachers' Methods---------------------------------
-
-int pedirCedulaProf(){
-    int cedulaP;
-    cout<<"Ingrese la cedula del profesor: ";
-    cin>>cedulaP;
-    return cedulaP;
-}
-
-profesor* buscarProf(int cedulaP){
-    profesor *temp = listaProfesores;
-    while(temp != NULL){
-        if (temp->cedulaProf == cedulaP)
-            return temp;
-        temp = temp->sigProf;
-    }
-    return NULL;
-}
-
-string pedirNombreProf(){
-    string nombreProf;
-    cout<<"Ingrese el nombre del profesor: ";
-    cin>>nombreProf;
-    return nombreProf;
-}
-
-void insertarProf(int cedulaP, string nombreP){
-
-    profesor*nP = new profesor(nombreP, cedulaP);
-    
-    nP->sigProf = listaProfesores;
-    
-    if(listaProfesores != NULL)
-        listaProfesores->antProf = nP;
-    
-    listaProfesores = nP;
-    cout<<"\nProfesor insertado exitosamente"<<endl;
-}
-
-void insertarProfAux(){
-    int cedulaP = pedirCedulaProf();
-
-    if((buscarProf(cedulaP)) != NULL){
-        cout<<"El profesor ya se encuentra registrado"<<endl;
-        return;
-    }
-    else
-    {
-        string nombre = pedirNombreProf();
-        insertarProf(cedulaP, nombre);
-    }
-}
-
-void modificarProf(){
-    int cedulaP = pedirCedulaProf();
-    profesor *temp = buscarProf(cedulaP);
-    
-    if(temp == NULL){
-        cout<<"\nEl profesor no existe, no se puede modificar"<<endl;
-    }
-    else{
-        string nomProf = pedirNombreProf();
-        temp->nombreProf = nomProf;
-        cout<<"Nombre del profesor modificado existosamente"<<endl;
-    }
-}
-
-void eliminarProf(){
-    int cedProf = pedirCedulaProf();
-    profesor *temp = buscarProf(cedProf);
-
-    if(temp == NULL){
-        cout<<"El profesor no existe, no se puede borrar"<<endl;
-    }
-    else{ //Eliminar inicio
-        if(temp == listaProfesores){
-            if(temp->sigProf == NULL)
-                listaProfesores = NULL;
-            else{
-                listaProfesores = listaProfesores->sigProf;
-                listaProfesores->antProf = NULL;
-            }
-        }
-        else{//Recorrer lista
-            if(temp->sigProf == NULL)//Ultimo
-                temp->antProf->sigProf = NULL;
-            else{//En medio
-                temp->antProf->sigProf = temp->sigProf;
-                temp->sigProf->antProf = temp->antProf;
-            }
-        }
-        cout<<"Profesor eliminado exitosamente"<<endl;
-    }
-}
-
-int pedirNumGrupo(){
-    int numGrupoBuscar;
-    cout<<"Ingrese el numero del grupo por buscar: ";
-    cin>> numGrupoBuscar;
-    return numGrupoBuscar;
-}
-void relacionarGrupoProf(profesor* tempP, grupo* tempG){
-    enlazarGrupo* nE = new enlazarGrupo(tempG);
-    nE->sigEn = tempP->gruposProfAux;
-    tempP->gruposProfAux = nE;
-    cout<<"\nProfesor asignado a grupo satisfactoriamente"<<endl;
-
-}
-
-void relacionarGrupoProfAux(){
-    int cedulaP = pedirCedulaProf();
-
-    profesor* tempP = buscarProf(cedulaP);
-
-    if(tempP == NULL){
-        cout<<"Profesor no encontrado"<<endl;
-        return;
-    }
-    
-    string codigo = pedirCodigoCurso();
-    int numG = pedirNumGrupo();
-
-    grupo* tempG = encontrarGrupo(codigo, numG);
-    if(tempG == NULL){
-        cout<<"Grupo no encontrado"<<endl;
-        return;
-    }
-
-    relacionarGrupoProf(tempP, tempG);
-}
-
-void borrarGrupoProf(){
-    if(listaProfesores == NULL){
-        cout<<"No hay profesores registrados"<<endl;
-        return;
-    }else{
-        int cedulaP = pedirCedulaProf();
-        profesor* tempProf = buscarProf(cedulaP);
-
-        if(tempProf == NULL){
-        cout<<"Profesor no encontrado"<<endl;
-        return;
-        }else{
-            string codigo;
-            int numG;
-
-            cout<<"Ingrese el codigo del curso (Ej. IC3101): ";
-            cin>>codigo;
-
-            cout<<"Ingrese el numero de grupo: ";
-            cin>>numG;
-
-            grupo* tempG = encontrarGrupo(codigo, numG);
-            if(tempG == NULL){
-                cout<<"Grupo no encontrado"<<endl;
-                return;
-            }else{//Group and student exist
-                int idG = 100*(stoi(codigo.substr(2,4))) + numG;
-                if(tempProf->gruposProfAux->enlaceGrupo->idCurso == idG){//Delet the beginning of the list
-                    tempProf->gruposProfAux = tempProf->gruposProfAux->sigEn; 
-                    cout<<"Curso desvinculado del estudiante exitosamente"<<endl;
-                    return;
-                }else{                                                  //Delete middle or end of list
-                    enlazarGrupo* tempEn = tempProf->gruposProfAux;
-                    while(tempEn->sigEn != NULL){
-                        if(tempEn->sigEn->enlaceGrupo->idCurso == idG){
-                            tempEn->sigEn = tempEn->sigEn->sigEn;
-                            cout<<"Curso desvinculado del estudiante exitosamente"<<endl;
-                            return;
-                        }
-                        tempEn = tempEn->sigEn;
-                    }
-                    cout<<"Ha occurrido un error al desvincular el grupo"<<endl;
-                }
-            
-            }
-
-        }   
-
-    }
-
-}
-
 void reporteGruposProfe(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     int cedulaP = pedirCedulaProf();
 
     profesor* tempP = buscarProf(cedulaP);
@@ -1285,101 +1682,48 @@ void reporteGruposProfe(){
     }    
 }
 
+void reporteCursosSem(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
 
-
-
-
-//------------------Printing Methods---------------------------------
-
-void imprimirProfesores(){
-    if(listaProfesores == NULL)
-        cout<<"\nNo hay profesores en la lista"<<endl;
+*/
+    int codigoS = pedirCodigoSem();
+    semestre* tempSem = buscarSem(codigoS);
+    if(tempSem == NULL){
+        cout<<"Semestre no encontrado"<<endl;
+        return;
+    }
     else{
-        profesor *temp = listaProfesores;
-        cout<<"Lista de profesores: "<<endl;
-        while(temp->sigProf != NULL){
-            cout<<"Profesor: "<<temp->nombreProf<<", Cedula: " <<temp->cedulaProf<<endl;
-            temp = temp->sigProf;
+        cout<<"Anno: "<<tempSem->anno<<" Semestre: "<<tempSem->numSemestre<<endl;
+        cout<<"Cursos: "<<endl;
+        enlaceCurso* tempCurso = tempSem->listaCursos;
+        while(tempCurso != NULL){
+            cout<<"Nombre: "<<tempCurso->sigCurso->nombre<<endl;
+            cout<<"Codigo: "<<tempCurso->sigCurso->abreviatura<<tempCurso->sigCurso->codigoNum<<endl;
+            tempCurso = tempCurso->sig;
         }
-        cout<<"Profesor: "<<temp->nombreProf<<", Cedula: " <<temp->cedulaProf<<endl;    
-    }
-}
-
-void imprimirAdmins(){
-    if(listaAdministradores == NULL)
-        cout<<"\nNo hay administradores en la lista"<<endl;
-    else{
-        administrador *temp = listaAdministradores;
-        cout<<"Lista de administradores: ";
-        while(temp != NULL){
-            cout<<temp->usuario<<", ";
-            temp = temp->sigAdmin;
-        }
-        cout<<endl;
-    }
-}
-
-void imprimirEstudiantes(){
-    estudiante *temp = listaEstudiantes;
-    cout<<"Lista de estudiantes: "<<endl;
-    while(temp != NULL){
-        cout<<"pasando al siguiente"<<endl;
-        cout<<"Estudiante: "<<temp->nombreEst<<", Carnet: "<<temp->carnet<<endl;
-        temp = temp->sigEst;
+        cout<<"\nFinal de reporte"<<endl;
     }
 
 }
-void imprimirSemestres(){
-    semestre *temp = listaSemestres;
-    cout<<"Lista de semesetres: "<<endl;
-    while(temp != NULL){
-        //cout<<"pasando al siguiente"<<endl;
-        cout<<"Periodo: "<<temp->numSemestre<<", Anno: "<<temp->anno<<", Presupuesto: "<<temp->presupuesto<<" millones de colones"<<endl;
-        temp = temp->sigSem;
-    }
-
-}
-
 //------------------------------------------------Evaluation's Methods---------------------------
 
-/*
-void ingresarAdmin(){
-    string nombreA;
-    string contrasennaA;
-    string opcion;
-    administrador* temp = listaAdministradores;
-    
-    cout<<"Nombre de usuario: ";
-    cin>>nombreA;
-
-    if ((buscarAdmin(nombreA)) == NULL){
-        cout<<"El usuario ingresado no existe. Si desea volver al menu principal digite 1"<<endl;
-        cin>>opcion;
-        if(opcion == "1"){
-            menuPrincipal();
-        }
-        else{
-            ingresarAdmin();
-        }
-    }
-    else{
-        cout<<"Contrasena: ";
-        cin>>contrasennaA;
-    
-        temp = (buscarAdmin(nombreA));
-        if ((temp->contrasenna != contrasennaA)){
-            cout<<"Usuario o contrasena incorrecta"<<endl;
-            menuPrincipal();
-        }else{
-            menuAdmin();
-        }
-    }
-}
-*/
 void menuPrincipal();
 void menuProfesor();
 
 void ingresarProfesor(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     string nombreP = pedirNombreProf();
     int cedulaProf = pedirCedulaProf();
     string opcion;
@@ -1405,35 +1749,15 @@ void ingresarProfesor(){
 
 }
 
-grupo* buscarGrupoProfe(int cedulaP, string codCurso){
-    profesor* tempP = buscarProf(cedulaP);
-
-    if(tempP == NULL){
-        cout<<"Profesor no encontrado"<<endl;
-        return NULL;
-    }else{
-        enlazarGrupo* tempG = tempP->gruposProfAux;
-        if(buscarCurso(codCurso) == NULL){
-            cout<<"Curso no encontrado"<<endl;
-            return NULL;
-        }
-        else{
-            int numG = pedirNumGrupo();
-            int idG = 100*(stoi(codCurso.substr(2,4))) + numG;
-            while(tempG != NULL){
-                if(tempG->enlaceGrupo->idCurso == idG){
-                    return tempG->enlaceGrupo;
-                }
-                tempG = tempG->sigEn;
-            }
-            cout<<"Grupo no encontrado"<<endl;
-            return NULL;
-        } 
-    }    
-}
-
-
 string pedirTipoAct(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     string tipoAct;
     string opcion;
     cout<<"\nIngrese el numero correspondiente al tipo de actividad: \n1-Tarea\n2-Proyecto\n3-Examen\n4-Giras\nOpcion: ";
@@ -1454,135 +1778,196 @@ string pedirTipoAct(){
 }
 
 string pedirNumAct(){
-    string num;
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    int num;
     cout<<"Ingrese el numero de actividad: ";
-    cin>>num;
-    return num;
+    while (!(cin>>num)){
+        cin.clear();
+        while(cin.get() != '\n')
+            continue;
+        cout<<"Digite solo numeros"<<endl;
+        return pedirNumAct();
+    }
+    return to_string(num);
 }
 
 int pedirFechaAct(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     int anno;
     int mes;
     int dia;
     cout<<"Dia: ";
-    cin>>dia;
+    while(!(cin>>dia)){
+        cin.clear();
+        while(cin.get() != '\n')
+            continue;
+        cout<<"Solo digite numeros"<<endl;
+        return pedirFechaAct();
+    }
     cout<<"-1 Enero\n-2 Febrero\n-3 Marzo\n-4 Abril\n-5 Mayo\n-6 Junio\n-7 Julio\n-8 Agosto\n-9 Setiembre\n-10 Octubre\n-11 Noviembre\n-12 Diciembre\nIngrese el numero del mes: ";
-    cin>>mes;
+    while(!(cin>>mes)){
+        cin.clear();
+        while(cin.get() != '\n')
+            continue;
+        cout<<"Solo digite el numero correspondiente al mes"<<endl;
+        return pedirFechaAct();
+    }
     cout<<"Anno: ";
-    cin>>anno;
-    
+    while(!(cin>>anno)){
+        cin.clear();
+        while(cin.get() != '\n')
+            continue;
+        cout<<"Solo digite numeros"<<endl;
+        return pedirFechaAct();
+    }
     int codigo;
     codigo= anno*10000 + mes*100 + dia;
-    
     return codigo;
 }
 
 int pedirHoraAct(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     int hora;
     cout<<"Ingrese la hora de entrega (Formato militar. Ejemplo: 1600 (4:00p.m.)): ";
-    cin>>hora;
+    while (!(cin>>hora))
+    {
+        cin.clear();
+        while(cin.get() != '\n') 
+            continue;
+        cout<<"Por favor digite solo numeros"<<endl;
+        return pedirHoraAct();
+    }
     return hora;
 }
 
 int pedirNota(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     int nota;
     cout<<"Ingrese la nota del estudiante: ";
-    cin>>nota;
+    while(!(cin>>nota)){
+        cin.clear();
+        while(cin.get() != '\n') 
+            continue;
+        cout<<"Por favor digite solo numeros"<<endl;
+        return pedirNota();
+    }
     return nota;
 }
 
 string mostrarMesAct(evaluacion* actividad){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     string meses[12] = {"Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Setiembre", "Octubre", "Noviembre", "Diciembre"};
     string mes = meses[(((actividad->fechaEntrega)%10000)/100)-1];
     return mes;
 }
 
 int calcularMesAct(evaluacion* actividad){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     int mes = ((actividad->fechaEntrega)%10000)/100;
     return mes;
 }
 
 int calcularDiaAct(evaluacion* actividad){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     int dia = (actividad->fechaEntrega)%100;
     return dia;
 }
 
 int calcularAnnoAct(evaluacion* actividad){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     int anno = (actividad->fechaEntrega)/10000;
     return anno;
 }
 
-int calcularSemAct(evaluacion* actividad){
-    int anno = calcularAnnoAct(actividad);
-    int mes = calcularMesAct(actividad);
-    int dia = calcularDiaAct(actividad);
-    
-    tm date={};
-    date.tm_year=anno-1900;
-    date.tm_mon=mes-1;
-    date.tm_mday=dia;
-    mktime(&date);
-
-    return ((date.tm_yday-date.tm_wday+7)/7);
-}
-
+evaluacion* buscarAct(grupo* tempG, string tipoAct, string numAct){
 /*
-void insertarActividad(){
-    grupo* tempG = buscarGrupoProfe();
+Inputs: 
+        
+Process:
+        
+Outputs:
 
-    if(tempG == NULL){
-        cout<<"Grupo no encontrado"<<endl;
-        return;
-    }
-    else{
-        string tipoAct = pedirTipoAct();
-        string numAct = pedirNumAct();        
-        int fechaAct = pedirFechaAct();
-        int horaAct = pedirHoraAct();
-        
-        evaluacion* nEv = new evaluacion(fechaAct, horaAct, tipoAct, numAct);
-        
-        if(tempG->listaEvaluacion == NULL){//Empty list
-            tempG->listaEvaluacion = nEv;
-            cout<<"Actividad creada con exito vacia"<<endl;
-            return;
-        }else{
-            evaluacion* tempEv = tempG->listaEvaluacion;
-            cout<<tempEv->fechaEntrega<<" vs "<<nEv->fechaEntrega<<endl;
-            if(tempEv->fechaEntrega > nEv->fechaEntrega){//Insert beginning of linked list
-                cout<<tempEv->fechaEntrega<<" > "<<nEv->fechaEntrega<<endl;
-                nEv->sigEv = tempEv;
-                tempEv = nEv;
-                cout<<"Actividad creada con exito inicio"<<endl;
-                return;
+*/
+    string idAct = tipoAct.append(numAct);
+    if(tempG->listaEvaluacion == NULL){//Empty
+        return NULL;
+    }else{
+        evaluacion* tempEn = tempG->listaEvaluacion;
+        while(tempEn != NULL){
+            if(tempEn->idActividad == idAct){
+                return tempEn;
             }
-            while(tempEv->sigEv != NULL){
-                tempEv = tempEv->sigEv;
-            }
-            if(tempEv->fechaEntrega < nEv->fechaEntrega){
-                cout<<tempEv->fechaEntrega<<" < "<<nEv->fechaEntrega<<endl;
-                tempEv->sigEv = nEv;
-                nEv->sigEv = NULL;
-                cout<<"Actividad creada con exito al final"<<endl;
-                return;
-            }
-            evaluacion* temp = tempG->listaEvaluacion;
-            while(tempEv->sigEv != NULL){
-                if(temp->sigEv->fechaEntrega > nEv->fechaEntrega){
-                    cout<<tempEv->fechaEntrega<<" > "<<nEv->fechaEntrega<<endl;
-                    nEv->sigEv = temp->sigEv;
-                    temp->sigEv = nEv;
-                    cout<<"Actividad creada con exito en el medio"<<endl;
-                    return;
-                }
-                temp = temp->sigEv;
-            }
-            cout<<"Algo paso"<<endl;
-        }        
+            tempEn = tempEn->sigEv;
+        }
+        return NULL;
     }
 }
-*/
+
 void insertarActProf(grupo* tempG, string tipoAct, string numAct, int fechaAct, int horaAct){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     evaluacion* nEv = new evaluacion(fechaAct, horaAct, tipoAct, numAct);
     
     if(tempG->listaEvaluacion == NULL){//Empty list
@@ -1620,6 +2005,14 @@ void insertarActProf(grupo* tempG, string tipoAct, string numAct, int fechaAct, 
 }
 
 void insertarActProfAux(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     int cedulaProf = pedirCedulaProf();
     string codigoCurso = pedirCodigoCurso();
     
@@ -1640,6 +2033,14 @@ void insertarActProfAux(){
 }
 
 evaluacion* buscarEvaluacionProf(string idAct, int cedulaP, string codCurso){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
 
     grupo* tempG = buscarGrupoProfe(cedulaP, codCurso);
 
@@ -1660,6 +2061,14 @@ evaluacion* buscarEvaluacionProf(string idAct, int cedulaP, string codCurso){
 }
 
 void modificarActProf(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     int cedulaP = pedirCedulaProf();
     string codCurso = pedirCodigoCurso();
     string tipo = pedirTipoAct();
@@ -1678,6 +2087,14 @@ void modificarActProf(){
 }
 
 void borrarActProf(){    
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     int cedulaP = pedirCedulaProf();
     string codCurso = pedirCodigoCurso();
     grupo* tempG = buscarGrupoProfe(cedulaP, codCurso);
@@ -1710,6 +2127,14 @@ void borrarActProf(){
 }
 
 void imprimirActProf(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     int cedulaP = pedirCedulaProf();
     profesor* tempP = buscarProf(cedulaP);
     //string codCurso = pedirCodigoCurso();
@@ -1730,6 +2155,14 @@ void imprimirActProf(){
 }
 
 void imprimirActEst(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     int carnet = pedirCarnetEst();
     estudiante* tempEst = buscarEst(carnet);
     if(tempEst == NULL){
@@ -1756,13 +2189,31 @@ void imprimirActEst(){
 //-------------------------------------------------------Conferences' Methords--------
 
 string pedirNomCharla(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    
     string nom;
     cout<<"Ingrese el nombre de la charla: ";
-    cin>>nom;
+    cin.sync();
+    getline(cin, nom);
     return nom;
 }
 
 charla* buscarCharla(int codigoS, string idCh){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     semestre* tempSem = buscarSem(codigoS);
     if(tempSem == NULL){
         return NULL;
@@ -1782,6 +2233,15 @@ charla* buscarCharla(int codigoS, string idCh){
 }
 
 void insertarCharlaProf(semestre* tempSem, string nomCh, int fechaCh, int horaCh){//Inserts conference on semester
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    
     charla* nCh = new charla(nomCh, fechaCh, horaCh, tempSem->abreviatura);
     
     if(tempSem->listaCharlas == NULL){//Empty list
@@ -1822,6 +2282,14 @@ void insertarCharlaProf(semestre* tempSem, string nomCh, int fechaCh, int horaCh
 }
 
 void insertarChProfAux(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     int codigoS = pedirCodigoSem();//20201
     semestre* tempSem = buscarSem(codigoS);
     
@@ -1832,7 +2300,6 @@ void insertarChProfAux(){
         string nomCh = pedirNomCharla();
         
         string idCh = (to_string(tempSem->abreviatura)).append(nomCh);
-        cout<<"ID CHARLA: "<<tempSem->abreviatura;
         charla* buscar = buscarCharla(tempSem->abreviatura, idCh);
         if(buscar != NULL){
             cout<<"La charla llamada "<<nomCh<<" ya se encuentra registrada en el semestre"<<endl;
@@ -1847,6 +2314,14 @@ void insertarChProfAux(){
 }
 
 void modificarChProf(){//Inserts conference on semester
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
 
     int codigoS = pedirCodigoSem();
     semestre* tempSem = buscarSem(codigoS);
@@ -1866,7 +2341,8 @@ void modificarChProf(){//Inserts conference on semester
         }else{
             string nuevoNom;
             cout<<"Ingrese el nuevo nombre de la charla"<<endl;
-            cin>>nuevoNom;
+            cin.sync();
+            getline(cin, nuevoNom);
             string nuevoId = (to_string(tempSem->abreviatura)).append(nuevoNom);
             buscar->nombreCharla = nuevoNom;
             buscar->idCharla = nuevoId;
@@ -1877,6 +2353,14 @@ void modificarChProf(){//Inserts conference on semester
 }
 
 void borrarChProf(){//Deletes conference on semester
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
 
     int codigoS = pedirCodigoSem();
     semestre* tempSem = buscarSem(codigoS);
@@ -1918,6 +2402,14 @@ void borrarChProf(){//Deletes conference on semester
 }
 
 void mostrarCharlas(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     int codigoS = pedirCodigoSem();
     semestre* tempSem = buscarSem(codigoS);
     if(tempSem == NULL){
@@ -1931,7 +2423,7 @@ void mostrarCharlas(){
         charla* tempCh = tempSem->listaCharlas;
         cout<<"Charlas del semestre "<<tempSem->abreviatura<<endl;
         while(tempCh != NULL){
-            cout<<"Nombre de la charla: "<<tempCh->nombreCharla<<" ID: "<<tempCh->idCharla<< "Fecha y hora: "<< tempCh->fecha<< " "<<tempCh->hora;
+            cout<<"Nombre de la charla: "<<tempCh->nombreCharla<<" ID: "<<tempCh->idCharla<< "Fecha y hora: "<< tempCh->fecha<< " "<<tempCh->hora<<endl;
             tempCh = tempCh->sigCharla;
         }
         cout<<"Fin de reporte"<<endl;
@@ -1939,23 +2431,15 @@ void mostrarCharlas(){
     }
 }
 
-evaluacion* buscarAct(grupo* tempG, string tipoAct, string numAct){
-    string idAct = tipoAct.append(numAct);
-    if(tempG->listaEvaluacion == NULL){//Empty
-        return NULL;
-    }else{
-        evaluacion* tempEn = tempG->listaEvaluacion;
-        while(tempEn != NULL){
-            if(tempEn->idActividad == idAct){
-                return tempEn;
-            }
-            tempEn = tempEn->sigEv;
-        }
-        return NULL;
-    }
-}
-
 void agregarActEst(estudiante *tempEst, evaluacion* tempEv){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
 //Everything exists, add the activity to the list
     evaluacionesEntregadas* nEv = new evaluacionesEntregadas(tempEv);
     
@@ -1989,6 +2473,14 @@ void agregarActEst(estudiante *tempEst, evaluacion* tempEv){
 }
 
 void agregarActEstAux(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     int carnetEst = pedirCarnetEst();
     estudiante* tempEst = buscarEst(carnetEst);
     if(tempEst == NULL){//Check if student exists
@@ -2020,22 +2512,38 @@ void agregarActEstAux(){
 }
 
 void insertarCharlaEst(estudiante* tempEst, charla* tempCh){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     
     enlaceCharla* nEnCh = new enlaceCharla(tempCh); 
-                
     if(tempEst->charla == NULL){//Empty list
         tempEst->charla = nEnCh;
+        nEnCh = NULL;
         cout<<"Charla asistida con exito"<<endl;
         return;    
-    }else{//Insert at the beginning
-        nEnCh->sig = tempEst->charla->sig;
-        tempEst->charla->sig = nEnCh;
+    }else{//List with elements
+        nEnCh->sig = tempEst->charla;
+        tempEst->charla = nEnCh;
         cout<<"Charla asistida con exito"<<endl;
         return;
     } 
 }
 
 void insertarCharlaEstAux(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     int carnetEst = pedirCarnetEst();
     estudiante* tempEst = buscarEst(carnetEst);
     if(tempEst == NULL){//Check if student exists
@@ -2064,6 +2572,14 @@ void insertarCharlaEstAux(){
 //------------------Reports---------------------------------
 
 int fechaHoy(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
 //Returns today's date in yyyy/mm/dd format
     time_t t = time(0);   // gets today's date but in UTC time, (global time)
     tm* now = localtime(&t); //converts it to our tz
@@ -2071,6 +2587,14 @@ int fechaHoy(){
 }
 
 int numSemana(int d, int m, int y)
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
 {//Receives day, month and year in ints and calculates the day of the week in int
 //0 for sunday, 1 for monday...
     int t[] = { 0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4 };
@@ -2079,17 +2603,41 @@ int numSemana(int d, int m, int y)
 }
 
 string nomSemana(int numSem){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
 //Receives the number of the week and returns the name
     string diasSem[7] = {"Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"};
     return diasSem[numSem];
 }
 
 string nomMes(int numMes){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     string meses[12] = {"Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Setiembre", "Octubre", "Noviembre", "Diciembre"};
     return meses[numMes-1];
 }
  
 void reporte1(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     //DESPUES SUMARLE 7 A DIA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     int fecha = fechaHoy();
     int dia = (fecha%100);//We go to next week according to the project's instructions
@@ -2138,6 +2686,14 @@ void reporte1(){
 }
 
 void reporte2(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     int numSem2 = 0;
     int fecha = fechaHoy();//Returns yyyy/mm/dd
 
@@ -2213,6 +2769,14 @@ OutPut:
 }
 
 void reporte3(profesor* tempP, int fecha){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
 /*Goes through all the groups the teacher has, and thorugh all the evaluations in each group
 if their due date is before today's date, then it's already done
 then we go through all the students and check who has that evaluation done
@@ -2280,6 +2844,14 @@ then we go through all the students and check who has that evaluation done
 }
 
 void reporte3Aux(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     int fecha = fechaHoy();//today's date in yyyy/mm/dd format
     int cedulaP = pedirCedulaProf();//First check if the teacher exists
     profesor* tempP = buscarProf(cedulaP);
@@ -2296,9 +2868,8 @@ bool buscarCharlaEst(estudiante* tempEst, charla* tempCh){
     enlaceCharla* buscarCh = tempEst->charla;
 
     while(buscarCh != NULL){
-        if(buscarCh->enCharla == tempCh){
+        if(buscarCh->enCharla == tempCh)
             return true;
-        }
         buscarCh = buscarCh->sig;
     }
     return false;
@@ -2306,14 +2877,20 @@ bool buscarCharlaEst(estudiante* tempEst, charla* tempCh){
 
 
 void reporte4(){
-    int annoS = pedirAnnoSem();
-    int semS = pedirNumSem();
-    int codigoS = 10*annoS+semS;
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    int codigoS = pedirCodigoSem();
     semestre* tempSem = buscarSem(codigoS);
     if(tempSem == NULL){
         cout<<"Semestre no encontrado"<<endl;
     }else{
-        cout<<"\nEstudiantes que han participado en todas las charlas del semestre "<<semS<<" del "<<annoS<<"\n"<<endl;
+        cout<<"\nEstudiantes que han participado en todas las charlas del semestre "<<codigoS%10<<" del "<<codigoS/10<<"\n"<<endl;
         charla* tempCh = tempSem->listaCharlas;
         int cantCh = 0;
         while(tempCh != NULL){
@@ -2396,6 +2973,14 @@ Outputs:
 }
 
 void reporte5Aux(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     int cedula = pedirCedulaProf();
     profesor* tempP = buscarProf(cedula);
 
@@ -2448,7 +3033,15 @@ charla* buscarSemFecha(int fechaSem){
     return NULL;
 }
 
-void reporte6(){   
+void reporte6(){  
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/ 
     int carnetEst = pedirCarnetEst();
     estudiante* tempEst = buscarEst(carnetEst);
 
@@ -2571,11 +3164,16 @@ Output:
 }
 
 void reporte8(){
-    int annoS = pedirAnnoSem();
-    int semS = pedirNumSem();
-    int codigoS = 10*annoS+semS;
-    
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
 
+*/
+    int codigoS = pedirCodigoSem();
+    
     int a=0, b=0, c=0;
     string na, nb, nc;
     semestre*tempS= buscarSem(codigoS);
@@ -2610,12 +3208,10 @@ void reporte8(){
         tempC=tempC->sigCharla;
 
     }
-    cout<<"Las charlas más atendidas fueron: "<<endl;
-    cout<<"Charla#1: "<<na<<" con "<<a<<"estudiantes"<<endl;
-    cout<<"Charla#2: "<<nb<<" con "<<b<<"estudiantes"<<endl;
-    cout<<"Charla#3: "<<nc<<" con "<<c<<"estudiantes"<<endl;
-        
-
+    cout<<"Para el semestre "<<codigoS%10<<" del "<<codigoS/10<<" las 3 charlas con más asistencia fueron: "<<endl;
+    cout<<"Charla#1: "<<na<<" con "<<a<<" estudiantes"<<endl;
+    cout<<"Charla#2: "<<nb<<" con "<<b<<" estudiantes"<<endl;
+    cout<<"Charla#3: "<<nc<<" con "<<c<<" estudiantes"<<endl;
 }
 
 
@@ -2624,6 +3220,14 @@ void reporte8(){
 void menuPrincipal();
 
 void menuEstudiante(){
+/*
+Inputs: 
+        string opcion.
+Process:
+        Displays a menu, asks for input, leads user to option chosen.(Only for activities )
+Outputs:
+        Functionality chosen by the user.
+*/
     cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
     cout<<"a- Realizar Actividad\nb- Participar en Charla\nc- Reporte de actividades por semana\n\n1- Volver al menu principal\n\n\nOpcion: ";
     string opcion;
@@ -2644,7 +3248,6 @@ void menuEstudiante(){
     else if(opcion == "1"){
         menuPrincipal();
     }else if(opcion == "z"){
-        imprimirActEst();
         menuEstudiante();
     }
     else{
@@ -2654,6 +3257,14 @@ void menuEstudiante(){
 }
 
 void menuProfesorAct(){
+/*
+Inputs: 
+        string opcion.
+Process:
+        Displays a menu, asks for input, leads user to option chosen.(Only for activities )
+Outputs:
+        Functionality chosen by the user.
+*/
     cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
     cout<<"a- Crear Actividad\nb- Modificar Actividad\nc- Borrar Actividad\n\n1- Volver al menu de profesor\n2- Volver al menu principal\n\n\nOpcion: ";
     string opcion;
@@ -2684,6 +3295,14 @@ void menuProfesorAct(){
 }
 
 void menuProfesorCh(){
+/*
+Inputs: 
+        string opcion.
+Process:
+        Displays a menu, asks for input, leads user to option chosen.(Only for conferences )
+Outputs:
+        Functionality chosen by the user.
+*/
     cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
     cout<<"a- Crear Charla\nb- Modificar Charla\nc- Borrar Charla\n\n1- Volver al menu de profesor\n2- Volver al menu principal\n\n\nOpcion: ";
     string opcion;
@@ -2718,6 +3337,14 @@ void menuProfesorCh(){
 }
 
 void menuProfesorRep(){
+/*
+Inputs: 
+        string opcion.
+Process:
+        Displays a menu, asks for input, leads user to option chosen.(Only for reports )
+Outputs:
+        Functionality chosen by the user.
+*/
     cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
     cout<<"a- Actividades para la proxima semana\nb- Actividades para todo el semestre\nc- Actividades concluidas\nd- Estudiantes que participaron en todas las charlas \ne- Estudiantes que no han entregado asignaciones\n\n1- Volver al menu de profesor\n2- Volver al menu principal\n\n\nOpcion: ";
     string opcion;
@@ -2751,11 +3378,19 @@ void menuProfesorRep(){
         menuPrincipal();
     else{
         cout<<"Opcion Invalida"<<endl;
-        menuAdminEst();
+        menuProfesorRep();
     }
 }
 
 void menuProfesor(){
+/*
+Inputs: 
+        string opcion.
+Process:
+        Displays a menu, asks for input, leads user to option chosen.
+Outputs:
+        Menu chosen by the user.
+*/
     cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
     cout<<"a- Actividades\nb- Charlas\nc- Reportes\n\n1- Volver al menu principal\n\n\nOpcion: ";
     string opcion;
@@ -2787,6 +3422,14 @@ void menuProfesor(){
 void menuAdmin();
 
 void menuAdminReportes(){
+/*
+Inputs: 
+        string opcion.
+Process:
+        Displays a menu, asks for input, leads user to option chosen.
+Outputs:
+        Menu chosen by the user.
+*/
     cout<<"\nEscoja e ingrese el reporte que desea generar:"<<endl;
     
     cout<<"a- Estudiantes que no han entregado ninguna actividad en algun curso\nb- 3 charlas con mas asistencia de un semestre\n\n1- Volver al menu de administrador\n2- Volver al menu principal\n\n\nOpcion: ";
@@ -2816,6 +3459,14 @@ void menuAdminReportes(){
 }
 
 void menuAdminSemestre(){
+/*
+Inputs: 
+        string opcion.
+Process:
+        Displays a menu, asks for input, leads user to option chosen.
+Outputs:
+        Menu chosen by the user.
+*/
     cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
     
     cout<<"a- Insertar Semestre\nb- Modificar Semestre\nc- Insertar Curso\n\n1- Volver al menu de administrador\n2- Volver al menu principal\n\n\nOpcion: ";
@@ -2849,6 +3500,14 @@ void menuAdminSemestre(){
 }    
 
 void menuAdminCurso(){
+/*
+Inputs: 
+        string opcion.
+Process:
+        Displays a menu, asks for input, leads user to option chosen.
+Outputs:
+        Menu chosen by the user.
+*/
     cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
     
     cout<<"a- Insertar curso\nb- Modificar curso\nc- Borrar curso\n\n1- Volver al menu de administrador\n2- Volver al menu principal\n\n\nOpcion: ";
@@ -2882,6 +3541,14 @@ void menuAdminCurso(){
 }    
 
 void menuAdminEst(){
+/*
+Inputs: 
+        string opcion.
+Process:
+        Displays a menu, asks for input, leads user to option chosen.
+Outputs:
+        Menu chosen by the user.
+*/
     cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
     
     cout<<"a- Insertar estudiante\nb- Modificar estudiante\nc- Borrar estudiante\nd- Asignar a grupo\ne- Desvincular a grupo\n\n1- Volver al menu de administrador\n2- Volver al menu principal\n\n\nOpcion: ";
@@ -2904,7 +3571,7 @@ void menuAdminEst(){
         relacionarGrupoEstAux();
         menuAdminEst();
     }else if(opcion == "e"){
-        borrarGrupoEst();
+        borrarGrupoEstAux();
         menuAdminEst();
     }else if(opcion == "z"){
         reporteGruposEst();
@@ -2921,6 +3588,14 @@ void menuAdminEst(){
 }
 
 void menuAdminProf(){
+/*
+Inputs: 
+        string opcionMenuAdminProf.
+Process:
+        Displays a menu, asks for input, leads user to option chosen.
+Outputs:
+        Menu chosen by the user.
+*/
     cout<<"\nEscoja e ingrese el caracter de la opcion que desea realizar:"<<endl;
     cout<<"a- Insertar profesor\nb- Modificar profesor\nc- Borrar profesor\nd- Asignar a grupo\n\n1-Volver al menu de administrador \n2-Volver al menu principal \nOpcion: ";
     string opcionMenuAdminProf;
@@ -2944,7 +3619,7 @@ void menuAdminProf(){
         relacionarGrupoProfAux();
         menuAdminProf();
     }else if(opcionMenuAdminProf=="e"){
-        borrarGrupoProf();
+        borrarGrupoProfAux();
         menuAdminProf();
     }else if(opcionMenuAdminProf=="1"){
         //cout<<"Salir"<<endl;
@@ -2964,6 +3639,14 @@ void menuAdminProf(){
     menuAdminProf();
 }
 void menuAdmin(){
+/*
+Inputs: 
+        string opcionMenuAdmin.
+Process:
+        Displays a menu, asks for input, leads user to option chosen.
+Outputs:
+        Menu chosen by the user.
+*/
     cout<<"\nEscoja e ingrese el caracter del objeto que desea modificar:"<<endl;
     cout<<"a- Insertar Administrador\nb- Profesores\nc- Estudiantes\nd- Semestres\ne- Cursos\nf- Insertar grupo\ng- Reportes\n\n0- Volver al menu principal\nOpcion: ";
     
@@ -3011,16 +3694,27 @@ void menuAdmin(){
 }
 
 void ingresarAdmin(){
+/*
+Inputs: 
+        Username for manager
+        Password for manager
+
+Process:
+        Processes the username and password in order to give user access to account
+Outputs:
+        Continues in the program, respective menu
+*/
     string nombreA;
     string contrasennaA;
     string opcion;
     administrador* temp = listaAdministradores;
     
     cout<<"Nombre de usuario: ";
-    cin>>nombreA;
+    cin.sync();
+    getline(cin, nombreA);
 
     if ((buscarAdmin(nombreA)) == NULL){
-        cout<<"El usuario ingresado no existe. Si desea volver al menu principal digite 1"<<endl;
+        cout<<"El usuario ingresado no existe. Si desea volver al menu principal digite 1: ";
         cin>>opcion;
         if(opcion == "1"){
             menuPrincipal();
@@ -3031,7 +3725,8 @@ void ingresarAdmin(){
     }
     else{
         cout<<"Contrasena: ";
-        cin>>contrasennaA;
+        cin.sync();
+        getline(cin, contrasennaA);
     
         temp = (buscarAdmin(nombreA));
         if ((temp->contrasenna != contrasennaA)){
@@ -3049,8 +3744,19 @@ void menuPrincipal(){
     I: Number of choice.
     O: Respective function in the system.
     */
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    cout<<"\n\n"<<endl;
+    cout<<"------------------------------------------------------------"<<endl;
     cout<<"Bienvenido al sistema de Gestion de Actividades Curriculares"<<endl;
-    cout<<"Ingrese el numero de la seccion deseada: \n 1- Administrador\n 2- Usuario: Profesor\n 3- Usuario: Estudiante \n 4- Salir\nNumero:";
+    cout<<"------------------------------------------------------------"<<endl;
+    cout<<"Ingrese el numero de la seccion deseada: \n 1- Administrador\n 2- Usuario: Profesor\n 3- Usuario: Estudiante \n 4- Salir\nNumero: ";
     string opcion;
     cin>>opcion;
     if(opcion=="1"){
@@ -3070,6 +3776,14 @@ void menuPrincipal(){
 }
 
 int main(){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
     cout<<"\n\n\t\tCargando Datos...\n\n";
     cout<<"\tInsertando Administradores\n";    
     insertarAdmin("Maria", "123");
@@ -3134,33 +3848,34 @@ int main(){
     agregarActEst(buscarEst(201705), buscarAct(encontrarGrupo("IC3101", 51), "Proyecto", "1"));//Carmen 51 IC3101
     agregarActEst(buscarEst(201705), buscarAct(encontrarGrupo("IC3101", 51), "Examen", "2"));//Carmen 51 IC3101
     cout<<"\tCreando charlas\n";
-    insertarCharlaProf(buscarSem(20212), "Charla1", 20210923, 1300); //2021 octubre 30                         
-    insertarCharlaProf(buscarSem(20212), "Charla2", 20210927, 1600); //Noviembre 3
-    insertarCharlaProf(buscarSem(20212), "Charla3", 20210925, 1500); //Julio 13
-    insertarCharlaProf(buscarSem(20212), "Charla4", 20210926, 1700); //Setiembre 10
-    insertarCharlaProf(buscarSem(20212), "Charla5", 20210927, 1700); //Diciembre 27
+    insertarCharlaProf(buscarSem(20212), "IEEE Introduction", 20210923, 1300); //2021 octubre 30                         
+    insertarCharlaProf(buscarSem(20212), "IA en videojuegos", 20210927, 1600); //Noviembre 3
+    insertarCharlaProf(buscarSem(20212), "Habilidades Blandas en Ing. en Computacion", 20210925, 1500); //Julio 13
+    insertarCharlaProf(buscarSem(20212), "La industria de videojuegos en Costa Rica", 20210926, 1700); //Setiembre 10
+    insertarCharlaProf(buscarSem(20212), "Intercambio estudiantil a Alemania", 20210927, 1700); //Diciembre 27
     
     cout<<"\tInsertando estudiantes en charlas\t"<<endl;
-    insertarCharlaEst(buscarEst(201935), buscarCharla(20212, "Charla1")); ///Ch1-4 Ch2-3 Ch3-2 Ch4-1 ch5-5
-    insertarCharlaEst(buscarEst(201935), buscarCharla(20212, "Charla2"));
-    insertarCharlaEst(buscarEst(201935), buscarCharla(20212, "Charla3"));
-    insertarCharlaEst(buscarEst(201935), buscarCharla(20212, "Charla4"));
-    insertarCharlaEst(buscarEst(201935), buscarCharla(20212, "Charla5"));
+    insertarCharlaEst(buscarEst(201935), buscarCharla(20212, "20212IEEE Introduction")); ///Ch1-4 Ch2-3 Ch3-2 Ch4-2 ch5-5
+    insertarCharlaEst(buscarEst(201935), buscarCharla(20212, "20212IA en videojuegos"));
+    insertarCharlaEst(buscarEst(201935), buscarCharla(20212, "20212Habilidades Blandas en Ing. en Computacion"));
+    insertarCharlaEst(buscarEst(201935), buscarCharla(20212, "20212La industria de videojuegos en Costa Rica"));
+    insertarCharlaEst(buscarEst(201935), buscarCharla(20212, "20212Intercambio estudiantil a Alemania"));
 
-    insertarCharlaEst(buscarEst(202105), buscarCharla(20212, "Charla1"));
-    insertarCharlaEst(buscarEst(202105), buscarCharla(20212, "Charla2"));
-    insertarCharlaEst(buscarEst(202105), buscarCharla(20212, "Charla3"));
+    insertarCharlaEst(buscarEst(202105), buscarCharla(20212, "20212IEEE Introduction"));
+    insertarCharlaEst(buscarEst(202105), buscarCharla(20212, "20212IA en videojuegos"));
+    insertarCharlaEst(buscarEst(202105), buscarCharla(20212, "20212Habilidades Blandas en Ing. en Computacion"));
+    insertarCharlaEst(buscarEst(202105), buscarCharla(20212, "20212La industria de videojuegos en Costa Rica"));
+    insertarCharlaEst(buscarEst(202105), buscarCharla(20212, "20212Intercambio estudiantil a Alemania"));
 
-    insertarCharlaEst(buscarEst(201705), buscarCharla(20212, "Charla5"));
-    insertarCharlaEst(buscarEst(201705), buscarCharla(20212, "Charla2"));
+    insertarCharlaEst(buscarEst(201705), buscarCharla(20212, "20212Intercambio estudiantil a Alemania"));
+    insertarCharlaEst(buscarEst(201705), buscarCharla(20212, "20212IA en videojuegos"));
 
-    insertarCharlaEst(buscarEst(202006), buscarCharla(20212, "Charla1"));
-    insertarCharlaEst(buscarEst(202006), buscarCharla(20212, "Charla5"));
+    insertarCharlaEst(buscarEst(202006), buscarCharla(20212, "20212IEEE Introduction"));
+    insertarCharlaEst(buscarEst(202006), buscarCharla(20212, "20212Intercambio estudiantil a Alemania"));
 
-    insertarCharlaEst(buscarEst(201919), buscarCharla(20212, "Charla1"));
-    insertarCharlaEst(buscarEst(201919), buscarCharla(20212, "Charla5"));
-    //imprimirAdmins();
-    //imprimirSemestres();
+    insertarCharlaEst(buscarEst(201919), buscarCharla(20212, "20212IEEE Introduction"));
+    insertarCharlaEst(buscarEst(201919), buscarCharla(20212, "20212Intercambio estudiantil a Alemania"));
+    
     menuPrincipal();
 
     return 0;

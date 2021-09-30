@@ -50,9 +50,31 @@ int dayofweekaux()
     return 0;
 }
 
+int validarInt(){
+    int number;
+    cout<<"num: ";
+    while (!(cin >> number))
+    {
+        cin.clear();
+        while (cin.get() != '\n') continue;
+        cout << "Invalid Value! "<< endl;
+        return validarInt();
+    }
+    return number;
+}
+
+void validarString(){
+    string name;
+    cout << "Please, enter your full name: ";
+    getline (cin,name);
+    cout << "Hello, " << name << "!\n";
+}
+
+
 int main(){
-    cout<<semana(2021, 9, 19)<<endl;
-    dayofweekaux();
-    cout<<date()<<endl;
+    //cout<<semana(2021, 9, 19)<<endl;
+    //dayofweekaux();
+    //cout<<date()<<endl;
+    validarString();
     return 0;
 }
