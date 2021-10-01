@@ -218,11 +218,11 @@ void menuAdminSemestre();
 int pedirAnnoSem(){
 /*
 Inputs: 
-        
+        na
 Process:
-        
+        asks cx for the semester year
 Outputs:
-
+        User input
 */
     int annoS;
     cout<<"Ingrese el anno del semestre: ";
@@ -239,11 +239,11 @@ Outputs:
 int pedirNumSem(){
 /*
 Inputs: 
-        
+        na
 Process:
-        
+        asks cx for the semester number
 Outputs:
-
+        User input
 */
     int semS;
     cout<<"Ingrese el semestre del anno (1 o 2): ";
@@ -260,11 +260,11 @@ Outputs:
 int pedirPresupuestoSem(){
 /*
 Inputs: 
-        
+        na
 Process:
-        
+        asks cx for the semester budget
 Outputs:
-
+        User input
 */
     int presupuestoS;
     cout<<"Ingrese el presupuesto del semestre: ";
@@ -281,11 +281,12 @@ Outputs:
 int pedirCodigoSem(){
 /*
 Inputs: 
-        
+        na
 Process:
-        
+        asks cx for the semester information, then create the
+        specific code for this semester.
 Outputs:
-
+        Semester specific code.
 */
     int anno = pedirAnnoSem();
     int num = pedirNumSem();
@@ -295,11 +296,12 @@ Outputs:
 semestre* buscarSem(int nCodigo){
 /*
 Inputs: 
-        
+        Semester internal code we are looking for
 Process:
-        
+        Runs semesters list in order to look for a collision
+        in internarl semester codes.
 Outputs:
-
+        If so, returns ptr to semester, if not, NULL
 */
     semestre *temp = listaSemestres;
     while(temp != NULL){
@@ -324,6 +326,10 @@ Outputs:
     codigoS= 10*annoS+semS;
 
     semestre *nS = new semestre(semS, annoS, codigoS, presupuestoS);
+
+    if(buscarSem(codigoS)!=NULL){
+        cout<< "Ya existe un semestre con estas directrices."<<endl;
+    }
 
     //if list is empty
     if(listaSemestres == NULL){
@@ -384,9 +390,6 @@ Outputs:
 */
     int annoS = pedirAnnoSem();
     int semS = pedirNumSem();
-    if(buscarSem(10*annoS+semS)!=NULL){
-        cout<< "Ya existe un semestre con estas directrices."<<endl;
-    }
     int presupuestoS = pedirPresupuestoSem();
     insertarSemestre(annoS, semS, presupuestoS);
 }
@@ -430,11 +433,11 @@ Outputs:
 string pedirCodigoCurso(){
 /*
 Inputs: 
-        
+        na
 Process:
-        
+        Asks user for course code
 Outputs:
-
+        Course code, for the respective function
 */
     string codigo;
     cout<<"Ingrese el codigo del curso (Ej. IC3101): ";
@@ -457,11 +460,12 @@ bool buscarCursoSem(semestre* tempSem, curso* tempC){
 curso* buscarCurso(string codigo){
 /*
 Inputs: 
-        
+        Course code we are looking for
 Process:
-        
+        Runs courses list in order to look for a collision
+        in internar courses codes.
 Outputs:
-
+        If so, returns ptr to semester, if not, NULL
 */
     string abv = codigo.substr(0,2);
     int numCurso = stoi(codigo.substr(2,4));
@@ -533,11 +537,11 @@ Outputs:
 string pedirNomCurso(){
 /*
 Inputs: 
-        
+        na
 Process:
-        
+        Asks user for course name
 Outputs:
-
+        Course name, for the respective function
 */
     string nombreC;
     cout<<"Ingrese el nombre del curso: ";
@@ -549,11 +553,11 @@ Outputs:
 string pedirAbvCurso(){
 /*
 Inputs: 
-        
+        na
 Process:
-        
+        Asks user for School reference
 Outputs:
-
+        School reference, for the respective function
 */
     string abvC;
     cout<<"Ingrese la escuela del curso (Ej. IC, MA..): ";
@@ -743,11 +747,12 @@ Outputs:
 estudiante* buscarEst(int carnetEst){
 /*
 Inputs: 
-        
+        Student id we are looking for
 Process:
-        
+        Runs students list in order to look for a collision
+        in internal student codes.
 Outputs:
-
+        If so, returns ptr to semester, if not, NULL
 */
     //cout<<"t"<<endl;
     estudiante *temp = listaEstudiantes;
@@ -931,11 +936,14 @@ Outputs:
 grupo* buscarGrupoEst(int carnetEst, int codG){
 /*
 Inputs: 
-        
+        Student id, and group id we are looking for
 Process:
-        
+        Runs students list in order to look for a collision
+        in internal student codes, and to compare it with
+        group codes.
 Outputs:
-
+        If so, returns ptr to Group where the student is, 
+        if not, NULL
 */
     estudiante* tempEst = buscarEst(carnetEst);
     if(tempEst == NULL){
@@ -959,11 +967,12 @@ Outputs:
 grupo* encontrarGrupo(string codigo, int numGrupo){
 /*
 Inputs: 
-        
+        Group code and number we are looking for
 Process:
-        
+        Runs groups list in order to look for a collision
+        in internal student codes.
 Outputs:
-
+        If so, returns ptr to semester, if not, NULL
 */
 
     curso* tempCurso = buscarCurso(codigo);
@@ -1141,11 +1150,12 @@ Outputs:
 administrador* buscarAdmin(string nombreA){
 /*
 Inputs: 
-        
+        Admin's name we are looking for
 Process:
-        
+        Runs admins list in order to look for a collision
+        in internal admins names.
 Outputs:
-
+        If so, returns ptr to admin, if not, NULL
 */
     administrador* temp = listaAdministradores;
     while(temp!= NULL){
@@ -1206,11 +1216,12 @@ Outputs:
 int pedirCedulaProf(){
 /*
 Inputs: 
-        
+       NA 
 Process:
-        
+        Asks user for the id, verifies the input goes only for numbers, 
+        and then returns it.
 Outputs:
-
+        Id inserted by the user, already verified as only numbers
 */
     int cedulaP;
     cout<<"Ingrese la cedula: ";
@@ -1227,11 +1238,13 @@ Outputs:
 profesor* buscarProf(int cedulaP){
 /*
 Inputs: 
-        
+        Teacher's we want to check about id.
 Process:
-        
+        Goes from the begginning of teachers list, to the end
+        comparing the struct's id to the one the function received,
 Outputs:
-
+        The pointer to the struct where there was a collission in
+        the id, or null ptr.
 */
     profesor *temp = listaProfesores;
     while(temp != NULL){
@@ -1259,6 +1272,14 @@ Outputs:
 }
 
 void insertarProf(int cedulaP, string nombreP){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
 
     profesor*nP = new profesor(nombreP, cedulaP);
     
@@ -1354,14 +1375,17 @@ Outputs:
     }
 }
 
-grupo* buscarGrupoProfe(int cedulaP, string codCurso, int numG){
+grupo* buscarGrupoProfe(int cedulaP, string codCurso){
 /*
 Inputs: 
-        
+        Teacher's we want to check about id.
+        Course Id we want to check about.
 Process:
-        
+        Goes from the begginning of teacher's groups list, to the end
+        comparing the struct's id to the one the function received,
 Outputs:
-
+        The pointer to the struct where there was a collission in
+        the id, or null ptr.
 */
     profesor* tempP = buscarProf(cedulaP);
 
@@ -1373,7 +1397,7 @@ Outputs:
             return NULL;
         }
         else{
-            //int numG = pedirNumGrupo();
+            int numG = pedirNumGrupo();
             int idG = 100*(stoi(codCurso.substr(2,4))) + numG;
             while(tempG != NULL){
                 if(tempG->enlaceGrupo->idCurso == idG){
@@ -1481,7 +1505,7 @@ Outputs:
         cout<<"Grupo no encontrado"<<endl;
         return;
     }else{
-        grupo* buscar = buscarGrupoProfe(cedulaP, codigo, numG);
+        grupo* buscar = buscarGrupoProfe(cedulaP, codigo);
         if(buscar != NULL){
             cout<<"El profesor ya se encuentra asignado a este grupo"<<endl;
         }else{
@@ -1495,11 +1519,12 @@ Outputs:
 void imprimirProfesores(){
 /*
 Inputs: 
-        
+        na
 Process:
-        
+        runs teachers lists in order to print their information
+        using  ptrs
 Outputs:
-
+        cout of the information
 */
     if(listaProfesores == NULL)
         cout<<"\nNo hay profesores en la lista"<<endl;
@@ -1517,11 +1542,12 @@ Outputs:
 void imprimirAdmins(){
 /*
 Inputs: 
-        
+        na
 Process:
-        
+        runs admins lists in order to print their information
+        using  ptrs
 Outputs:
-
+        cout of the information
 */
     if(listaAdministradores == NULL)
         cout<<"\nNo hay administradores en la lista"<<endl;
@@ -1539,13 +1565,18 @@ Outputs:
 void imprimirEstudiantes(){
 /*
 Inputs: 
-        
+        na
 Process:
-        
+        runs students lists in order to print their information
+        using  ptrs
 Outputs:
-
+        cout of the information
 */
     estudiante *temp = listaEstudiantes;
+    if(temp==NULL){
+        cout<<"No hay estudiantes registrados"<<endl;
+        return;
+    }
     cout<<"Lista de estudiantes: "<<endl;
     while(temp != NULL){
         cout<<"pasando al siguiente"<<endl;
@@ -1557,11 +1588,12 @@ Outputs:
 void imprimirSemestres(){
 /*
 Inputs: 
-        
+        na
 Process:
-        
+        runs semesters lists in order to print their information
+        using  ptrs
 Outputs:
-
+        cout of the information
 */
     semestre *temp = listaSemestres;
     cout<<"Lista de semesetres: "<<endl;
@@ -1576,11 +1608,12 @@ Outputs:
 void mostrarCurso(){
 /*
 Inputs: 
-        
+        na
 Process:
-        
+        runs courses lists in order to print their information
+        using  ptrs
 Outputs:
-
+        cout of the information
 */
     cout<<"Lista de cursos"<<endl;
     if(listaCursos == NULL){
@@ -1937,11 +1970,15 @@ Outputs:
 evaluacion* buscarAct(grupo* tempG, string tipoAct, string numAct){
 /*
 Inputs: 
-        
+        ptr to the group of the evaluation.
+        Evaluation class
+        Number of activity
 Process:
-        
+        Goes from the begginning of evaluations list, to the end
+        comparing the struct's id to the one the function received,
 Outputs:
-
+        The pointer to the struct where there was a collission in
+        the id, or null ptr.
 */
     string idAct = tipoAct.append(numAct);
     if(tempG->listaEvaluacion == NULL){//Empty
@@ -1953,34 +1990,6 @@ Outputs:
                 return tempEn;
             }
             tempEn = tempEn->sigEv;
-        }
-        return NULL;
-    }
-}
-
-evaluacion* buscarEvaluacionProf(string idAct, int cedulaP, string codCurso){
-/*
-Inputs: 
-        
-Process:
-        
-Outputs:
-
-*/
-    int num = pedirNumGrupo();
-    grupo* tempG = buscarGrupoProfe(cedulaP, codCurso, num);
-
-    if(tempG == NULL){
-        cout<<"Grupo no encontrado"<<endl;
-        return NULL;
-    }
-    else{
-        evaluacion *tempEv = tempG->listaEvaluacion;
-        while(tempEv != NULL){
-            if(tempEv->idActividad == idAct){
-                return tempEv;
-            }
-            tempEv = tempEv->sigEv;
         }
         return NULL;
     }
@@ -2042,9 +2051,8 @@ Outputs:
 */
     int cedulaProf = pedirCedulaProf();
     string codigoCurso = pedirCodigoCurso();
-
-    int num = pedirNumGrupo();
-    grupo* tempG = buscarGrupoProfe(cedulaProf, codigoCurso, num);
+    
+    grupo* tempG = buscarGrupoProfe(cedulaProf, codigoCurso);
 
     if(tempG == NULL){
         cout<<"Grupo no encontrado"<<endl;
@@ -2052,15 +2060,43 @@ Outputs:
     }
     else{
         string tipoAct = pedirTipoAct();
-        string numAct = pedirNumAct();   
-        if(buscarAct(tempG, tipoAct, numAct)!=NULL){
-            cout<<"La actividad ya se encuentra registrada en este grupo"<<endl;
-            return;
-        }     
+        string numAct = pedirNumAct();        
         int fechaAct = pedirFechaAct();
         int horaAct = pedirHoraAct();
 
         insertarActProf(tempG, tipoAct, numAct, fechaAct, horaAct);
+    }
+}
+
+evaluacion* buscarEvaluacionProf(string idAct, int cedulaP, string codCurso){
+/*
+Inputs: 
+        The id of the activity we want to search for
+        Teacher's id
+        Course id in the system
+Process:
+        Goes from the begginning of evaluations list, to the end
+        comparing the struct's id to the one the function received,
+Outputs:
+        The pointer to the struct where there was a collission in
+        the id, or null ptr.
+*/
+
+    grupo* tempG = buscarGrupoProfe(cedulaP, codCurso);
+
+    if(tempG == NULL){
+        cout<<"Grupo no encontrado"<<endl;
+        return NULL;
+    }
+    else{
+        evaluacion *tempEv = tempG->listaEvaluacion;
+        while(tempEv != NULL){
+            if(tempEv->idActividad == idAct){
+                return tempEv;
+            }
+            tempEv = tempEv->sigEv;
+        }
+        return NULL;
     }
 }
 
@@ -2101,8 +2137,7 @@ Outputs:
 */
     int cedulaP = pedirCedulaProf();
     string codCurso = pedirCodigoCurso();
-    int num = pedirNumGrupo();
-    grupo* tempG = buscarGrupoProfe(cedulaP, codCurso, num);
+    grupo* tempG = buscarGrupoProfe(cedulaP, codCurso);
 
     if(tempG == NULL){
         cout<<"Grupo no encontrado"<<endl;
@@ -2213,11 +2248,13 @@ Outputs:
 charla* buscarCharla(int codigoS, string idCh){
 /*
 Inputs: 
-        
+        Conference id we are looking for
 Process:
-        
+        Goes from the begginning of teachers list, to the end
+        comparing the struct's id to the one the function received,
 Outputs:
-
+        The pointer to the struct where there was a collission in
+        the id, or null ptr.
 */
     semestre* tempSem = buscarSem(codigoS);
     if(tempSem == NULL){
@@ -2436,38 +2473,6 @@ Outputs:
     }
 }
 
-bool buscarActEst(estudiante* tempEst, evaluacion* tempEv){
-/*
-Inputs: 
-        estudiante* tempEst: the student
-        evaluacion* tempEv: the activity
-Process: 
-        Goes through the list of activities the student has done, if one of them is the activity we're
-        looking for, then it returns it. Else, it returns NULL.
-
-OutPut:
-        NULL: If the student didn't do the activity
-        evaluacionesEntregadas* tempEv: If the student did the activity
-*/
-
-    evaluacionesEntregadas* tempEvaEn = tempEst->evaluacionEst;
-
-    if(tempEvaEn == NULL){
-        return false;
-    }else{
-
-        while(tempEvaEn != NULL){
-
-            if(tempEvaEn->sigEvaluacion == tempEv){
-                return true; 
-            }
-
-            tempEvaEn = tempEvaEn->sig;
-        }
-        return false;
-    }
-}
-
 void agregarActEst(estudiante *tempEst, evaluacion* tempEv){
 /*
 Inputs: 
@@ -2477,12 +2482,6 @@ Process:
 Outputs:
 
 */
-
-    if(buscarActEst(tempEst, tempEv)){
-        cout<<"La actividad ingresada ya se encuentra como entregada o asistida"<<endl;
-        return;
-    }
-
 //Everything exists, add the activity to the list
     evaluacionesEntregadas* nEv = new evaluacionesEntregadas(tempEv);
     
@@ -2554,18 +2553,6 @@ Outputs:
     }
 }
 
-bool buscarCharlaEst(estudiante* tempEst, charla* tempCh){
-
-    enlaceCharla* buscarCh = tempEst->charla;
-
-    while(buscarCh != NULL){
-        if(buscarCh->enCharla == tempCh)
-            return true;
-        buscarCh = buscarCh->sig;
-    }
-    return false;
-}
-
 void insertarCharlaEst(estudiante* tempEst, charla* tempCh){
 /*
 Inputs: 
@@ -2575,10 +2562,7 @@ Process:
 Outputs:
 
 */
-    if(buscarCharlaEst(tempEst, tempCh)){
-        cout<<"Charla ya ingresada como asistida"<<endl;
-        return;
-    }
+    
     enlaceCharla* nEnCh = new enlaceCharla(tempCh); 
     if(tempEst->charla == NULL){//Empty list
         tempEst->charla = nEnCh;
@@ -2627,16 +2611,18 @@ Outputs:
         }
     }
 }
+//..
 //------------------Reports---------------------------------
 
 int fechaHoy(){
 /*
 Inputs: 
-        
+        na
 Process:
-        
+        Using time library, processes today's date
+        Uses today's date to convert it to a specific format
 Outputs:
-
+        Specific format date
 */
 //Returns today's date in yyyy/mm/dd format
     time_t t = time(0);   // gets today's date but in UTC time, (global time)
@@ -2647,11 +2633,11 @@ Outputs:
 int numSemana(int d, int m, int y)
 /*
 Inputs: 
-        
+        Day, Month, Year desired
 Process:
-        
+        Processes a formula to calculate the number of the week
 Outputs:
-
+        Number of the week
 */
 {//Receives day, month and year in ints and calculates the day of the week in int
 //0 for sunday, 1 for monday...
@@ -2663,11 +2649,11 @@ Outputs:
 string nomSemana(int numSem){
 /*
 Inputs: 
-        
+        Number of the day of the week
 Process:
-        
+        Chooses from an array the day
 Outputs:
-
+        Day  chosen
 */
 //Receives the number of the week and returns the name
     string diasSem[7] = {"Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"};
@@ -2677,11 +2663,11 @@ Outputs:
 string nomMes(int numMes){
 /*
 Inputs: 
-        
+        Number of the month of the year
 Process:
-        
+        Chooses from an array the month
 Outputs:
-
+        month chosen
 */
     string meses[12] = {"Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Setiembre", "Octubre", "Noviembre", "Diciembre"};
     return meses[numMes-1];
@@ -2698,7 +2684,7 @@ Outputs:
 */
     //DESPUES SUMARLE 7 A DIA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     int fecha = fechaHoy();
-    int dia = (fecha%100)+7;//We go to next week according to the project's instructions
+    int dia = (fecha%100);//We go to next week according to the project's instructions
     int mes = (fecha%10000)/100;//get month, day and year separated 
     int anno = fecha/10000;
 
@@ -2792,6 +2778,38 @@ Outputs:
         tempS=tempS->sigSem;
     }
     return;
+}
+
+bool buscarActEst(estudiante* tempEst, evaluacion* tempEv){
+/*
+Inputs: 
+        estudiante* tempEst: the student
+        evaluacion* tempEv: the activity
+Process: 
+        Goes through the list of activities the student has done, if one of them is the activity we're
+        looking for, then it returns it. Else, it returns NULL.
+
+OutPut:
+        NULL: If the student didn't do the activity
+        evaluacionesEntregadas* tempEv: If the student did the activity
+*/
+
+    evaluacionesEntregadas* tempEvaEn = tempEst->evaluacionEst;
+
+    if(tempEvaEn == NULL){
+        return false;
+    }else{
+
+        while(tempEvaEn != NULL){
+
+            if(tempEvaEn->sigEvaluacion == tempEv){
+                return true; 
+            }
+
+            tempEvaEn = tempEvaEn->sig;
+        }
+        return false;
+    }
 }
 
 void reporte3(profesor* tempP, int fecha){
@@ -2888,6 +2906,19 @@ Outputs:
         reporte3(tempP, fecha); 
     }   
 }
+
+bool buscarCharlaEst(estudiante* tempEst, charla* tempCh){
+
+    enlaceCharla* buscarCh = tempEst->charla;
+
+    while(buscarCh != NULL){
+        if(buscarCh->enCharla == tempCh)
+            return true;
+        buscarCh = buscarCh->sig;
+    }
+    return false;
+}
+
 
 void reporte4(){
 /*
@@ -3013,7 +3044,14 @@ Outputs:
 }
 
 string grupoActEst(estudiante* tempEst, evaluacion* tempEv){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
 
+*/ 
     enlazarGrupo* tempG = tempEst->gruposEstAux;
 
     while(tempG != NULL){
@@ -3029,6 +3067,29 @@ string grupoActEst(estudiante* tempEst, evaluacion* tempEv){
         tempG = tempG->sigEn;
     }
     return "";
+}
+
+charla* buscarSemFecha(int fechaSem){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/ 
+    semestre* tempSem = listaSemestres;
+    while(tempSem != NULL){
+        charla* tempCh = tempSem->listaCharlas;
+        while(tempCh != NULL){
+            if(tempCh->fecha == fechaSem){
+                return tempCh;
+            }
+            tempCh = tempCh->sigCharla;
+        }
+        tempSem = tempSem->sigSem;
+    }
+    return NULL;
 }
 
 void reporte6(){  
@@ -3808,18 +3869,13 @@ Outputs:
 }
 
 void menuPrincipal(){
-    /*
-    F: Displays the main menu for user to choose between Administrator or User.
-    I: Number of choice.
-    O: Respective function in the system.
-    */
 /*
 Inputs: 
-        
+        Number of choice.
 Process:
-        
+        Displays the main menu for user to choose between Administrator or User.
 Outputs:
-
+        Respective function in the system.
 */
     cout<<"\n\n"<<endl;
     cout<<"----------------------------------------------------------------"<<endl;
@@ -3907,8 +3963,8 @@ Outputs:
     insertarGrupo("MA3098", buscarCurso("MA3098"), 21);//Probabilidad, grupo 21
     insertarGrupo("MA3098", buscarCurso("MA3098"), 20);//Probabilidad, grupo 20
     cout<<"\tAsignado profesores a grupos\n";
-    relacionarGrupoProf(buscarProf(11833), encontrarGrupo("IC3101", 51));//Jose Ortega Granados, Arqui, grupo 51
-    relacionarGrupoProf(buscarProf(11833), encontrarGrupo("IC3101", 50));//Jose Ortega Granados, Arqui, grupo 50
+    relacionarGrupoProf(buscarProf(11833), encontrarGrupo("IC3101", 51));//Jose Ortega Granados, Arqui, grupo 50
+    relacionarGrupoProf(buscarProf(11833), encontrarGrupo("IC3101", 50));//Jose Ortega Granados, Arqui, grupo 51
     relacionarGrupoProf(buscarProf(84728), encontrarGrupo("IC3101", 53));//Gerardo Gonzales Ferrero, Arqui, grupo 53   
     relacionarGrupoProf(buscarProf(84728), encontrarGrupo("IC3101", 52));//Gerardo Gonzales Ferrero, Arqui, grupo 52  
     relacionarGrupoProf(buscarProf(84728), encontrarGrupo("IC3101", 54));//Gerardo Gonzales Ferrero, Arqui, grupo 54  
@@ -3930,6 +3986,7 @@ Outputs:
     //Arqui, grupo 51
     relacionarGrupoEst(buscarEst(202105), encontrarGrupo("IC3101", 51));//Earl grupo 51
     relacionarGrupoEst(buscarEst(201705), encontrarGrupo("IC3101", 51));//Carmen grupo 51
+    relacionarGrupoEst(buscarEst(201798), encontrarGrupo("IC3101", 51));//Valery grupo 51
     relacionarGrupoEst(buscarEst(202115), encontrarGrupo("IC3101", 51));//Jeremy grupo 51
     relacionarGrupoEst(buscarEst(201933), encontrarGrupo("IC3101", 51));//Javier grupo 51
     //Estructuras, grupo 20
@@ -3961,7 +4018,6 @@ Outputs:
     agregarActEst(buscarEst(202006), buscarAct(encontrarGrupo("IC3101", 50), "Examen", "1"));//Brenda
     agregarActEst(buscarEst(201935), buscarAct(encontrarGrupo("IC3101", 50), "Gira", "1"));//Crystel 50 IC3101
     agregarActEst(buscarEst(201935), buscarAct(encontrarGrupo("IC3101", 50), "Examen", "1"));//Crystel
-
     agregarActEst(buscarEst(202105), buscarAct(encontrarGrupo("IC3101", 51), "Proyecto", "1"));//Earl 51 IC3101
     agregarActEst(buscarEst(201705), buscarAct(encontrarGrupo("IC3101", 51), "Proyecto", "1"));//Carmen 51 IC3101
     agregarActEst(buscarEst(201705), buscarAct(encontrarGrupo("IC3101", 51), "Examen", "2"));//Carmen 51 IC3101
