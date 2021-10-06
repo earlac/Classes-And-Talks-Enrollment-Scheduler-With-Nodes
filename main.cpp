@@ -1354,7 +1354,7 @@ Outputs:
     }
 }
 
-grupo* buscarGrupoProfe(int cedulaP, string codCurso){
+grupo* buscarGrupoProfe(int cedulaP, string codCurso, int numG){
 /*
 Inputs: 
         
@@ -1373,7 +1373,7 @@ Outputs:
             return NULL;
         }
         else{
-            int numG = pedirNumGrupo();
+            //int numG = pedirNumGrupo();
             int idG = 100*(stoi(codCurso.substr(2,4))) + numG;
             while(tempG != NULL){
                 if(tempG->enlaceGrupo->idCurso == idG){
@@ -1481,7 +1481,7 @@ Outputs:
         cout<<"Grupo no encontrado"<<endl;
         return;
     }else{
-        grupo* buscar = buscarGrupoProfe(cedulaP, codigo);
+        grupo* buscar = buscarGrupoProfe(cedulaP, codigo, numG);
         if(buscar != NULL){
             cout<<"El profesor ya se encuentra asignado a este grupo"<<endl;
         }else{
@@ -1958,6 +1958,34 @@ Outputs:
     }
 }
 
+evaluacion* buscarEvaluacionProf(string idAct, int cedulaP, string codCurso){
+/*
+Inputs: 
+        
+Process:
+        
+Outputs:
+
+*/
+    int num = pedirNumGrupo();
+    grupo* tempG = buscarGrupoProfe(cedulaP, codCurso, num);
+
+    if(tempG == NULL){
+        cout<<"Grupo no encontrado"<<endl;
+        return NULL;
+    }
+    else{
+        evaluacion *tempEv = tempG->listaEvaluacion;
+        while(tempEv != NULL){
+            if(tempEv->idActividad == idAct){
+                return tempEv;
+            }
+            tempEv = tempEv->sigEv;
+        }
+        return NULL;
+    }
+}
+
 void insertarActProf(grupo* tempG, string tipoAct, string numAct, int fechaAct, int horaAct){
 /*
 Inputs: 
@@ -2014,8 +2042,9 @@ Outputs:
 */
     int cedulaProf = pedirCedulaProf();
     string codigoCurso = pedirCodigoCurso();
-    
-    grupo* tempG = buscarGrupoProfe(cedulaProf, codigoCurso);
+
+    int num = pedirNumGrupo();
+    grupo* tempG = buscarGrupoProfe(cedulaProf, codigoCurso, num);
 
     if(tempG == NULL){
         cout<<"Grupo no encontrado"<<endl;
@@ -2023,39 +2052,15 @@ Outputs:
     }
     else{
         string tipoAct = pedirTipoAct();
-        string numAct = pedirNumAct();        
+        string numAct = pedirNumAct();   
+        if(buscarAct(tempG, tipoAct, numAct)!=NULL){
+            cout<<"La actividad ya se encuentra registrada en este grupo"<<endl;
+            return;
+        }     
         int fechaAct = pedirFechaAct();
         int horaAct = pedirHoraAct();
 
         insertarActProf(tempG, tipoAct, numAct, fechaAct, horaAct);
-    }
-}
-
-evaluacion* buscarEvaluacionProf(string idAct, int cedulaP, string codCurso){
-/*
-Inputs: 
-        
-Process:
-        
-Outputs:
-
-*/
-
-    grupo* tempG = buscarGrupoProfe(cedulaP, codCurso);
-
-    if(tempG == NULL){
-        cout<<"Grupo no encontrado"<<endl;
-        return NULL;
-    }
-    else{
-        evaluacion *tempEv = tempG->listaEvaluacion;
-        while(tempEv != NULL){
-            if(tempEv->idActividad == idAct){
-                return tempEv;
-            }
-            tempEv = tempEv->sigEv;
-        }
-        return NULL;
     }
 }
 
@@ -2096,7 +2101,8 @@ Outputs:
 */
     int cedulaP = pedirCedulaProf();
     string codCurso = pedirCodigoCurso();
-    grupo* tempG = buscarGrupoProfe(cedulaP, codCurso);
+    int num = pedirNumGrupo();
+    grupo* tempG = buscarGrupoProfe(cedulaP, codCurso, num);
 
     if(tempG == NULL){
         cout<<"Grupo no encontrado"<<endl;
@@ -3901,8 +3907,8 @@ Outputs:
     insertarGrupo("MA3098", buscarCurso("MA3098"), 21);//Probabilidad, grupo 21
     insertarGrupo("MA3098", buscarCurso("MA3098"), 20);//Probabilidad, grupo 20
     cout<<"\tAsignado profesores a grupos\n";
-    relacionarGrupoProf(buscarProf(11833), encontrarGrupo("IC3101", 51));//Jose Ortega Granados, Arqui, grupo 50
-    relacionarGrupoProf(buscarProf(11833), encontrarGrupo("IC3101", 50));//Jose Ortega Granados, Arqui, grupo 51
+    relacionarGrupoProf(buscarProf(11833), encontrarGrupo("IC3101", 51));//Jose Ortega Granados, Arqui, grupo 51
+    relacionarGrupoProf(buscarProf(11833), encontrarGrupo("IC3101", 50));//Jose Ortega Granados, Arqui, grupo 50
     relacionarGrupoProf(buscarProf(84728), encontrarGrupo("IC3101", 53));//Gerardo Gonzales Ferrero, Arqui, grupo 53   
     relacionarGrupoProf(buscarProf(84728), encontrarGrupo("IC3101", 52));//Gerardo Gonzales Ferrero, Arqui, grupo 52  
     relacionarGrupoProf(buscarProf(84728), encontrarGrupo("IC3101", 54));//Gerardo Gonzales Ferrero, Arqui, grupo 54  
