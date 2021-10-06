@@ -325,10 +325,6 @@ Outputs:
 
     semestre *nS = new semestre(semS, annoS, codigoS, presupuestoS);
 
-    if(buscarSem(codigoS)!=NULL){
-        cout<< "Ya existe un semestre con estas directrices."<<endl;
-    }
-
     //if list is empty
     if(listaSemestres == NULL){
         
@@ -388,6 +384,9 @@ Outputs:
 */
     int annoS = pedirAnnoSem();
     int semS = pedirNumSem();
+    if(buscarSem(10*annoS+semS)!=NULL){
+        cout<< "Ya existe un semestre con estas directrices."<<endl;
+    }
     int presupuestoS = pedirPresupuestoSem();
     insertarSemestre(annoS, semS, presupuestoS);
 }
@@ -2431,6 +2430,38 @@ Outputs:
     }
 }
 
+bool buscarActEst(estudiante* tempEst, evaluacion* tempEv){
+/*
+Inputs: 
+        estudiante* tempEst: the student
+        evaluacion* tempEv: the activity
+Process: 
+        Goes through the list of activities the student has done, if one of them is the activity we're
+        looking for, then it returns it. Else, it returns NULL.
+
+OutPut:
+        NULL: If the student didn't do the activity
+        evaluacionesEntregadas* tempEv: If the student did the activity
+*/
+
+    evaluacionesEntregadas* tempEvaEn = tempEst->evaluacionEst;
+
+    if(tempEvaEn == NULL){
+        return false;
+    }else{
+
+        while(tempEvaEn != NULL){
+
+            if(tempEvaEn->sigEvaluacion == tempEv){
+                return true; 
+            }
+
+            tempEvaEn = tempEvaEn->sig;
+        }
+        return false;
+    }
+}
+
 void agregarActEst(estudiante *tempEst, evaluacion* tempEv){
 /*
 Inputs: 
@@ -2440,6 +2471,12 @@ Process:
 Outputs:
 
 */
+
+    if(buscarActEst(tempEst, tempEv)){
+        cout<<"La actividad ingresada ya se encuentra como entregada o asistida"<<endl;
+        return;
+    }
+
 //Everything exists, add the activity to the list
     evaluacionesEntregadas* nEv = new evaluacionesEntregadas(tempEv);
     
@@ -2511,6 +2548,18 @@ Outputs:
     }
 }
 
+bool buscarCharlaEst(estudiante* tempEst, charla* tempCh){
+
+    enlaceCharla* buscarCh = tempEst->charla;
+
+    while(buscarCh != NULL){
+        if(buscarCh->enCharla == tempCh)
+            return true;
+        buscarCh = buscarCh->sig;
+    }
+    return false;
+}
+
 void insertarCharlaEst(estudiante* tempEst, charla* tempCh){
 /*
 Inputs: 
@@ -2520,7 +2569,10 @@ Process:
 Outputs:
 
 */
-    
+    if(buscarCharlaEst(tempEst, tempCh)){
+        cout<<"Charla ya ingresada como asistida"<<endl;
+        return;
+    }
     enlaceCharla* nEnCh = new enlaceCharla(tempCh); 
     if(tempEst->charla == NULL){//Empty list
         tempEst->charla = nEnCh;
@@ -2640,7 +2692,7 @@ Outputs:
 */
     //DESPUES SUMARLE 7 A DIA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     int fecha = fechaHoy();
-    int dia = (fecha%100);//We go to next week according to the project's instructions
+    int dia = (fecha%100)+7;//We go to next week according to the project's instructions
     int mes = (fecha%10000)/100;//get month, day and year separated 
     int anno = fecha/10000;
 
@@ -2734,38 +2786,6 @@ Outputs:
         tempS=tempS->sigSem;
     }
     return;
-}
-
-bool buscarActEst(estudiante* tempEst, evaluacion* tempEv){
-/*
-Inputs: 
-        estudiante* tempEst: the student
-        evaluacion* tempEv: the activity
-Process: 
-        Goes through the list of activities the student has done, if one of them is the activity we're
-        looking for, then it returns it. Else, it returns NULL.
-
-OutPut:
-        NULL: If the student didn't do the activity
-        evaluacionesEntregadas* tempEv: If the student did the activity
-*/
-
-    evaluacionesEntregadas* tempEvaEn = tempEst->evaluacionEst;
-
-    if(tempEvaEn == NULL){
-        return false;
-    }else{
-
-        while(tempEvaEn != NULL){
-
-            if(tempEvaEn->sigEvaluacion == tempEv){
-                return true; 
-            }
-
-            tempEvaEn = tempEvaEn->sig;
-        }
-        return false;
-    }
 }
 
 void reporte3(profesor* tempP, int fecha){
@@ -2862,19 +2882,6 @@ Outputs:
         reporte3(tempP, fecha); 
     }   
 }
-
-bool buscarCharlaEst(estudiante* tempEst, charla* tempCh){
-
-    enlaceCharla* buscarCh = tempEst->charla;
-
-    while(buscarCh != NULL){
-        if(buscarCh->enCharla == tempCh)
-            return true;
-        buscarCh = buscarCh->sig;
-    }
-    return false;
-}
-
 
 void reporte4(){
 /*
@@ -3016,21 +3023,6 @@ string grupoActEst(estudiante* tempEst, evaluacion* tempEv){
         tempG = tempG->sigEn;
     }
     return "";
-}
-
-charla* buscarSemFecha(int fechaSem){
-    semestre* tempSem = listaSemestres;
-    while(tempSem != NULL){
-        charla* tempCh = tempSem->listaCharlas;
-        while(tempCh != NULL){
-            if(tempCh->fecha == fechaSem){
-                return tempCh;
-            }
-            tempCh = tempCh->sigCharla;
-        }
-        tempSem = tempSem->sigSem;
-    }
-    return NULL;
 }
 
 void reporte6(){  
@@ -3932,7 +3924,6 @@ Outputs:
     //Arqui, grupo 51
     relacionarGrupoEst(buscarEst(202105), encontrarGrupo("IC3101", 51));//Earl grupo 51
     relacionarGrupoEst(buscarEst(201705), encontrarGrupo("IC3101", 51));//Carmen grupo 51
-    relacionarGrupoEst(buscarEst(201798), encontrarGrupo("IC3101", 51));//Valery grupo 51
     relacionarGrupoEst(buscarEst(202115), encontrarGrupo("IC3101", 51));//Jeremy grupo 51
     relacionarGrupoEst(buscarEst(201933), encontrarGrupo("IC3101", 51));//Javier grupo 51
     //Estructuras, grupo 20
@@ -3964,6 +3955,7 @@ Outputs:
     agregarActEst(buscarEst(202006), buscarAct(encontrarGrupo("IC3101", 50), "Examen", "1"));//Brenda
     agregarActEst(buscarEst(201935), buscarAct(encontrarGrupo("IC3101", 50), "Gira", "1"));//Crystel 50 IC3101
     agregarActEst(buscarEst(201935), buscarAct(encontrarGrupo("IC3101", 50), "Examen", "1"));//Crystel
+
     agregarActEst(buscarEst(202105), buscarAct(encontrarGrupo("IC3101", 51), "Proyecto", "1"));//Earl 51 IC3101
     agregarActEst(buscarEst(201705), buscarAct(encontrarGrupo("IC3101", 51), "Proyecto", "1"));//Carmen 51 IC3101
     agregarActEst(buscarEst(201705), buscarAct(encontrarGrupo("IC3101", 51), "Examen", "2"));//Carmen 51 IC3101
